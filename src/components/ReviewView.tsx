@@ -234,17 +234,24 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
             prev.map((c) => (c.id === currentCard.id ? { ...c, status: 2 } : c))
         );
         if (reviewMode === "writing") {
-            // Writing モード: 習得済みを後ろに回すため shuffledCards をリセットして再ソート
-            setShuffledCards(null);
+            // Writing モード: 習得済みを末尾に移動してシャッフル順を更新
+            setShuffledSets((prev) => {
+                const current = prev.writing;
+                if (!current) return prev;
+                const remaining = current.filter((c) => c.id !== currentCard.id);
+                const mastered = { ...currentCard, status: 2 as const };
+                return { ...prev, writing: [...remaining, mastered] };
+            });
             const newIndex = currentIndex >= displayCards.length - 1 ? 0 : currentIndex;
             setCurrentIndex(newIndex);
         } else {
             // 通常モード: シャッフル済みリストからも除外
-            if (shuffledCards) {
-                setShuffledCards((prev) =>
-                    prev ? prev.filter((c) => c.id !== currentCard.id) : null
-                );
-            }
+            setShuffledSets((prev) => {
+                const key = reviewMode as "unlearned" | "all";
+                const current = prev[key];
+                if (!current) return prev;
+                return { ...prev, [key]: current.filter((c) => c.id !== currentCard.id) };
+            });
             const newIndex = currentIndex >= displayCards.length - 1 ? 0 : currentIndex;
             setCurrentIndex(newIndex);
         }
