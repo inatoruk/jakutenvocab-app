@@ -267,16 +267,15 @@ export default function WordListView({ active }: { active: boolean }) {
             {/* 編集モーダル */}
             {editingWord && (
                 <div
-                    className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
                     onClick={closeEdit}
                 >
-                    <div className="min-h-full flex items-center justify-center p-4">
-                        <div
-                            className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-5 pb-8 space-y-4 animate-slide-up"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-base font-bold text-gray-800">
+                    <div
+                        className="w-full max-w-2xl max-h-full overflow-y-auto bg-white rounded-2xl shadow-xl p-5 pb-8 space-y-4 animate-slide-up"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-base font-bold text-gray-800">
                                 単語を編集
                             </h3>
                             <button
@@ -391,7 +390,6 @@ export default function WordListView({ active }: { active: boolean }) {
                                 )}
                                 {saving ? "保存中..." : "保存"}
                             </button>
-                        </div>
                         </div>
                     </div>
                 </div>

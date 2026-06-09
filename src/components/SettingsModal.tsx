@@ -131,15 +131,14 @@ export default function SettingsModal({ settings, onChange, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={onClose}
     >
-      <div className="min-h-full flex items-center justify-center p-4">
-        <div
-          className="settings-modal w-full max-w-2xl rounded-2xl shadow-2xl p-5 pb-10 space-y-6 animate-slide-up"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* ヘッダー */}
+      <div
+        className="settings-modal w-full max-w-2xl max-h-full overflow-y-auto rounded-2xl shadow-2xl p-5 pb-10 space-y-6 animate-slide-up"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ヘッダー */}
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold settings-text-primary">設定</h2>
           <button
@@ -318,7 +317,6 @@ export default function SettingsModal({ settings, onChange, onClose }: Props) {
             初期化を実行すると全ての単語データが削除されます
           </p>
         </section>
-        </div>
       </div>
     </div>
   );

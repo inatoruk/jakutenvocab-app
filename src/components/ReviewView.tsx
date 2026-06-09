@@ -85,73 +85,79 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         return base;
     }, [allCards, reviewMode, settings.reviewOrder, settings.reviewCount]);
 
-    const [shuffledCards, setShuffledCards] = useState<Vocab[] | null>(null);
+    // モードごとのシャッフル済みカードを保持
+    const [shuffledSets, setShuffledSets] = useState<{
+        unlearned: Vocab[] | null;
+        all: Vocab[] | null;
+        writing: Vocab[] | null;
+    }>({ unlearned: null, all: null, writing: null });
 
-    // cards の最新参照を保持する Ref
-    const cardsRef = useRef(cards);
+    // allCards の最新参照を保持する Ref
+    const allCardsRef = useRef(allCards);
     useEffect(() => {
-        cardsRef.current = cards;
-    }, [cards]);
+        allCardsRef.current = allCards;
+    }, [allCards]);
 
-    // 直前の状態を保持する Ref 群
+    // 直前の active 状態を保持する Ref
     const prevActiveRef = useRef(active);
+    // 直前の reviewMode を保持する Ref（インデックスリセット用）
     const prevModeRef = useRef(reviewMode);
 
-    // シャッフル制御:
-    // - タブを開いた瞬間 → シャッフル実行
-    // - モード切り替え時 → shuffledCards をクリア（再シャッフルはしない）
-    // - 設定変更など他のタイミング → 何もしない（順番を保持）
+    // シャッフルユーティリティ
+    const shuffleArr = (arr: Vocab[]): Vocab[] => {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    };
+
+    // タブを開いた瞬間に全モードのシャッフルをまとめて実行
     useEffect(() => {
         const isTabOpened = prevActiveRef.current === false && active === true;
-        const isModeChanged = prevModeRef.current !== reviewMode;
-
         prevActiveRef.current = active;
-        prevModeRef.current = reviewMode;
-
-        if (isModeChanged) {
-            // モードが変わったら古いシャッフル状態をクリアして自然順を表示
-            setShuffledCards(null);
-            setCurrentIndex(0);
-            setShowAnswer(false);
-            return;
-        }
 
         if (!isTabOpened) return;
 
         if (settings.reviewOrder === "random") {
-            // タブを開いた瞬間にシャッフルを実行する
-            const currentCards = cardsRef.current;
-            if (currentCards.length > 0) {
-                if (reviewMode === "writing") {
-                    const unlearned = currentCards.filter((c) => c.status !== 2);
-                    const mastered = currentCards.filter((c) => c.status === 2);
-                    const shuffleArr = (arr: Vocab[]) => {
-                        const a = [...arr];
-                        for (let i = a.length - 1; i > 0; i--) {
-                            const j = Math.floor(Math.random() * (i + 1));
-                            [a[i], a[j]] = [a[j], a[i]];
-                        }
-                        return a;
-                    };
-                    setShuffledCards([...shuffleArr(unlearned), ...mastered]);
-                } else {
-                    const arr = [...currentCards];
-                    for (let i = arr.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [arr[i], arr[j]] = [arr[j], arr[i]];
-                    }
-                    setShuffledCards(arr);
-                }
-                setCurrentIndex(0);
-                setShowAnswer(false);
-            }
-        } else {
-            // ランダム以外の場合はシャッフル状態をクリア
-            setShuffledCards(null);
-        }
-    }, [active, reviewMode]);
+            const all = allCardsRef.current;
+            const limit = settings.reviewCount;
+            const applyLimit = <T,>(arr: T[]) => (limit !== 9999 ? arr.slice(0, limit) : arr);
 
-    const displayCards = shuffledCards ?? cards;
+            // unlearned モード
+            const unlearnedBase = all.filter((c) => c.status === 0 || c.status === 1);
+            const unlearnedShuffled = shuffleArr(applyLimit(unlearnedBase));
+
+            // all モード
+            const allShuffled = shuffleArr(applyLimit([...all]));
+
+            // writing モード（未習得をシャッフル後、習得済みを末尾に固定）
+            const writingAll = all.filter((c) => c.category === "Writing");
+            const writingUnlearned = shuffleArr(writingAll.filter((c) => c.status !== 2));
+            const writingMastered = writingAll.filter((c) => c.status === 2);
+            const writingShuffled = applyLimit([...writingUnlearned, ...writingMastered]);
+
+            setShuffledSets({ unlearned: unlearnedShuffled, all: allShuffled, writing: writingShuffled });
+        } else {
+            setShuffledSets({ unlearned: null, all: null, writing: null });
+        }
+        setCurrentIndex(0);
+        setShowAnswer(false);
+    }, [active]);
+
+    // モード切り替え時はインデックスと回答表示をリセット（シャッフルはしない）
+    useEffect(() => {
+        if (prevModeRef.current !== reviewMode) {
+            prevModeRef.current = reviewMode;
+            setCurrentIndex(0);
+            setShowAnswer(false);
+        }
+    }, [reviewMode]);
+
+    const displayCards = (settings.reviewOrder === "random" && shuffledSets[reviewMode] !== null)
+        ? shuffledSets[reviewMode]!
+        : cards;
     const safeIndex = Math.min(currentIndex, Math.max(displayCards.length - 1, 0));
     const currentCard = displayCards[safeIndex] ?? null;
 
