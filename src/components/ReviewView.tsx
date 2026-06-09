@@ -278,7 +278,6 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
 
     function handleModeChange(mode: ReviewMode) {
         setReviewMode(mode);
-        setShuffledCards(null);
         setCurrentIndex(0);
         setShowAnswer(false);
     }
@@ -286,24 +285,13 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
     function handleShuffle() {
         if (reviewMode === "writing") {
             // Writing モード: 未習得グループのみシャッフル、習得済みは後ろに固定
-            const unlearned = cards.filter((c) => c.status !== 2);
-            const mastered = cards.filter((c) => c.status === 2);
-            const shuffleArr = (arr: Vocab[]) => {
-                const a = [...arr];
-                for (let i = a.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [a[i], a[j]] = [a[j], a[i]];
-                }
-                return a;
-            };
-            setShuffledCards([...shuffleArr(unlearned), ...mastered]);
+            const unlearned = displayCards.filter((c) => c.status !== 2);
+            const mastered = displayCards.filter((c) => c.status === 2);
+            const shuffled = [...shuffleArr(unlearned), ...mastered];
+            setShuffledSets((prev) => ({ ...prev, writing: shuffled }));
         } else {
-            const arr = [...cards];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            setShuffledCards(arr);
+            const shuffled = shuffleArr([...displayCards]);
+            setShuffledSets((prev) => ({ ...prev, [reviewMode]: shuffled }));
         }
         setCurrentIndex(0);
         setShowAnswer(false);
