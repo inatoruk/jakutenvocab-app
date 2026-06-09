@@ -93,20 +93,33 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         cardsRef.current = cards;
     }, [cards]);
 
-    // 直前の active 状態を保持する Ref
+    // 直前の状態を保持する Ref 群
     const prevActiveRef = useRef(active);
+    const prevModeRef = useRef(reviewMode);
 
-    // タブを開いた瞬間のみ自動シャッフルを実行する
+    // シャッフル制御:
+    // - タブを開いた瞬間 → シャッフル実行
+    // - モード切り替え時 → shuffledCards をクリア（再シャッフルはしない）
+    // - 設定変更など他のタイミング → 何もしない（順番を保持）
     useEffect(() => {
         const isTabOpened = prevActiveRef.current === false && active === true;
+        const isModeChanged = prevModeRef.current !== reviewMode;
 
-        // Ref の更新
         prevActiveRef.current = active;
+        prevModeRef.current = reviewMode;
+
+        if (isModeChanged) {
+            // モードが変わったら古いシャッフル状態をクリアして自然順を表示
+            setShuffledCards(null);
+            setCurrentIndex(0);
+            setShowAnswer(false);
+            return;
+        }
 
         if (!isTabOpened) return;
 
         if (settings.reviewOrder === "random") {
-            // シャッフルを実行する
+            // タブを開いた瞬間にシャッフルを実行する
             const currentCards = cardsRef.current;
             if (currentCards.length > 0) {
                 if (reviewMode === "writing") {
@@ -136,7 +149,7 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
             // ランダム以外の場合はシャッフル状態をクリア
             setShuffledCards(null);
         }
-    }, [active]);
+    }, [active, reviewMode]);
 
     const displayCards = shuffledCards ?? cards;
     const safeIndex = Math.min(currentIndex, Math.max(displayCards.length - 1, 0));
