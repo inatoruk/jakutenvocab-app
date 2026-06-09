@@ -4,10 +4,20 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Vocab } from "@/types/vocab";
-import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle } from "lucide-react";
+import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen } from "lucide-react";
 import { AppSettings } from "@/lib/settings";
 
 type ReviewMode = "unlearned" | "all" | "writing";
+
+/** Fisher-Yates shuffle */
+function shuffleArr<T>(arr: T[]): T[] {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
 
 export default function ReviewView({ active, settings }: { active: boolean; settings: AppSettings }) {
     const [allCards, setAllCards] = useState<Vocab[]>([]);
@@ -15,6 +25,7 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
     const [showAnswer, setShowAnswer] = useState(false);
     const [loading, setLoading] = useState(true);
     const [reviewMode, setReviewMode] = useState<ReviewMode>("unlearned");
+    const [showCompletion, setShowCompletion] = useState(false);
     const initialLoadDone = useRef(false);
 
     const fetchCards = useCallback(async (silent = false) => {
@@ -43,14 +54,32 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         }
     }, [active, fetchCards]);
 
-    // クライアント側でフィルタリング + 出題順・枚数適用
+    // -----------------------------------------------------------------------
+    // cards: フィルタ + ソート + 枚数制限（シャッフルなし）
+    // 未習得モードでは未学習(status=0)を先、学習中(status=1)を後に並べる
+    // -----------------------------------------------------------------------
     const cards = useMemo(() => {
         let base: Vocab[];
 
         if (reviewMode === "unlearned") {
-            base = allCards.filter((c) => c.status === 0 || c.status === 1);
+            // 未学習(0) → 学習中(1) の順に優先表示
+            const notLearned = allCards.filter((c) => c.status === 0);
+            const inProgress = allCards.filter((c) => c.status === 1);
+            const sortGroup = (arr: Vocab[]) => {
+                if (settings.reviewOrder === "newest") {
+                    return [...arr].sort((a, b) => b.created_at.localeCompare(a.created_at));
+                } else if (settings.reviewOrder === "oldest") {
+                    return [...arr].sort((a, b) => a.created_at.localeCompare(b.created_at));
+                }
+                return arr;
+            };
+            base = [...sortGroup(notLearned), ...sortGroup(inProgress)];
+            if (settings.reviewCount !== 9999) {
+                base = base.slice(0, settings.reviewCount);
+            }
+            return base;
         } else if (reviewMode === "writing") {
-            // Writing のみ: 未習得を先、習得済みを後ろ。設定の順番は各グループ内に適用
+            // Writing のみ: 未習得を先、習得済みを後ろ
             const writingCards = allCards.filter((c) => c.category === "Writing");
             const unlearned = writingCards.filter((c) => c.status !== 2);
             const mastered = writingCards.filter((c) => c.status === 2);
@@ -60,7 +89,7 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
                 } else if (settings.reviewOrder === "oldest") {
                     return [...arr].sort((a, b) => a.created_at.localeCompare(b.created_at));
                 }
-                return arr; // random はシャッフルボタンに任せる
+                return arr;
             };
             base = [...sortGroup(unlearned), ...sortGroup(mastered)];
             if (settings.reviewCount !== 9999) {
@@ -76,7 +105,6 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         } else if (settings.reviewOrder === "oldest") {
             base = [...base].sort((a, b) => a.created_at.localeCompare(b.created_at));
         }
-        // "random" はシャッフルボタンに任せる
 
         if (settings.reviewCount !== 9999) {
             base = base.slice(0, settings.reviewCount);
@@ -85,7 +113,9 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         return base;
     }, [allCards, reviewMode, settings.reviewOrder, settings.reviewCount]);
 
-    // モードごとのシャッフル済みカードを保持
+    // -----------------------------------------------------------------------
+    // shuffledSets: モードごとのシャッフル済みカードを保持
+    // -----------------------------------------------------------------------
     const [shuffledSets, setShuffledSets] = useState<{
         unlearned: Vocab[] | null;
         all: Vocab[] | null;
@@ -98,20 +128,49 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         allCardsRef.current = allCards;
     }, [allCards]);
 
+    // settings の最新参照を保持する Ref（コールバック内で参照するため）
+    const settingsRef = useRef(settings);
+    useEffect(() => {
+        settingsRef.current = settings;
+    }, [settings]);
+
     // 直前の active 状態を保持する Ref
     const prevActiveRef = useRef(active);
     // 直前の reviewMode を保持する Ref（インデックスリセット用）
     const prevModeRef = useRef(reviewMode);
 
-    // シャッフルユーティリティ
-    const shuffleArr = (arr: Vocab[]): Vocab[] => {
-        const a = [...arr];
-        for (let i = a.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [a[i], a[j]] = [a[j], a[i]];
-        }
-        return a;
-    };
+    // -----------------------------------------------------------------------
+    // 新しいセットを構築するユーティリティ
+    // -----------------------------------------------------------------------
+    const buildShuffledSets = useCallback((all: Vocab[], currentMode: ReviewMode) => {
+        const s = settingsRef.current;
+        const limit = s.reviewCount;
+        const applyLimit = <T,>(arr: T[]) => (limit !== 9999 ? arr.slice(0, limit) : arr);
+
+        // unlearned: 未学習(0) → 学習中(1) の優先順でシャッフル
+        const notLearned = all.filter((c) => c.status === 0);
+        const inProgress = all.filter((c) => c.status === 1);
+        // 未学習が全てなくなっていたら学習中のみ
+        const unlearnedBase = notLearned.length > 0
+            ? [...shuffleArr(notLearned), ...shuffleArr(inProgress)]
+            : shuffleArr(inProgress);
+        const unlearnedShuffled = applyLimit(unlearnedBase);
+
+        // all
+        const allShuffled = shuffleArr(applyLimit([...all]));
+
+        // writing: 未習得グループをシャッフル後、習得済みを末尾に固定
+        const writingAll = all.filter((c) => c.category === "Writing");
+        const writingUnlearned = shuffleArr(writingAll.filter((c) => c.status !== 2));
+        const writingMastered = writingAll.filter((c) => c.status === 2);
+        const writingShuffled = applyLimit([...writingUnlearned, ...writingMastered]);
+
+        return {
+            unlearned: unlearnedShuffled,
+            all: allShuffled,
+            writing: writingShuffled,
+        };
+    }, []);
 
     // タブを開いた瞬間に全モードのシャッフルをまとめて実行
     useEffect(() => {
@@ -120,30 +179,15 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
 
         if (!isTabOpened) return;
 
-        if (settings.reviewOrder === "random") {
-            const all = allCardsRef.current;
-            const limit = settings.reviewCount;
-            const applyLimit = <T,>(arr: T[]) => (limit !== 9999 ? arr.slice(0, limit) : arr);
-
-            // unlearned モード
-            const unlearnedBase = all.filter((c) => c.status === 0 || c.status === 1);
-            const unlearnedShuffled = shuffleArr(applyLimit(unlearnedBase));
-
-            // all モード
-            const allShuffled = shuffleArr(applyLimit([...all]));
-
-            // writing モード（未習得をシャッフル後、習得済みを末尾に固定）
-            const writingAll = all.filter((c) => c.category === "Writing");
-            const writingUnlearned = shuffleArr(writingAll.filter((c) => c.status !== 2));
-            const writingMastered = writingAll.filter((c) => c.status === 2);
-            const writingShuffled = applyLimit([...writingUnlearned, ...writingMastered]);
-
-            setShuffledSets({ unlearned: unlearnedShuffled, all: allShuffled, writing: writingShuffled });
+        if (settingsRef.current.reviewOrder === "random") {
+            setShuffledSets(buildShuffledSets(allCardsRef.current, reviewMode));
         } else {
             setShuffledSets({ unlearned: null, all: null, writing: null });
         }
         setCurrentIndex(0);
         setShowAnswer(false);
+        setShowCompletion(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [active]);
 
     // モード切り替え時はインデックスと回答表示をリセット（シャッフルはしない）
@@ -152,6 +196,7 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
             prevModeRef.current = reviewMode;
             setCurrentIndex(0);
             setShowAnswer(false);
+            setShowCompletion(false);
         }
     }, [reviewMode]);
 
@@ -161,7 +206,9 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
     const safeIndex = Math.min(currentIndex, Math.max(displayCards.length - 1, 0));
     const currentCard = displayCards[safeIndex] ?? null;
 
-    // 通常カード: 例文中の単語をハイライト
+    // -----------------------------------------------------------------------
+    // テキストハイライト / 空欄ユーティリティ
+    // -----------------------------------------------------------------------
     function highlightTerm(context: string, term: string) {
         if (!term) return <span>{context}</span>;
         const words = term.trim().split(/\s+/);
@@ -185,7 +232,6 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         );
     }
 
-    // Writing カード: 例文中の単語を下線空欄に置き換え
     function blankTermInContext(context: string, term: string) {
         if (!term || !context) return <span>{context}</span>;
         const words = term.trim().split(/\s+/);
@@ -213,6 +259,9 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
         );
     }
 
+    // -----------------------------------------------------------------------
+    // ハンドラ
+    // -----------------------------------------------------------------------
     function handleReveal() {
         setShowAnswer(true);
         if (currentCard && settings.autoSpeak) {
@@ -234,7 +283,6 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
             prev.map((c) => (c.id === currentCard.id ? { ...c, status: 2 } : c))
         );
         if (reviewMode === "writing") {
-            // Writing モード: 習得済みを末尾に移動してシャッフル順を更新
             setShuffledSets((prev) => {
                 const current = prev.writing;
                 if (!current) return prev;
@@ -245,7 +293,6 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
             const newIndex = currentIndex >= displayCards.length - 1 ? 0 : currentIndex;
             setCurrentIndex(newIndex);
         } else {
-            // 通常モード: シャッフル済みリストからも除外
             setShuffledSets((prev) => {
                 const key = reviewMode as "unlearned" | "all";
                 const current = prev[key];
@@ -259,15 +306,62 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
     }
 
     function goNext() {
-        if (displayCards.length <= 1) {
+        const nextIndex = currentIndex + 1;
+        if (nextIndex >= displayCards.length) {
+            // セット完了 → 完了画面を表示
+            setShowCompletion(true);
             setShowAnswer(false);
-            return;
+        } else {
+            setCurrentIndex(nextIndex);
+            setShowAnswer(false);
         }
-        const nextIndex = (currentIndex + 1) % displayCards.length;
-        setCurrentIndex(nextIndex);
-        setShowAnswer(false);
     }
 
+    /** 新しいセットを開始する */
+    function handleStartNewSet() {
+        setShowCompletion(false);
+        setCurrentIndex(0);
+        setShowAnswer(false);
+
+        if (settings.reviewOrder === "random") {
+            // ランダム設定のときはシャッフルして新セット開始
+            const newSets = buildShuffledSets(allCardsRef.current, reviewMode);
+            setShuffledSets(newSets);
+        }
+        // ランダム以外はそのまま cards を最初から
+    }
+
+    function handleShuffle() {
+        if (reviewMode === "writing") {
+            const unlearned = cards.filter((c) => c.status !== 2);
+            const mastered = cards.filter((c) => c.status === 2);
+            setShuffledSets((prev) => ({
+                ...prev,
+                writing: [...shuffleArr(unlearned), ...mastered],
+            }));
+        } else {
+            const key = reviewMode as "unlearned" | "all";
+            setShuffledSets((prev) => ({
+                ...prev,
+                [key]: shuffleArr(cards),
+            }));
+        }
+        setCurrentIndex(0);
+        setShowAnswer(false);
+        setShowCompletion(false);
+    }
+
+    function handleModeChange(mode: ReviewMode) {
+        setReviewMode(mode);
+        setShuffledSets({ unlearned: null, all: null, writing: null });
+        setCurrentIndex(0);
+        setShowAnswer(false);
+        setShowCompletion(false);
+    }
+
+    // -----------------------------------------------------------------------
+    // UI
+    // -----------------------------------------------------------------------
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -275,29 +369,6 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
             </div>
         );
     }
-
-    function handleModeChange(mode: ReviewMode) {
-        setReviewMode(mode);
-        setCurrentIndex(0);
-        setShowAnswer(false);
-    }
-
-    function handleShuffle() {
-        if (reviewMode === "writing") {
-            // Writing モード: 未習得グループのみシャッフル、習得済みは後ろに固定
-            const unlearned = displayCards.filter((c) => c.status !== 2);
-            const mastered = displayCards.filter((c) => c.status === 2);
-            const shuffled = [...shuffleArr(unlearned), ...mastered];
-            setShuffledSets((prev) => ({ ...prev, writing: shuffled }));
-        } else {
-            const shuffled = shuffleArr([...displayCards]);
-            setShuffledSets((prev) => ({ ...prev, [reviewMode]: shuffled }));
-        }
-        setCurrentIndex(0);
-        setShowAnswer(false);
-    }
-
-
 
     const modeToggle = (
         <div className="flex rounded-lg border border-gray-200 bg-gray-100 p-1 mb-4">
@@ -349,6 +420,42 @@ export default function ReviewView({ active, settings }: { active: boolean; sett
                     >
                         <RotateCcw size={16} />
                         再読み込み
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // 完了画面
+    // -----------------------------------------------------------------------
+    if (showCompletion) {
+        return (
+            <div className="space-y-4">
+                {modeToggle}
+                <div className="flex flex-col items-center justify-center py-12 space-y-6">
+                    {/* アイコン */}
+                    <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-100 border-2 border-green-300">
+                        <CheckCircle size={40} className="text-green-500" />
+                    </div>
+
+                    {/* メッセージ */}
+                    <div className="text-center space-y-2">
+                        <h2 className="text-xl font-bold text-gray-800">
+                            今日の学習が完了しました！
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                            学習を続けますか？
+                        </p>
+                    </div>
+
+                    {/* ボタン */}
+                    <button
+                        onClick={handleStartNewSet}
+                        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-md hover:bg-blue-700 active:bg-blue-800 transition-colors"
+                    >
+                        <BookOpen size={18} />
+                        新しいセットを学ぶ
                     </button>
                 </div>
             </div>
