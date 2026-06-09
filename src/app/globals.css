@@ -1,26 +1,232 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* デスクトップ: zoomをhtmlに移してSafariの表示を修正 */
+@media (min-width: 768px) {
+    body {
+        zoom: 1;
+    }
+}
+
+/* モーダル用アニメーション */
+@keyframes slide-up {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: slide-up 0.25s ease-out;
+}
+
+/* ============================================
+   ダークモード
+   ============================================ */
+
+/* ライトモード: デフォルト */
+:root {
+    --bg-primary: #f9fafb;
+    --bg-secondary: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #9ca3af;
+    --border-color: #e5e7eb;
+}
+
+/* ダークモード: data-theme="dark" が html に付いた場合 */
+html[data-theme="dark"] {
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #6b7280;
+    --border-color: #374151;
+    color-scheme: dark;
+}
+
+html[data-theme="dark"] body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* ダークモード: システム設定に従う (data-theme="system" かつ OS がダーク) */
+html[data-theme="system"] {
+    color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] {
+        --bg-primary: #111827;
+        --bg-secondary: #1f2937;
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-muted: #6b7280;
+        --border-color: #374151;
+    }
+
+    html[data-theme="system"] body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    /* ダークモード時のTailwindクラス上書き */
+    html[data-theme="system"] .bg-white { background-color: #1f2937 !important; }
+    html[data-theme="system"] .bg-gray-50 { background-color: #111827 !important; }
+    html[data-theme="system"] .bg-gray-100 { background-color: #1f2937 !important; }
+    html[data-theme="system"] .text-gray-800,
+    html[data-theme="system"] .text-gray-900 { color: #f9fafb !important; }
+    html[data-theme="system"] .text-gray-600,
+    html[data-theme="system"] .text-gray-700 { color: #d1d5db !important; }
+    html[data-theme="system"] .text-gray-400,
+    html[data-theme="system"] .text-gray-500 { color: #6b7280 !important; }
+    html[data-theme="system"] .border-gray-200 { border-color: #374151 !important; }
+    html[data-theme="system"] .border-gray-300 { border-color: #4b5563 !important; }
+}
+
+html[data-theme="dark"] .bg-white { background-color: #1f2937 !important; }
+html[data-theme="dark"] .bg-gray-50 { background-color: #111827 !important; }
+html[data-theme="dark"] .bg-gray-100 { background-color: #1f2937 !important; }
+html[data-theme="dark"] .text-gray-800,
+html[data-theme="dark"] .text-gray-900 { color: #f9fafb !important; }
+html[data-theme="dark"] .text-gray-600,
+html[data-theme="dark"] .text-gray-700 { color: #d1d5db !important; }
+html[data-theme="dark"] .text-gray-400,
+html[data-theme="dark"] .text-gray-500 { color: #6b7280 !important; }
+html[data-theme="dark"] .border-gray-200 { border-color: #374151 !important; }
+html[data-theme="dark"] .border-gray-300 { border-color: #4b5563 !important; }
+
+/* ============================================
+   設定モーダル専用スタイル（ダークモード対応）
+   ============================================ */
+
+.settings-modal {
+    background-color: #ffffff;
+    color: #111827;
+}
+
+html[data-theme="dark"] .settings-modal,
+html[data-theme="system"] .settings-modal {
+    background-color: #1f2937;
+    color: #f9fafb;
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .settings-modal {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+}
+
+.settings-text-primary { color: #111827; }
+.settings-text-secondary { color: #374151; }
+.settings-text-muted { color: #9ca3af; }
+.settings-section-label { color: #6b7280; }
+.settings-divider { border-color: #e5e7eb; }
+
+.settings-btn-active {
+    background-color: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.settings-btn-inactive {
+    background-color: #ffffff;
+    color: #374151;
+    border-color: #d1d5db;
+}
+.settings-btn-inactive:hover { background-color: #f9fafb; }
+
+.settings-btn-ghost {
+    color: #9ca3af;
+}
+.settings-btn-ghost:hover {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.settings-btn-secondary {
+    background-color: #ffffff;
+    color: #374151;
+    border-color: #d1d5db;
+}
+.settings-btn-secondary:hover { background-color: #f9fafb; }
+
+.settings-toggle-off { background-color: #d1d5db; }
+
+/* ダークモード時の設定モーダル */
+html[data-theme="dark"] .settings-text-primary,
+html[data-theme="dark"] .settings-modal .settings-text-primary { color: #f9fafb; }
+html[data-theme="dark"] .settings-text-secondary { color: #d1d5db; }
+html[data-theme="dark"] .settings-text-muted { color: #6b7280; }
+html[data-theme="dark"] .settings-section-label { color: #9ca3af; }
+html[data-theme="dark"] .settings-divider { border-color: #374151; }
+html[data-theme="dark"] .settings-btn-inactive {
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+}
+html[data-theme="dark"] .settings-btn-inactive:hover { background-color: #4b5563; }
+html[data-theme="dark"] .settings-btn-ghost:hover { background-color: #374151; color: #d1d5db; }
+html[data-theme="dark"] .settings-btn-secondary {
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+}
+html[data-theme="dark"] .settings-btn-secondary:hover { background-color: #4b5563; }
+html[data-theme="dark"] .settings-toggle-off { background-color: #4b5563; }
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .settings-text-primary { color: #f9fafb; }
+    html[data-theme="system"] .settings-text-secondary { color: #d1d5db; }
+    html[data-theme="system"] .settings-text-muted { color: #6b7280; }
+    html[data-theme="system"] .settings-section-label { color: #9ca3af; }
+    html[data-theme="system"] .settings-divider { border-color: #374151; }
+    html[data-theme="system"] .settings-btn-inactive {
+        background-color: #374151;
+        color: #d1d5db;
+        border-color: #4b5563;
+    }
+    html[data-theme="system"] .settings-btn-inactive:hover { background-color: #4b5563; }
+    html[data-theme="system"] .settings-btn-ghost:hover { background-color: #374151; color: #d1d5db; }
+    html[data-theme="system"] .settings-btn-secondary {
+        background-color: #374151;
+        color: #d1d5db;
+        border-color: #4b5563;
+    }
+    html[data-theme="system"] .settings-btn-secondary:hover { background-color: #4b5563; }
+    html[data-theme="system"] .settings-toggle-off { background-color: #4b5563; }
+}
+
+/* フィルターボタン（アクティブ状態） */
+.filter-btn-active {
+    background-color: #1f2937; /* bg-gray-800 */
+    color: #ffffff;
+    border-color: #1f2937;
+}
+
+html[data-theme="dark"] .filter-btn-active {
+    background-color: #e5e7eb !important; /* bg-gray-200 */
+    color: #000000 !important;
+    border-color: #e5e7eb !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .filter-btn-active {
+        background-color: #e5e7eb !important;
+        color: #000000 !important;
+        border-color: #e5e7eb !important;
+    }
 }
