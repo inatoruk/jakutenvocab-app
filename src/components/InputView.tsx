@@ -352,7 +352,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             type="text"
                             value={term}
                             onChange={(e) => setTerm(e.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="block w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
 
@@ -381,7 +381,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 type="text"
                                 value={meaning}
                                 onChange={(e) => setMeaning(e.target.value)}
-                                className="w-full h-[50px] md:h-[42px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="block w-full h-[50px] md:h-[42px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                         )}
                     </div>
@@ -437,7 +437,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 onChange={(e) => setContext(e.target.value)}
                                 rows={isMobile ? 3 : 2}
                                 suppressHydrationWarning
-                                className="w-full h-[102px] md:h-[66px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                                className="block w-full h-[102px] md:h-[66px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                             />
                         )}
                         <button
