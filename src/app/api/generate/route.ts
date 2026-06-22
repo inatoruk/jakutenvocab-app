@@ -24,18 +24,23 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
         }
 
-        let prompt = '';
+        let systemInstruction = '';
+        let contents = '';
+
         if (type === 'meaning') {
-            prompt = `あなたは優秀な英語講師です。英単語・熟語「${term}」の日本語における最も一般的で代表的な意味を1〜2つ、簡潔に教えてください。（出力は意味のみ。余計な説明や挨拶は不要。例: "妥協する、和解"）`;
+            systemInstruction = 'あなたは優秀な英語講師です。出力は意味のみとし、挨拶、解説、思考プロセス、前置きなどの余計な文章は一切含めないでください。例: "妥協する、和解"';
+            contents = `英単語・熟語「${term}」の日本語における最も一般的で代表的な意味を1〜2つ、簡潔に教えてください。`;
         } else {
-            prompt = `あなたは優秀な英語講師です。英単語・熟語「${term}」の難易度（日常レベルから学術・ビジネスレベル）に合わせた、「${term}」を使った自然な英語の例文を1つ作成してください。文脈が分かりやすく、実用的な文章にしてください。（出力は英語の例文のみ。挨拶や日本語訳は不要。）`;
+            systemInstruction = 'あなたは優秀な英語講師です。英単語・熟語の難易度（日常レベルから学術・ビジネスレベル）に合わせた自然な英語の例文を作成してください。文脈が分かりやすく、実用的な文章にしてください。出力は英語の例文のみとし、挨拶、日本語訳、思考プロセス、前置きなどは一切含めないでください。';
+            contents = `英単語・熟語「${term}」を使った、自然な英語の例文を1つ作成してください。`;
         }
 
         const response = await ai.models.generateContent({
             model: 'gemini-3.5-flash',
-            contents: prompt,
+            contents: contents,
             config: {
-                temperature: 0.2, // Low temperature for more deterministic output
+                systemInstruction: systemInstruction,
+                temperature: 0.1, // Low temperature to minimize creative/unwanted text
             }
         });
 
