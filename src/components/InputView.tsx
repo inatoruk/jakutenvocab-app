@@ -84,8 +84,13 @@ export default function InputView({ onAdded }: InputViewProps) {
             return;
         }
 
-        if (type === 'meaning') setIsGeneratingMeaning(true);
-        else setIsGeneratingExample(true);
+        if (type === 'meaning') {
+            setMeaning('');
+            setIsGeneratingMeaning(true);
+        } else {
+            setContext('');
+            setIsGeneratingExample(true);
+        }
 
         try {
             const response = await fetch('/api/generate', {
@@ -367,7 +372,10 @@ export default function InputView({ onAdded }: InputViewProps) {
                             type="text"
                             value={meaning}
                             onChange={(e) => setMeaning(e.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            placeholder={isGeneratingMeaning ? "AIが意味を生成中..." : ""}
+                            className={`w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all ${
+                                isGeneratingMeaning ? "animate-shimmer-input" : ""
+                            }`}
                         />
                     </div>
 
@@ -412,7 +420,10 @@ export default function InputView({ onAdded }: InputViewProps) {
                             onChange={(e) => setContext(e.target.value)}
                             rows={isMobile ? 3 : 2}
                             suppressHydrationWarning
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                            placeholder={isGeneratingExample ? "AIが例文を生成中..." : ""}
+                            className={`w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all ${
+                                isGeneratingExample ? "animate-shimmer-input" : ""
+                            }`}
                         />
                         <button
                             type="button"
