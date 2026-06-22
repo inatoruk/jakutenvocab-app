@@ -444,7 +444,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             type="button"
                             onClick={() => speak(context)}
                             disabled={!context.trim()}
-                            className="mt-2 inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm md:mt-1.5 md:px-3 md:py-1.5 md:text-xs text-gray-700 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="mt-2 inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm md:mt-1.5 md:px-3 md:py-1.5 md:text-xs text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 active:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                         >
                             <Volume2 size={16} />
                             例文の読み上げ確認

@@ -466,7 +466,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {currentCard.context && (
                                             <button
                                                 onClick={() => speak(currentCard.context)}
-                                                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 active:bg-gray-100 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                                             >
                                                 <Volume2 size={16} />
                                                 再生
@@ -493,7 +493,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     <div className="flex justify-center gap-3">
                                         <button
                                             onClick={() => speak(currentCard.context || currentCard.term)}
-                                            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 active:bg-gray-100 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                                         >
                                             <Volume2 size={16} />
                                             再生
@@ -522,7 +522,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                 <div className="flex justify-center gap-3">
                                     <button
                                         onClick={() => speak(currentCard.term)}
-                                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 active:bg-gray-100 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                                         title="発音"
                                     >
                                         <Volume2 size={16} />
