@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Category, CATEGORIES } from "@/types/vocab";
 import { filterDuplicates } from "@/lib/vocab";
-import { Plus, Volume2, Upload, CheckCircle, AlertCircle, Info, Copy, Check } from "lucide-react";
+import { Plus, Volume2, Upload, CheckCircle, AlertCircle, Info, Copy, Check, Sparkles, Loader2 } from "lucide-react";
 
 type InputMode = "single" | "bulk";
 type Delimiter = "tab" | "comma" | "semicolon";
@@ -73,6 +73,46 @@ export default function InputView({ onAdded }: InputViewProps) {
         type: "success" | "error";
         message: string;
     } | null>(null);
+
+    const [isGeneratingMeaning, setIsGeneratingMeaning] = useState(false);
+    const [isGeneratingExample, setIsGeneratingExample] = useState(false);
+
+    const generateAIContent = async (type: 'meaning' | 'example') => {
+        if (!term.trim()) {
+            setSingleResult({ type: "error", message: "単語を入力してください" });
+            setTimeout(() => setSingleResult(null), 3000);
+            return;
+        }
+
+        if (type === 'meaning') setIsGeneratingMeaning(true);
+        else setIsGeneratingExample(true);
+
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ term: term.trim(), type }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || '生成に失敗しました');
+            }
+
+            if (type === 'meaning') {
+                setMeaning(data.result);
+            } else {
+                setContext(data.result);
+            }
+        } catch (error: any) {
+            setSingleResult({ type: "error", message: error.message || 'エラーが発生しました' });
+            setTimeout(() => setSingleResult(null), 3000);
+        } finally {
+            if (type === 'meaning') setIsGeneratingMeaning(false);
+            else setIsGeneratingExample(false);
+        }
+    };
 
     // Bulk mode states
     const [bulkText, setBulkText] = useState("");
@@ -309,9 +349,20 @@ export default function InputView({ onAdded }: InputViewProps) {
 
                     {/* 意味 */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            意味
-                        </label>
+                        <div className="flex items-center gap-3 mb-1">
+                            <label className="block text-sm font-medium text-gray-700">
+                                意味
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => generateAIContent('meaning')}
+                                disabled={isGeneratingMeaning || !term.trim()}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {isGeneratingMeaning ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                AI生成
+                            </button>
+                        </div>
                         <input
                             type="text"
                             value={meaning}
@@ -322,28 +373,39 @@ export default function InputView({ onAdded }: InputViewProps) {
 
                     {/* 例文 */}
                     <div>
-                        <div className="flex items-center gap-1.5 mb-1">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                例文
-                            </label>
-                            <div
-                                className="group relative flex items-center outline-none"
-                                tabIndex={-1}
-                            >
-                                <button
-                                    type="button"
-                                    className="focus:outline-none"
+                        <div className="flex items-center gap-3 mb-1">
+                            <div className="flex items-center gap-1.5">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    例文
+                                </label>
+                                <div
+                                    className="group relative flex items-center outline-none"
+                                    tabIndex={-1}
                                 >
-                                    <Info size={14} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                                </button>
-                                <div 
-                                    className="absolute left-0 top-[25px] w-[310px] md:left-full md:top-0 md:ml-4 transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-top-left after:content-[''] after:absolute after:-top-2 after:left-0 after:w-full after:h-2 md:after:right-full md:after:top-0 md:after:w-5 md:after:h-full md:after:left-auto opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
-                                >
-                                    <p className="mb-1.5">登録する単語と例文の単語の時制や形が違っても、自動認識できます。</p>
-                                    <p className="mb-1.5">また、例文がない場合や用意できない場合は、何も書かなくても普通の単語カードとして使えます。</p>
-                                    <p>ただ、単語を覚える時には例文と一緒に覚えた方が、イメージとして記憶に残りやすいのでおすすめです。</p>
+                                    <button
+                                        type="button"
+                                        className="focus:outline-none"
+                                    >
+                                        <Info size={14} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                                    </button>
+                                    <div 
+                                        className="absolute left-0 top-[25px] w-[310px] md:left-full md:top-0 md:ml-4 transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-top-left after:content-[''] after:absolute after:-top-2 after:left-0 after:w-full after:h-2 md:after:right-full md:after:top-0 md:after:w-5 md:after:h-full md:after:left-auto opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
+                                    >
+                                        <p className="mb-1.5">登録する単語と例文の単語の時制や形が違っても、自動認識できます。</p>
+                                        <p className="mb-1.5">また、例文がない場合や用意できない場合は、何も書かなくても普通の単語カードとして使えます。</p>
+                                        <p>ただ、単語を覚える時には例文と一緒に覚えた方が、イメージとして記憶に残りやすいのでおすすめです。</p>
+                                    </div>
                                 </div>
                             </div>
+                            <button
+                                type="button"
+                                onClick={() => generateAIContent('example')}
+                                disabled={isGeneratingExample || !term.trim()}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {isGeneratingExample ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                AI生成
+                            </button>
                         </div>
                         <textarea
                             value={context}
