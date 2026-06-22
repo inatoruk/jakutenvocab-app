@@ -362,7 +362,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 type="button"
                                 onClick={() => generateAIContent('meaning')}
                                 disabled={isGeneratingMeaning || !term.trim()}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
                             >
                                 {isGeneratingMeaning ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
                                 AI生成
@@ -408,7 +408,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 type="button"
                                 onClick={() => generateAIContent('example')}
                                 disabled={isGeneratingExample || !term.trim()}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
                             >
                                 {isGeneratingExample ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
                                 AI生成
