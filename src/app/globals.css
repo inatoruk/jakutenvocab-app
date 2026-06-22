@@ -411,8 +411,8 @@ html[data-theme="dark"] .skeleton-bar::after {
     background-image: linear-gradient(
         90deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.05) 20%,
-        rgba(255, 255, 255, 0.12) 60%,
+        rgba(255, 255, 255, 0.18) 20%,
+        rgba(255, 255, 255, 0.38) 60%,
         rgba(255, 255, 255, 0) 100%
     );
 }
@@ -461,9 +461,9 @@ html[data-theme="dark"] .animate-shimmer-input {
     background: linear-gradient(
         90deg,
         rgba(31, 41, 55, 0) 0%,
-        rgba(59, 130, 246, 0.15) 35%,
-        rgba(139, 92, 246, 0.15) 50%,
-        rgba(59, 130, 246, 0.15) 65%,
+        rgba(59, 130, 246, 0.28) 35%,
+        rgba(139, 92, 246, 0.28) 50%,
+        rgba(59, 130, 246, 0.28) 65%,
         rgba(31, 41, 55, 0) 100%
     ) !important;
     background-size: 200% 100% !important;
@@ -509,15 +509,15 @@ html[data-theme="system"] .speak-button {
 /* ダークモードホバー */
 html[data-theme="dark"] .speak-button:hover:not(:disabled),
 html[data-theme="system"] .speak-button:hover:not(:disabled) {
-    background-color: #374151; /* bg-gray-700 equivalent */
-    border-color: #4b5563; /* border-gray-600 equivalent */
+    background-color: #4b5563; /* bg-gray-600 equivalent */
+    border-color: #6b7280; /* bg-gray-500 equivalent */
     color: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
     html[data-theme="system"] .speak-button:hover:not(:disabled) {
-        background-color: #374151;
-        border-color: #4b5563;
+        background-color: #4b5563;
+        border-color: #6b7280;
         color: #ffffff;
     }
 }
@@ -559,11 +559,11 @@ html[data-theme="system"] .copy-btn-icon {
 /* ダークモードホバー */
 html[data-theme="dark"] .copy-btn-icon:hover,
 html[data-theme="system"] .copy-btn-icon:hover {
-    color: #d1d5db; /* text-gray-300 */
+    color: #ffffff; /* text-white */
 }
 
 @media (prefers-color-scheme: dark) {
     html[data-theme="system"] .copy-btn-icon:hover {
-        color: #d1d5db;
+        color: #ffffff;
     }
 }
