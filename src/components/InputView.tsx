@@ -423,9 +423,13 @@ export default function InputView({ onAdded }: InputViewProps) {
                             </button>
                         </div>
                         {isGeneratingExample ? (
-                            <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col gap-2.5 justify-center h-[102px] md:h-[66px] animate-shimmer-input">
-                                <div className="h-3 w-[85%] skeleton-bar"></div>
-                                <div className="h-3 w-[55%] skeleton-bar"></div>
+                            <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-[102px] md:h-[66px] animate-shimmer-input">
+                                <div className="h-6 md:h-5 flex items-center">
+                                    <div className="h-3 w-[85%] skeleton-bar"></div>
+                                </div>
+                                <div className="h-6 md:h-5 flex items-center">
+                                    <div className="h-3 w-[55%] skeleton-bar"></div>
+                                </div>
                             </div>
                         ) : (
                             <textarea
