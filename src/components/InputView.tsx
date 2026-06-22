@@ -111,8 +111,12 @@ export default function InputView({ onAdded }: InputViewProps) {
                 setContext(data.result);
             }
         } catch (error: any) {
-            setSingleResult({ type: "error", message: error.message || 'エラーが発生しました' });
-            setTimeout(() => setSingleResult(null), 3000);
+            let userMessage = error.message || 'エラーが発生しました。';
+            if (userMessage.includes('Failed to fetch') || userMessage.includes('NetworkError') || userMessage.includes('fetch')) {
+                userMessage = 'サーバーとの通信に失敗しました。ネットワークの接続状況を確認してください。';
+            }
+            setSingleResult({ type: "error", message: userMessage });
+            setTimeout(() => setSingleResult(null), 5000);
         } finally {
             if (type === 'meaning') setIsGeneratingMeaning(false);
             else setIsGeneratingExample(false);

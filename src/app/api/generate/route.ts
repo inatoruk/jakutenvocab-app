@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     try {
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json(
-                { error: 'API key is missing. Please set GEMINI_API_KEY in your environment variables.' },
+                { error: 'APIキーが設定されていません。環境変数（GEMINI_API_KEY）を確認してください。' },
                 { status: 500 }
             );
         }
@@ -17,11 +17,11 @@ export async function POST(request: Request) {
         const { term, type } = await request.json();
 
         if (!term) {
-            return NextResponse.json({ error: 'Term is required' }, { status: 400 });
+            return NextResponse.json({ error: '単語が入力されていません。' }, { status: 400 });
         }
 
         if (!['meaning', 'example'].includes(type)) {
-            return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+            return NextResponse.json({ error: '不正なリクエストタイプです。' }, { status: 400 });
         }
 
         let systemInstruction = '';
@@ -47,8 +47,15 @@ export async function POST(request: Request) {
         const text = response.text?.trim() || '';
 
         return NextResponse.json({ result: text });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Gemini API Error:', error);
-        return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });
+        let errorMsg = 'AI生成中にエラーが発生しました。';
+        const errorStr = String(error.message || error);
+        if (errorStr.includes('429') || errorStr.includes('quota') || errorStr.includes('Quota')) {
+            errorMsg = 'APIの利用制限（1分間15回まで）を超えました。1分ほど待ってから再度お試しください。';
+        } else if (errorStr.includes('API_KEY_INVALID') || errorStr.includes('API key') || errorStr.includes('key is invalid')) {
+            errorMsg = 'APIキーが無効です。正しいキーを設定してください。';
+        }
+        return NextResponse.json({ error: errorMsg }, { status: 500 });
     }
 }
