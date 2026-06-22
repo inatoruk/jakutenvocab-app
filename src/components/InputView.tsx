@@ -374,7 +374,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                         </div>
                         {isGeneratingMeaning ? (
                             <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-[48px] md:h-[40px] animate-shimmer-input">
-                                <div className="h-3 w-44 skeleton-bar"></div>
+                                <div className="h-3 w-[50%] skeleton-bar"></div>
                             </div>
                         ) : (
                             <input
