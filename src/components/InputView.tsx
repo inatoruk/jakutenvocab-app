@@ -368,14 +368,18 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 AI生成
                             </button>
                         </div>
-                        <input
-                            type="text"
-                            value={meaning}
-                            onChange={(e) => setMeaning(e.target.value)}
-                            className={`w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all ${
-                                isGeneratingMeaning ? "animate-shimmer-input" : ""
-                            }`}
-                        />
+                        {isGeneratingMeaning ? (
+                            <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-[48px] md:h-[40px]">
+                                <div className="h-3 rounded-full w-24 skeleton-bar"></div>
+                            </div>
+                        ) : (
+                            <input
+                                type="text"
+                                value={meaning}
+                                onChange={(e) => setMeaning(e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                        )}
                     </div>
 
                     {/* 例文 */}
@@ -414,15 +418,20 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 AI生成
                             </button>
                         </div>
-                        <textarea
-                            value={context}
-                            onChange={(e) => setContext(e.target.value)}
-                            rows={isMobile ? 3 : 2}
-                            suppressHydrationWarning
-                            className={`w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all ${
-                                isGeneratingExample ? "animate-shimmer-input" : ""
-                            }`}
-                        />
+                        {isGeneratingExample ? (
+                            <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col gap-2.5 justify-center h-[96px] md:h-[72px]">
+                                <div className="h-3 rounded-full w-[85%] skeleton-bar"></div>
+                                <div className="h-3 rounded-full w-[55%] skeleton-bar"></div>
+                            </div>
+                        ) : (
+                            <textarea
+                                value={context}
+                                onChange={(e) => setContext(e.target.value)}
+                                rows={isMobile ? 3 : 2}
+                                suppressHydrationWarning
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                            />
+                        )}
                         <button
                             type="button"
                             onClick={() => speak(context)}
