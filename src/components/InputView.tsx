@@ -372,7 +372,6 @@ export default function InputView({ onAdded }: InputViewProps) {
                             type="text"
                             value={meaning}
                             onChange={(e) => setMeaning(e.target.value)}
-                            placeholder={isGeneratingMeaning ? "AIが意味を生成中..." : ""}
                             className={`w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all ${
                                 isGeneratingMeaning ? "animate-shimmer-input" : ""
                             }`}
@@ -420,7 +419,6 @@ export default function InputView({ onAdded }: InputViewProps) {
                             onChange={(e) => setContext(e.target.value)}
                             rows={isMobile ? 3 : 2}
                             suppressHydrationWarning
-                            placeholder={isGeneratingExample ? "AIが例文を生成中..." : ""}
                             className={`w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all ${
                                 isGeneratingExample ? "animate-shimmer-input" : ""
                             }`}
