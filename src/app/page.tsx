@@ -5,8 +5,11 @@ import InputView from "@/components/InputView";
 import ReviewView from "@/components/ReviewView";
 import WordListView from "@/components/WordListView";
 import SettingsModal from "@/components/SettingsModal";
+import LoginView from "@/components/LoginView";
 import { PenLine, BookOpen, List, Settings } from "lucide-react";
 import { AppSettings, loadSettings, saveSettings, DEFAULT_SETTINGS } from "@/lib/settings";
+import { supabase } from "@/lib/supabase";
+import { User } from "@supabase/supabase-js";
 
 type Tab = "input" | "review" | "list";
 
@@ -14,29 +17,41 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("input");
   const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [vocabVersion, setVocabVersion] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // 認証状態の監視
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  function handleVocabMutated() {
+    setVocabVersion((v) => v + 1);
+  }
 
   // localStorage から設定を読み込む（クライアントサイドのみ）
   useEffect(() => {
     setSettings(loadSettings());
   }, []);
 
-  // 設定変更時: 保存 + ズーム/テーマを即時適用
+  // 設定変更時: 保存 + テーマを即時適用
   useEffect(() => {
     saveSettings(settings);
-    applyZoom(settings.zoom);
     applyTheme(settings.theme);
   }, [settings]);
-
-  function applyZoom(zoom: number) {
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) {
-      document.body.style.zoom = String(zoom);
-      document.documentElement.style.zoom = "";
-    } else {
-      document.documentElement.style.zoom = String(zoom);
-      document.body.style.zoom = "";
-    }
-  }
 
   function applyTheme(theme: AppSettings["theme"]) {
     document.documentElement.setAttribute("data-theme", theme);
@@ -51,10 +66,25 @@ export default function Home() {
     setSettings(next);
   }
 
+  if (loading) {
+    return (
+      <div className="h-dvh flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginView />;
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-dvh flex flex-col">
       {/* ヘッダー */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 shrink-0 z-40">
         <div className="relative flex items-center justify-center">
           <h1 className="text-center text-lg font-bold text-gray-800">
             弱点単語集
@@ -71,23 +101,29 @@ export default function Home() {
       </header>
 
       {/* メインコンテンツ */}
-      <main className="flex-1 mx-auto w-full max-w-2xl px-4 py-6">
-        <div style={{ display: tab === "input" ? "block" : "none" }}>
-          <InputView />
-        </div>
-        <div style={{ display: tab === "list" ? "block" : "none" }}>
-          <WordListView active={tab === "list"} />
-        </div>
-        <div style={{ display: tab === "review" ? "block" : "none" }}>
-          <ReviewView
-            active={tab === "review"}
-            settings={settings}
-          />
+      <main className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+        <div className={`mx-auto w-full max-w-2xl px-4 py-6 flex flex-col min-h-0 ${tab === "review" ? "flex-1 h-full" : "h-auto"}`}>
+          <div style={{ display: tab === "input" ? "block" : "none" }}>
+            <InputView onAdded={handleVocabMutated} />
+          </div>
+          <div style={{ display: tab === "list" ? "block" : "none" }}>
+            <WordListView active={tab === "list"} onMutated={handleVocabMutated} />
+          </div>
+          <div
+            style={{ display: tab === "review" ? "flex" : "none" }}
+            className="flex-1 flex flex-col min-h-0"
+          >
+            <ReviewView
+              active={tab === "review"}
+              settings={settings}
+              vocabVersion={vocabVersion}
+            />
+          </div>
         </div>
       </main>
 
       {/* タブナビゲーション */}
-      <nav className="bg-white border-t border-gray-200 sticky bottom-0">
+      <nav className="bg-white border-t border-gray-200 shrink-0 z-40">
         <div className="mx-auto max-w-lg flex">
           <button
             onClick={() => handleTabChange("input")}
@@ -128,6 +164,7 @@ export default function Home() {
           settings={settings}
           onChange={handleSettingsChange}
           onClose={() => setShowSettings(false)}
+          user={user}
         />
       )}
     </div>

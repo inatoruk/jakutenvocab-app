@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Vocab, Category, CATEGORIES, Status } from "@/types/vocab";
-import { Search, X, Check, Loader2 } from "lucide-react";
+import { Search, X, Check, Loader2, Link2 } from "lucide-react";
+
 const STATUS_LABELS: Record<Status, string> = {
     0: "未学習",
     1: "学習中",
@@ -24,13 +25,14 @@ const CATEGORY_STYLES: Record<Category, string> = {
 type FilterCategory = Category | "all";
 type FilterStatus = Status | "all";
 
-export default function WordListView({ active }: { active: boolean }) {
+export default function WordListView({ active, onMutated }: { active: boolean; onMutated?: () => void }) {
     const [words, setWords] = useState<Vocab[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [filterCategory, setFilterCategory] = useState<FilterCategory>("all");
     const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
     const [editingWord, setEditingWord] = useState<Vocab | null>(null);
+    const [isClosing, setIsClosing] = useState(false);
     const [saving, setSaving] = useState(false);
     const initialLoadDone = useRef(false);
 
@@ -40,6 +42,31 @@ export default function WordListView({ active }: { active: boolean }) {
     const [editContext, setEditContext] = useState("");
     const [editCategory, setEditCategory] = useState<Category>("Vocab");
     const [editStatus, setEditStatus] = useState<Status>(0);
+
+    // ── グループ化機能 ──────────────────────────────────────────────────────
+    const [isGroupMode, setIsGroupMode] = useState(false);
+    const [selectedWordIds, setSelectedWordIds] = useState<Set<string>>(new Set());
+    // vocab_id → group_id のマッピング
+    const [paraphraseGroups, setParaphraseGroups] = useState<Record<string, string>>({});
+    // group_id → "G1", "G2"... の表示ラベル
+    const [groupLabels, setGroupLabels] = useState<Record<string, string>>({});
+    const [grouping, setGrouping] = useState(false);
+
+    const fetchParaphraseGroups = useCallback(async () => {
+        const { data } = await supabase.from("paraphrase_groups").select("*");
+        if (data) {
+            const mapping: Record<string, string> = {};
+            const seenGroups: string[] = [];
+            (data as { vocab_id: string; group_id: string }[]).forEach(row => {
+                mapping[row.vocab_id] = row.group_id;
+                if (!seenGroups.includes(row.group_id)) seenGroups.push(row.group_id);
+            });
+            setParaphraseGroups(mapping);
+            const labels: Record<string, string> = {};
+            seenGroups.forEach((gid, i) => { labels[gid] = `G${i + 1}`; });
+            setGroupLabels(labels);
+        }
+    }, []);
 
     const fetchWords = useCallback(async (silent = false) => {
         if (!silent) setLoading(true);
@@ -53,15 +80,19 @@ export default function WordListView({ active }: { active: boolean }) {
 
     useEffect(() => {
         fetchWords();
+        fetchParaphraseGroups();
         initialLoadDone.current = true;
-    }, [fetchWords]);
+    }, [fetchWords, fetchParaphraseGroups]);
 
     // タブがアクティブになったらバックグラウンドで再取得
     useEffect(() => {
         if (active && initialLoadDone.current) {
             fetchWords(true);
+            fetchParaphraseGroups();
         }
-    }, [active, fetchWords]);
+    }, [active, fetchWords, fetchParaphraseGroups]);
+
+
 
     // フィルタリング
     const filteredWords = words.filter((word) => {
@@ -79,6 +110,7 @@ export default function WordListView({ active }: { active: boolean }) {
 
     function openEdit(word: Vocab) {
         setEditingWord(word);
+        setIsClosing(false);
         setEditTerm(word.term);
         setEditMeaning(word.meaning);
         setEditContext(word.context);
@@ -87,7 +119,11 @@ export default function WordListView({ active }: { active: boolean }) {
     }
 
     function closeEdit() {
-        setEditingWord(null);
+        setIsClosing(true);
+        setTimeout(() => {
+            setEditingWord(null);
+            setIsClosing(false);
+        }, 250);
     }
 
     async function handleSave() {
@@ -107,6 +143,7 @@ export default function WordListView({ active }: { active: boolean }) {
         if (!error) {
             closeEdit();
             fetchWords();
+            onMutated?.();
         }
     }
 
@@ -122,7 +159,43 @@ export default function WordListView({ active }: { active: boolean }) {
         if (!error) {
             closeEdit();
             fetchWords();
+            onMutated?.();
         }
+    }
+
+    // カード選択トグル
+    function toggleSelectWord(id: string) {
+        setSelectedWordIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    }
+
+    // グループ化実行
+    async function handleGroup() {
+        if (selectedWordIds.size < 2) return;
+        setGrouping(true);
+        const newGroupId = crypto.randomUUID();
+        const rows = Array.from(selectedWordIds).map(vid => ({
+            vocab_id: vid,
+            group_id: newGroupId,
+        }));
+        const { error } = await supabase
+            .from("paraphrase_groups")
+            .upsert(rows, { onConflict: "vocab_id" });
+        setGrouping(false);
+        if (!error) {
+            setSelectedWordIds(new Set());
+            setIsGroupMode(false);
+            await fetchParaphraseGroups();
+        }
+    }
+
+    function exitGroupMode() {
+        setIsGroupMode(false);
+        setSelectedWordIds(new Set());
     }
 
     if (loading) {
@@ -133,8 +206,10 @@ export default function WordListView({ active }: { active: boolean }) {
         );
     }
 
+    const isParaphraseFilter = filterCategory === "Paraphrase";
+
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 pb-6">
             {/* 検索 */}
             <div className="relative">
                 <Search
@@ -160,37 +235,65 @@ export default function WordListView({ active }: { active: boolean }) {
 
             {/* フィルター */}
             <div className="space-y-2">
-                {/* カテゴリフィルター */}
-                <div className="flex gap-1.5 flex-wrap">
-                    <button
-                        onClick={() => setFilterCategory("all")}
-                        className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterCategory === "all"
-                            ? "filter-btn-active"
-                            : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-                            }`}
-                    >
-                        全カテゴリ
-                    </button>
-                    {CATEGORIES.map((c) => (
+                {/* カテゴリフィルター + グループ化ボタン */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex gap-1.5 flex-wrap flex-1">
                         <button
-                            key={c}
-                            onClick={() =>
-                                setFilterCategory(filterCategory === c ? "all" : c)
-                            }
-                            className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterCategory === c
-                                ? CATEGORY_STYLES[c]
+                            onClick={() => {
+                                setFilterCategory("all");
+                                exitGroupMode();
+                            }}
+                            className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterCategory === "all"
+                                ? "filter-btn-active"
                                 : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
                                 }`}
                         >
-                            {c}
+                            全カテゴリ
                         </button>
-                    ))}
+                        {CATEGORIES.map((c) => (
+                            <button
+                                key={c}
+                                onClick={() => {
+                                    setFilterCategory(filterCategory === c ? "all" : c);
+                                    exitGroupMode();
+                                }}
+                                className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterCategory === c
+                                    ? CATEGORY_STYLES[c]
+                                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                    }`}
+                            >
+                                {c}
+                            </button>
+                        ))}
+                    </div>
+                    {/* グループ化ボタン（常に表示） */}
+                    <button
+                        onClick={() => {
+                            if (isGroupMode) {
+                                exitGroupMode();
+                            } else {
+                                setFilterCategory("Paraphrase");
+                                setIsGroupMode(true);
+                            }
+                        }}
+                        className={`flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium border transition-colors shrink-0 ${
+                            isGroupMode
+                                ? "border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100"
+                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                        }`}
+                    >
+                        <Link2 size={12} />
+                        グループ化
+                    </button>
                 </div>
 
                 {/* ステータスフィルター */}
                 <div className="flex gap-1.5 flex-wrap">
                     <button
-                        onClick={() => setFilterStatus("all")}
+                        onClick={() => {
+                            setFilterStatus("all");
+                            exitGroupMode();
+                        }}
                         className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterStatus === "all"
                             ? "filter-btn-active"
                             : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
@@ -201,9 +304,10 @@ export default function WordListView({ active }: { active: boolean }) {
                     {([0, 1, 2] as Status[]).map((s) => (
                         <button
                             key={s}
-                            onClick={() =>
-                                setFilterStatus(filterStatus === s ? "all" : s)
-                            }
+                            onClick={() => {
+                                setFilterStatus(filterStatus === s ? "all" : s);
+                                exitGroupMode();
+                            }}
                             className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterStatus === s
                                 ? STATUS_STYLES[s]
                                 : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
@@ -214,6 +318,16 @@ export default function WordListView({ active }: { active: boolean }) {
                     ))}
                 </div>
             </div>
+
+            {/* グループ化モード：ヒント */}
+            {isGroupMode && (
+                <div className="flex items-center gap-2 rounded-lg bg-purple-50 border border-purple-200 px-3 py-2">
+                    <Link2 size={14} className="text-purple-600 shrink-0" />
+                    <p className="text-xs text-purple-700 font-medium">
+                        グループ化したいカードを2つ以上タップして選んでください
+                    </p>
+                </div>
+            )}
 
             {/* 件数 */}
             <p className="text-xs text-gray-400">
@@ -230,48 +344,119 @@ export default function WordListView({ active }: { active: boolean }) {
                     </p>
                 </div>
             ) : (
-                <ul className="space-y-2">
-                    {filteredWords.map((word) => (
-                        <li
-                            key={word.id}
-                            onClick={() => openEdit(word)}
-                            className="rounded-lg border border-gray-200 bg-white px-4 py-3 active:bg-gray-50 cursor-pointer transition-colors"
-                        >
-                            <div className="flex items-start justify-between gap-2">
-                                <div className="min-w-0 flex-1">
-                                    <p className="font-semibold text-gray-900 text-base">
-                                        {word.term}
-                                    </p>
-                                    <p className="text-sm text-gray-600 mt-0.5">
-                                        {word.meaning}
-                                    </p>
+                <ul className={`space-y-2 ${isGroupMode ? "pb-24" : ""}`}>
+                    {filteredWords.map((word) => {
+                        const groupId = paraphraseGroups[word.id];
+                        const groupLabel = groupId ? groupLabels[groupId] : null;
+                        const isSelected = selectedWordIds.has(word.id);
+
+                        return (
+                            <li
+                                key={word.id}
+                                onClick={() => {
+                                    if (isGroupMode) {
+                                        toggleSelectWord(word.id);
+                                    } else {
+                                        openEdit(word);
+                                    }
+                                }}
+                                className={`rounded-lg border bg-white px-4 py-3 cursor-pointer transition-all ${isGroupMode && isSelected
+                                    ? "border-purple-400 bg-purple-50 ring-1 ring-purple-300"
+                                    : "border-gray-200 active:bg-gray-50"
+                                    }`}
+                            >
+                                <div className="flex items-start gap-3">
+                                    {/* 選択インジケーター（グループ化モード時のみ） */}
+                                    {isGroupMode && (
+                                        <div className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected
+                                            ? "bg-purple-600 border-purple-600"
+                                            : "border-gray-300 bg-white"
+                                            }`}>
+                                            {isSelected && <Check size={11} className="text-white" />}
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-start justify-between gap-2 flex-1 min-w-0">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-semibold text-gray-900 text-base">
+                                                {word.term}
+                                            </p>
+                                            <p className="text-sm text-gray-600 mt-0.5">
+                                                {word.meaning}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-1 shrink-0 mt-0.5">
+                                            <div className="flex items-center gap-1">
+                                                {/* グループバッジ */}
+                                                {groupLabel && (
+                                                    <span className="inline-flex items-center gap-0.5 rounded-full border border-purple-300 bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-600">
+                                                        <Link2 size={9} />
+                                                        {groupLabel}
+                                                    </span>
+                                                )}
+                                                <span
+                                                    className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${CATEGORY_STYLES[word.category]}`}
+                                                >
+                                                    {word.category}
+                                                </span>
+                                            </div>
+                                            <span
+                                                className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[word.status]}`}
+                                            >
+                                                {STATUS_LABELS[word.status]}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-1 shrink-0 mt-0.5">
-                                    <span
-                                        className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${CATEGORY_STYLES[word.category]}`}
-                                    >
-                                        {word.category}
-                                    </span>
-                                    <span
-                                        className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[word.status]}`}
-                                    >
-                                        {STATUS_LABELS[word.status]}
-                                    </span>
-                                </div>
-                            </div>
-                        </li>
-                    ))}
+                            </li>
+                        );
+                    })}
                 </ul>
+            )}
+
+            {/* グループ化モード：スティッキーアクションバー */}
+            {isGroupMode && (
+                <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none">
+                    <div className="mx-auto max-w-2xl pointer-events-auto">
+                        <div className="flex items-center gap-2 rounded-2xl border border-purple-200 bg-white shadow-lg px-4 py-3">
+                            <p className="text-sm font-medium text-gray-700 flex-1">
+                                {selectedWordIds.size > 0
+                                    ? `${selectedWordIds.size}件選択中`
+                                    : "カードを選択してください"}
+                            </p>
+                            <button
+                                onClick={exitGroupMode}
+                                className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 active:bg-gray-100"
+                            >
+                                キャンセル
+                            </button>
+                            <button
+                                onClick={handleGroup}
+                                disabled={selectedWordIds.size < 2 || grouping}
+                                className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {grouping
+                                    ? <Loader2 size={14} className="animate-spin" />
+                                    : <Link2 size={14} />
+                                }
+                                グループ化
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* 編集モーダル */}
             {editingWord && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-                    onClick={closeEdit}
-                >
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
-                        className="w-full max-w-2xl max-h-full overflow-y-auto bg-white rounded-2xl shadow-xl p-5 pb-8 space-y-4 animate-slide-up"
+                        className={`absolute inset-0 bg-black/40 backdrop-blur-sm ${isClosing ? "animate-fade-out" : "animate-fade-in"
+                            }`}
+                        onClick={closeEdit}
+                    />
+                    <div
+                        className={`relative z-10 w-full max-w-2xl max-h-full overflow-y-auto bg-white rounded-2xl shadow-xl p-5 pb-8 space-y-4 ${isClosing ? "animate-slide-down" : "animate-slide-up"
+                            }`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between">
@@ -394,8 +579,6 @@ export default function WordListView({ active }: { active: boolean }) {
                     </div>
                 </div>
             )}
-
-
         </div>
     );
 }

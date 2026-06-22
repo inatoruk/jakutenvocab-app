@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Category, CATEGORIES } from "@/types/vocab";
-import { Plus, Volume2, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { filterDuplicates } from "@/lib/vocab";
+import { Plus, Volume2, Upload, CheckCircle, AlertCircle, Info, Copy, Check } from "lucide-react";
 
 type InputMode = "single" | "bulk";
 type Delimiter = "tab" | "comma" | "semicolon";
@@ -35,8 +36,32 @@ function parseRows(text: string, delimiter: Delimiter): ParsedRow[] {
         .filter((row): row is ParsedRow => row !== null);
 }
 
-export default function InputView() {
+interface InputViewProps {
+    onAdded?: () => void;
+}
+
+export default function InputView({ onAdded }: InputViewProps) {
     const [mode, setMode] = useState<InputMode>("single");
+    const [showAllPreview, setShowAllPreview] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
+    const handleCopyPrompt = () => {
+        const promptText = `添付した英文の中で、私がマーカーを引いた単語に対して、以下のルールで出力して。
+・出力形式は [単語][タブ][日本語の意味][タブ][その単語が含まれていた元の英文] とする
+・1行に1単語ずつ出力して
+・例文がない場合は、単語レベルに合わせた例文を生成して`;
+        navigator.clipboard.writeText(promptText);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     // Single mode states
     const [term, setTerm] = useState("");
@@ -102,6 +127,8 @@ export default function InputView() {
             setContext("");
             setCategory("Vocab");
             setTimeout(() => setSingleResult(null), 2000);
+            fetchExistingTerms();
+            onAdded?.();
         }
     }
 
@@ -109,32 +136,84 @@ export default function InputView() {
         if (parsedRows.length === 0) return;
         setBulkLoading(true);
         setBulkResult(null);
-        const rows = parsedRows.map((row) => ({
+
+        const allRows = parsedRows.map((row) => ({
             term: row.term,
             meaning: row.meaning,
             context: row.context,
             category: bulkCategory,
-            status: 0,
+            status: 0 as const,
         }));
-        const { error } = await supabase.from("vocab").insert(rows);
+
+        // Writing 以外の場合のみ重複フィルタリング
+        const { toInsert, skipped } = filterDuplicates(allRows, existingTerms);
+
+        if (toInsert.length === 0) {
+            setBulkLoading(false);
+            setBulkResult({
+                type: "error",
+                message: `全 ${skipped.length} 件が既に登録済みのためスキップしました`,
+            });
+            return;
+        }
+
+        const { error } = await supabase.from("vocab").insert(toInsert);
         setBulkLoading(false);
         if (error) {
             setBulkResult({ type: "error", message: "登録に失敗しました" });
         } else {
+            const skipMsg = skipped.length > 0 ? `（${skipped.length}件は重複のためスキップ）` : "";
             setBulkResult({
                 type: "success",
-                message: `${rows.length}件を登録しました`,
+                message: `${toInsert.length}件を登録しました${skipMsg}`,
             });
             setBulkText("");
+            await fetchExistingTerms();
+            onAdded?.();
         }
     }
 
 
 
+    const aiContent = (
+        <>
+            <p className="mb-1.5">教材の英文やニュースを読んでいてわからない単語があったら、その単語にマーカーを引いて、AIに以下のように指示してみてください。</p>
+            <div className="relative bg-gray-50 dark:bg-gray-900/50 py-2 pl-2.5 pr-9 rounded-lg border border-gray-100 dark:border-gray-800/80 font-mono text-[10px] mb-1.5 leading-normal select-all">
+                添付した英文の中で、私がマーカーを引いた単語に対して、以下のルールで出力して。<br />
+                ・出力形式は [単語][タブ][日本語の意味][タブ][その単語が含まれていた元の英文] とする<br />
+                ・1行に1単語ずつ出力して<br />
+                ・例文がない場合は、単語レベルに合わせた例文を生成して
+                <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyPrompt();
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.stopPropagation();
+                            handleCopyPrompt();
+                        }
+                    }}
+                    className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer transition-colors focus:outline-none"
+                    title="コピー"
+                >
+                    {copied ? (
+                        <Check size={16} className="text-green-500" />
+                    ) : (
+                        <Copy size={16} className="-scale-y-100" />
+                    )}
+                </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400">あとは、AIが出力してくれたテキストをそのままコピーしてここに貼り付けるだけで、一気に登録ができます。</p>
+        </>
+    );
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* モード切替 */}
-            <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+            <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 relative z-20">
                 <button
                     type="button"
                     onClick={() => {
@@ -148,25 +227,73 @@ export default function InputView() {
                 >
                     1件ずつ
                 </button>
-                <button
-                    type="button"
+                <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
                         setMode("bulk");
                         setBulkResult(null);
                     }}
-                    className={`flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${mode === "bulk"
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setMode("bulk");
+                            setBulkResult(null);
+                        }
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors cursor-pointer outline-none ${mode === "bulk"
                         ? "bg-white text-gray-800 shadow-sm"
                         : "text-gray-500 hover:text-gray-700"
                         }`}
                 >
                     <Upload size={14} />
-                    一括登録
-                </button>
+                    <span>一括登録</span>
+                    <div
+                        className="group flex items-center outline-none"
+                        tabIndex={-1}
+                    >
+                        <button
+                            type="button"
+                            className="focus:outline-none"
+                        >
+                            <Info size={14} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                        </button>
+                        <div 
+                            className="absolute left-0 right-0 mx-auto w-full sm:w-[400px] top-[45px] transition-all duration-300 py-3 px-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-xl z-50 leading-normal text-left origin-top-right md:w-[550px] after:content-[''] after:absolute after:-top-5 after:left-0 after:w-full after:h-5 opacity-0 invisible pointer-events-none scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100 cursor-default"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <p className="font-semibold mb-1 text-gray-900 dark:text-white">複数の単語をまとめて登録できる機能です。</p>
+                            <p className="mb-1.5"><strong>【入力方法】</strong><br />「単語」「意味」「例文」の間を選択した区切り文字（標準はタブ）で区切って、1行に1単語ずつ入力してください。<br />(例: compromise [タブ] 妥協する [タブ] They had to...)</p>
+                            <p className="mb-2 text-gray-500 dark:text-gray-400">
+                                ※ 例文は省略しても大丈夫です。<br />
+                                ※ Excelやスプレッドシートの表をそのままコピー＆ペーストすると、自動的に「タブ」で区切られて綺麗に入力できます。<br />
+                                ※ すでに登録済みの単語は、重複登録を防ぐために自動でスキップされます。
+                            </p>
+                            {isMobile ? (
+                                <details className="border-t border-gray-100 dark:border-gray-700 my-1.5 pt-2">
+                                    <summary className="font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 cursor-pointer select-none outline-none list-none [&::-webkit-details-marker]:hidden">
+                                        💡 AI活用のすすめ <span className="text-[10px] font-normal text-gray-400 ml-1">(クリックで展開)</span>
+                                    </summary>
+                                    <div className="mt-2">
+                                        {aiContent}
+                                    </div>
+                                </details>
+                            ) : (
+                                <div className="border-t border-gray-100 dark:border-gray-700 my-1.5 pt-2">
+                                    <p className="font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-1">
+                                        💡 AI活用のすすめ
+                                    </p>
+                                    {aiContent}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {mode === "single" ? (
                 /* ── 1件ずつモード（既存） ── */
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-3 pb-8 md:pb-10">
                     {/* 単語 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -176,8 +303,7 @@ export default function InputView() {
                             type="text"
                             value={term}
                             onChange={(e) => setTerm(e.target.value)}
-                            // placeholder="例: compromise"
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
 
@@ -190,28 +316,47 @@ export default function InputView() {
                             type="text"
                             value={meaning}
                             onChange={(e) => setMeaning(e.target.value)}
-                            // placeholder="例: 妥協する、歩み寄る"
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
 
                     {/* 例文 */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            例文
-                        </label>
+                        <div className="flex items-center gap-1.5 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                例文
+                            </label>
+                            <div
+                                className="group relative flex items-center outline-none"
+                                tabIndex={-1}
+                            >
+                                <button
+                                    type="button"
+                                    className="focus:outline-none"
+                                >
+                                    <Info size={14} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                                </button>
+                                <div 
+                                    className="absolute left-0 top-[25px] w-[310px] md:left-full md:top-0 md:ml-4 transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-top-left after:content-[''] after:absolute after:-top-2 after:left-0 after:w-full after:h-2 md:after:right-full md:after:top-0 md:after:w-5 md:after:h-full md:after:left-auto opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
+                                >
+                                    <p className="mb-1.5">登録する単語と例文の単語の時制や形が違っても、自動認識できます。</p>
+                                    <p className="mb-1.5">また、例文がない場合や用意できない場合は、何も書かなくても普通の単語カードとして使えます。</p>
+                                    <p>ただ、単語を覚える時には例文と一緒に覚えた方が、イメージとして記憶に残りやすいのでおすすめです。</p>
+                                </div>
+                            </div>
+                        </div>
                         <textarea
                             value={context}
                             onChange={(e) => setContext(e.target.value)}
-                            // placeholder="例: They had to compromise on the budget."
-                            rows={3}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                            rows={isMobile ? 3 : 2}
+                            suppressHydrationWarning
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                         />
                         <button
                             type="button"
                             onClick={() => speak(context)}
                             disabled={!context.trim()}
-                            className="mt-2 inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="mt-2 inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm md:mt-1.5 md:px-3 md:py-1.5 md:text-xs text-gray-700 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             <Volume2 size={16} />
                             例文の読み上げ確認
@@ -228,7 +373,7 @@ export default function InputView() {
                             onChange={(e) =>
                                 setCategory(e.target.value as Category)
                             }
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
                         >
                             {CATEGORIES.map((c) => (
                                 <option key={c} value={c}>
@@ -259,7 +404,7 @@ export default function InputView() {
                     <button
                         type="submit"
                         disabled={loading || !term.trim() || !meaning.trim()}
-                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 md:py-2.5 text-base md:text-sm font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={18} />
                         {loading ? "登録中..." : "登録"}
@@ -267,7 +412,7 @@ export default function InputView() {
                 </form>
             ) : (
                 /* ── 一括登録モード ── */
-                <div className="space-y-4">
+                <div className="space-y-4 md:space-y-5 pb-8 has-[.group:focus-within_details[open]]:pb-56 has-[.group:hover_details[open]]:pb-56 md:pb-10">
                     {/* 区切り文字 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -279,9 +424,9 @@ export default function InputView() {
                                     key={opt.value}
                                     type="button"
                                     onClick={() => setDelimiter(opt.value)}
-                                    className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-colors ${delimiter === opt.value
-                                        ? "bg-gray-800 text-white border-gray-800"
-                                        : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                    className={`rounded-full px-3.5 py-1.5 md:px-3 md:py-1 text-xs font-medium border transition-colors ${delimiter === opt.value
+                                        ? "filter-btn-active shadow-sm"
+                                        : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
                                         }`}
                                 >
                                     {opt.label}
@@ -292,129 +437,127 @@ export default function InputView() {
 
                     {/* テキストエリア */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            データを貼り付け
-                        </label>
+                        <div className="flex items-center gap-1.5 mb-1 md:mb-1.5">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                データを貼り付け
+                            </label>
+                        </div>
                         <textarea
                             value={bulkText}
                             onChange={(e) => {
                                 setBulkText(e.target.value);
                                 setBulkResult(null);
                             }}
-                            /* placeholder={
-                                delimiter === "tab"
-                                    ? "スプレッドシートからコピペ\n（単語  意味  例文 の3列）"
-                                    : delimiter === "comma"
-                                        ? "compromise,妥協する,They had to compromise.\nrevenue,収益,The revenue increased."
-                                        : "compromise;妥協する;They had to compromise.\nrevenue;収益;The revenue increased."
-                            } */
                             rows={6}
                             className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm font-mono focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                         />
-                        {/* <p className="mt-1 text-xs text-gray-400">
-                            1行 = 1単語。各行に「単語{DELIMITER_OPTIONS.find((d) => d.value === delimiter)!.label}意味{DELIMITER_OPTIONS.find((d) => d.value === delimiter)!.label}例文」の順で入力（例文は省略可）
-                        </p> */}
                     </div>
 
-                    {/* カテゴリ */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            カテゴリ（全件に適用）
-                        </label>
-                        <select
-                            value={bulkCategory}
-                            onChange={(e) =>
-                                setBulkCategory(e.target.value as Category)
-                            }
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-                        >
-                            {CATEGORIES.map((c) => (
-                                <option key={c} value={c}>
-                                    {c}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <div className="space-y-3">
+                        {/* カテゴリ */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-1.5">
+                                カテゴリ（全件に適用）
+                            </label>
+                            <select
+                                value={bulkCategory}
+                                onChange={(e) =>
+                                    setBulkCategory(e.target.value as Category)
+                                }
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                            >
+                                {CATEGORIES.map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                    {/* プレビュー */}
-                    {parsedRows.length > 0 && (
-                        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                            <p className="text-xs font-medium text-gray-500 mb-2">
-                                プレビュー（{parsedRows.length}件）
-                            </p>
-                            {duplicateRows.length > 0 && (
-                                <p className="text-xs text-orange-600 mb-2">
-                                    ⚠ {duplicateRows.length}件が既に登録済み
+                        {/* プレビュー */}
+                        {parsedRows.length > 0 && (
+                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                                <p className="text-xs font-medium text-gray-500 mb-2">
+                                    プレビュー（{parsedRows.length}件）
                                 </p>
-                            )}
-                            <ul className="space-y-1.5">
-                                {parsedRows.slice(0, 5).map((row, i) => {
-                                    const isDup = existingTerms.has(row.term.toLowerCase());
-                                    return (
-                                        <li
-                                            key={i}
-                                            className="text-sm text-gray-700"
-                                        >
-                                            <span className="font-semibold">
-                                                {row.term}
-                                            </span>
-                                            {isDup && (
-                                                <span className="ml-1.5 inline-block rounded-full bg-orange-100 text-orange-600 border border-orange-200 px-1.5 py-0 text-[10px] font-medium">
-                                                    重複
-                                                </span>
-                                            )}
-                                            <span className="text-gray-400 mx-1.5">
-                                                →
-                                            </span>
-                                            <span>{row.meaning}</span>
-                                            {row.context && (
-                                                <span className="text-gray-400 text-xs ml-2">
-                                                    ({row.context})
-                                                </span>
-                                            )}
-                                        </li>
-                                    );
-                                })}
-                                {parsedRows.length > 5 && (
-                                    <li className="text-xs text-gray-400">
-                                        ...他 {parsedRows.length - 5} 件
-                                    </li>
+                                {duplicateRows.length > 0 && (
+                                    <p className="text-xs text-orange-600 mb-2">
+                                        ⚠ {duplicateRows.length}件が既に登録済み
+                                    </p>
                                 )}
-                            </ul>
-                        </div>
-                    )}
+                                <ul className="space-y-1.5">
+                                    {(showAllPreview ? parsedRows : parsedRows.slice(0, 5)).map((row, i) => {
+                                        const isDup = existingTerms.has(row.term.toLowerCase());
+                                        return (
+                                            <li
+                                                key={i}
+                                                className={`text-xs p-2 rounded border flex flex-col gap-0.5 ${isDup
+                                                    ? "bg-orange-50/50 border-orange-100 text-orange-800"
+                                                    : "bg-white border-gray-100 text-gray-700"
+                                                    }`}
+                                            >
+                                                <div className="flex justify-between items-center font-medium">
+                                                    <span className="font-mono text-sm">{row.term}</span>
+                                                    {isDup && <span className="text-[10px] bg-orange-100 px-1.5 py-0.5 rounded">既登録</span>}
+                                                </div>
+                                                <div className="text-gray-600 dark:text-gray-400">{row.meaning}</div>
+                                                {row.context && (
+                                                    <div className="text-gray-400 dark:text-gray-500 italic text-[11px] mt-0.5">
+                                                        {row.context}
+                                                    </div>
+                                                )}
+                                            </li>
+                                        );
+                                    })}
+                                    {parsedRows.length > 5 && (
+                                        <li>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAllPreview((v) => !v)}
+                                                className="text-xs text-blue-500 hover:text-blue-700 hover:underline"
+                                            >
+                                                {showAllPreview
+                                                    ? "折りたたむ"
+                                                    : `...他 ${parsedRows.length - 5} 件`}
+                                            </button>
+                                        </li>
+                                    )}
+                                </ul>
+                            </div>
+                        )}
 
-                    {/* 結果メッセージ */}
-                    {bulkResult && (
-                        <div
-                            className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium ${bulkResult.type === "success"
-                                ? "bg-green-50 text-green-700 border border-green-200"
-                                : "bg-red-50 text-red-700 border border-red-200"
-                                }`}
+                        {/* 結果メッセージ */}
+                        {bulkResult && (
+                            <div
+                                className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium ${bulkResult.type === "success"
+                                    ? "bg-green-50 text-green-700 border border-green-200"
+                                    : "bg-red-50 text-red-700 border border-red-200"
+                                    }`}
+                            >
+                                {bulkResult.type === "success" ? (
+                                    <CheckCircle size={16} />
+                                ) : (
+                                    <AlertCircle size={16} />
+                                )}
+                                {bulkResult.message}
+                            </div>
+                        )}
+
+                        {/* 登録ボタン */}
+                        <button
+                            type="button"
+                            onClick={handleBulkSubmit}
+                            disabled={bulkLoading || parsedRows.length === 0}
+                            className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 md:py-2.5 text-base md:text-sm font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {bulkResult.type === "success" ? (
-                                <CheckCircle size={16} />
-                            ) : (
-                                <AlertCircle size={16} />
-                            )}
-                            {bulkResult.message}
-                        </div>
-                    )}
-
-                    {/* 登録ボタン */}
-                    <button
-                        type="button"
-                        onClick={handleBulkSubmit}
-                        disabled={bulkLoading || parsedRows.length === 0}
-                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Upload size={18} />
-                        {bulkLoading
-                            ? "登録中..."
-                            : parsedRows.length > 0
-                                ? `${parsedRows.length}件を一括登録`
-                                : "一括登録"}
-                    </button>
+                            <Upload size={18} />
+                            {bulkLoading
+                                ? "登録中..."
+                                : parsedRows.length > 0
+                                    ? `${parsedRows.length}件を一括登録`
+                                    : "一括登録"}
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
