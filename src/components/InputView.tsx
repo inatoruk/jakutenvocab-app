@@ -245,7 +245,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             handleCopyPrompt();
                         }
                     }}
-                    className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer transition-colors focus:outline-none"
+                    className="absolute right-2 top-2 cursor-pointer focus:outline-none copy-btn-icon"
                     title="コピー"
                 >
                     {copied ? (

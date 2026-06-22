@@ -533,3 +533,37 @@ html[data-theme="system"] .speak-button:active:not(:disabled) {
         background-color: #111827;
     }
 }
+
+/* コピーアイコン用スタイル（Tailwind !important 回避） */
+.copy-btn-icon {
+    color: #9ca3af; /* text-gray-400 */
+    transition: color 0.2s ease;
+}
+
+.copy-btn-icon:hover {
+    color: #4b5563; /* text-gray-600 */
+}
+
+/* ダークモード */
+html[data-theme="dark"] .copy-btn-icon,
+html[data-theme="system"] .copy-btn-icon {
+    color: #6b7280; /* text-gray-500 */
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .copy-btn-icon {
+        color: #6b7280;
+    }
+}
+
+/* ダークモードホバー */
+html[data-theme="dark"] .copy-btn-icon:hover,
+html[data-theme="system"] .copy-btn-icon:hover {
+    color: #d1d5db; /* text-gray-300 */
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .copy-btn-icon:hover {
+        color: #d1d5db;
+    }
+}
