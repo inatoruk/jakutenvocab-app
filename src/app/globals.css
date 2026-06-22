@@ -382,6 +382,7 @@ html[data-theme="dark"] .settings-btn-danger:hover {
     position: relative;
     overflow: hidden;
     background-color: #e5e7eb; /* bg-gray-200 */
+    border-radius: 6px; /* 角丸長方形 */
 }
 
 html[data-theme="dark"] .skeleton-bar {
@@ -402,7 +403,7 @@ html[data-theme="dark"] .skeleton-bar {
         rgba(255, 255, 255, 0.6) 60%,
         rgba(255, 255, 255, 0) 100%
     );
-    animation: shimmer-skeleton 1.6s infinite;
+    animation: shimmer-skeleton 1.0s infinite; /* 1.6s -> 1.0s に高速化 */
     content: '';
 }
 
