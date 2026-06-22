@@ -468,3 +468,68 @@ html[data-theme="dark"] .animate-shimmer-input {
     ) !important;
     background-size: 200% 100% !important;
 }
+
+/* ============================================
+   読み上げ再生ボタン専用スタイル（Tailwind !important 回避）
+   ============================================ */
+
+.speak-button {
+    background-color: #ffffff;
+    border-color: #d1d5db; /* border-gray-300 */
+    color: #374151; /* text-gray-700 */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.speak-button:hover:not(:disabled) {
+    background-color: #f9fafb; /* bg-gray-50 */
+    border-color: #9ca3af; /* border-gray-400 */
+    color: #111827; /* text-gray-900 */
+}
+
+.speak-button:active:not(:disabled) {
+    background-color: #f3f4f6; /* bg-gray-100 */
+}
+
+/* ダークモード */
+html[data-theme="dark"] .speak-button,
+html[data-theme="system"] .speak-button {
+    background-color: #1f2937; /* bg-gray-800 equivalent */
+    border-color: #374151; /* border-gray-700 equivalent */
+    color: #d1d5db; /* text-gray-300 equivalent */
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .speak-button {
+        background-color: #1f2937;
+        border-color: #374151;
+        color: #d1d5db;
+    }
+}
+
+/* ダークモードホバー */
+html[data-theme="dark"] .speak-button:hover:not(:disabled),
+html[data-theme="system"] .speak-button:hover:not(:disabled) {
+    background-color: #374151; /* bg-gray-700 equivalent */
+    border-color: #4b5563; /* border-gray-600 equivalent */
+    color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .speak-button:hover:not(:disabled) {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #ffffff;
+    }
+}
+
+/* ダークモードアクティブ */
+html[data-theme="dark"] .speak-button:active:not(:disabled),
+html[data-theme="system"] .speak-button:active:not(:disabled) {
+    background-color: #111827; /* bg-gray-900 equivalent */
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .speak-button:active:not(:disabled) {
+        background-color: #111827;
+    }
+}
