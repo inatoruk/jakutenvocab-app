@@ -26,12 +26,12 @@ export async function POST(request: Request) {
 
         let systemInstruction = '';
         let contents = '';
-        let temperature = 0.1;
+        let temperature = 0.5;
 
         if (type === 'meaning') {
             systemInstruction = 'あなたは優秀な英語講師です。出力は意味のみとし、挨拶、解説、思考プロセス、前置きなどの余計な文章は一切含めないでください。例: "妥協する、和解"';
             contents = `英単語・熟語「${term}」の日本語における最も一般的で代表的な意味を1〜2つ、簡潔に教えてください。`;
-            temperature = 0.1;
+            temperature = 0.5;
         } else {
             systemInstruction = 'あなたは優秀な英語講師です。英単語・熟語の難易度に合わせた自然な英語の例文を作成してください。文脈が分かりやすく、実用的な文章にしてください。対象の単語・熟語の形（時制、単複、品詞など）は、最も一般的で自然な使われ方に適宜変形して使用して構いません。出力は英語の例文のみとし、挨拶、日本語訳、思考プロセス、前置きなどは一切含めないでください。';
             contents = `英単語・熟語「${term}」を使った、自然な英語の例文を1つ作成してください。`;
