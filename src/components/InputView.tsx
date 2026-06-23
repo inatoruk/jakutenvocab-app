@@ -384,7 +384,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                     isGeneratingMeaning ? "opacity-100" : "opacity-0"
                                 }`}
                             >
-                                <div className="h-3 w-[35%] skeleton-bar"></div>
+                                {isGeneratingMeaning && <div className="h-3 w-[35%] skeleton-bar"></div>}
                             </div>
                         </div>
                     </div>
@@ -438,12 +438,16 @@ export default function InputView({ onAdded }: InputViewProps) {
                                     isGeneratingExample ? "opacity-100" : "opacity-0"
                                 }`}
                             >
-                                <div className="h-6 md:h-5 flex items-center">
-                                    <div className="h-3 w-[85%] skeleton-bar"></div>
-                                </div>
-                                <div className="h-6 md:h-5 flex items-center">
-                                    <div className="h-3 w-[55%] skeleton-bar"></div>
-                                </div>
+                                {isGeneratingExample && (
+                                    <>
+                                        <div className="h-6 md:h-5 flex items-center">
+                                            <div className="h-3 w-[85%] skeleton-bar"></div>
+                                        </div>
+                                        <div className="h-6 md:h-5 flex items-center">
+                                            <div className="h-3 w-[55%] skeleton-bar"></div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                         <button
