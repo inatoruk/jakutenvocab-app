@@ -34,9 +34,10 @@ export async function POST(request: Request) {
             temperature = 0.5;
         } else if (type === 'example') {
             systemInstruction = 'あなたは優秀な英語講師です。英単語・熟語の難易度に合わせた自然な英語の例文を作成してください。文脈が分かりやすく、実用的な文章にしてください。対象の単語・熟語の形（時制、単複、品詞など）は、最も一般的で自然な使われ方に適宜変形して使用して構いません。出力は英語の例文のみとし、挨拶、日本語訳、思考プロセス、前置きなどは一切含めないでください。毎回異なる視点や状況を想定し、バリエーション豊かな例文を出力してください。';
-            const situations = ['ビジネスのメールや会議', '友達とのカジュアルな日常会話', 'ニュースや雑誌の記事', '旅行中のトラブルや出来事', '学校やオフィスでの雑談', 'フォーマルなスピーチや発表'];
-            const randomSituation = situations[Math.floor(Math.random() * situations.length)];
-            contents = `英単語・熟語「${term}」を使った、自然な英語の例文を1つ作成してください。\n\n【条件】\n想定シチュエーション: ${randomSituation}`;
+            // const situations = ['ビジネスのメールや会議', '友達とのカジュアルな日常会話', 'ニュースや雑誌の記事', '旅行中のトラブルや出来事', '学校やオフィスでの雑談', 'フォーマルなスピーチや発表'];
+            // const randomSituation = situations[Math.floor(Math.random() * situations.length)];
+            // contents = `英単語・熟語「${term}」を使った、自然な英語の例文を1つ作成してください。\n\n【条件】\n想定シチュエーション: ${randomSituation}`;
+            contents = `英単語・熟語「${term}」を使った、自然な英語の例文を1つ作成してください。`;
             temperature = 0.9; // 高めの温度とシチュエーション指定で多様性を出す
         }
 
