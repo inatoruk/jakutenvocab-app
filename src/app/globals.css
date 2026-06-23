@@ -473,7 +473,7 @@ html[data-theme="dark"] .skeleton-bar::after {
         rgba(255, 255, 255, 0) 100%
     ) !important;
     background-size: 300% 300% !important;
-    animation: shimmer-glow 3s infinite ease-in-out !important;
+    animation: shimmer-glow 6s infinite ease-in-out !important;
     pointer-events: none;
 }
 
