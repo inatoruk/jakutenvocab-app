@@ -434,20 +434,30 @@ html[data-theme="dark"] .skeleton-bar::after {
     }
 }
 
-/* AI生成中のコンテナ背景・ボーダーの脈動演出 */
+/* AI生成中のコンテナ背景・ボーダーの脈動演出（ゆらゆら波打ちアニメーション） */
 @keyframes shimmer-glow {
     0% {
-        background-position: -200% 0;
+        background-position: 0% 50%;
         border-color: rgba(59, 130, 246, 0.5);
         box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
     }
+    25% {
+        background-position: 50% 100%;
+        border-color: rgba(99, 102, 241, 0.55);
+        box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+    }
     50% {
-        background-position: 100% 0;
+        background-position: 100% 50%;
         border-color: rgba(139, 92, 246, 0.6);
         box-shadow: 0 0 16px rgba(139, 92, 246, 0.4);
     }
+    75% {
+        background-position: 50% 0%;
+        border-color: rgba(99, 102, 241, 0.55);
+        box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+    }
     100% {
-        background-position: 200% 0;
+        background-position: 0% 50%;
         border-color: rgba(59, 130, 246, 0.5);
         box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
     }
@@ -455,29 +465,29 @@ html[data-theme="dark"] .skeleton-bar::after {
 
 .animate-shimmer-input {
     background: linear-gradient(
-        90deg,
+        135deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(59, 130, 246, 0.08) 35%,
-        rgba(139, 92, 246, 0.08) 50%,
-        rgba(59, 130, 246, 0.08) 65%,
+        rgba(59, 130, 246, 0.1) 25%,
+        rgba(139, 92, 246, 0.15) 50%,
+        rgba(59, 130, 246, 0.1) 75%,
         rgba(255, 255, 255, 0) 100%
     ) !important;
-    background-size: 200% 100% !important;
-    animation: shimmer-glow 2.5s infinite linear !important;
+    background-size: 300% 300% !important;
+    animation: shimmer-glow 3s infinite ease-in-out !important;
     pointer-events: none;
 }
 
 /* ダークモードでの調整 */
 html[data-theme="dark"] .animate-shimmer-input {
     background: linear-gradient(
-        90deg,
+        135deg,
         rgba(31, 41, 55, 0) 0%,
-        rgba(59, 130, 246, 0.28) 35%,
-        rgba(139, 92, 246, 0.28) 50%,
-        rgba(59, 130, 246, 0.28) 65%,
+        rgba(59, 130, 246, 0.3) 25%,
+        rgba(139, 92, 246, 0.35) 50%,
+        rgba(59, 130, 246, 0.3) 75%,
         rgba(31, 41, 55, 0) 100%
     ) !important;
-    background-size: 200% 100% !important;
+    background-size: 300% 300% !important;
 }
 
 /* ============================================
