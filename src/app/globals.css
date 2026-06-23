@@ -434,32 +434,18 @@ html[data-theme="dark"] .skeleton-bar::after {
     }
 }
 
-/* AI生成中のコンテナ背景・ボーダーの脈動演出（ゆらゆら波打ちアニメーション） */
+/* AI生成中のコンテナ背景・ボーダーの脈動演出（ゆらゆら波打ち＆呼吸アニメーション） */
 @keyframes shimmer-glow {
-    0% {
+    0%, 100% {
         background-position: 0% 50%;
-        border-color: rgba(59, 130, 246, 0.5);
-        box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
-    }
-    25% {
-        background-position: 50% 100%;
-        border-color: rgba(99, 102, 241, 0.55);
-        box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+        border-color: rgba(99, 102, 241, 0.3);
+        box-shadow: 0 0 4px rgba(99, 102, 241, 0.15);
     }
     50% {
         background-position: 100% 50%;
-        border-color: rgba(139, 92, 246, 0.6);
-        box-shadow: 0 0 16px rgba(139, 92, 246, 0.4);
-    }
-    75% {
-        background-position: 50% 0%;
-        border-color: rgba(99, 102, 241, 0.55);
-        box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
-    }
-    100% {
-        background-position: 0% 50%;
-        border-color: rgba(59, 130, 246, 0.5);
-        box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+        border-color: rgba(139, 92, 246, 0.75);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.6), 
+                    0 0 6px rgba(59, 130, 246, 0.3);
     }
 }
 
@@ -473,7 +459,7 @@ html[data-theme="dark"] .skeleton-bar::after {
         rgba(255, 255, 255, 0) 100%
     ) !important;
     background-size: 300% 300% !important;
-    animation: shimmer-glow 6s infinite ease-in-out !important;
+    animation: shimmer-glow 3s infinite ease-in-out !important;
     pointer-events: none;
 }
 
