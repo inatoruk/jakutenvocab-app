@@ -372,18 +372,23 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 AI生成
                             </button>
                         </div>
-                        {isGeneratingMeaning ? (
-                            <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-[50px] md:h-[42px] animate-shimmer-input">
-                                <div className="h-3 w-[35%] skeleton-bar"></div>
-                            </div>
-                        ) : (
+                        <div className="relative w-full h-[50px] md:h-[42px]">
                             <input
                                 type="text"
                                 value={meaning}
                                 onChange={(e) => setMeaning(e.target.value)}
-                                className="block w-full h-[50px] md:h-[42px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className={`absolute inset-0 block w-full h-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-opacity duration-500 ${
+                                    isGeneratingMeaning ? "opacity-0 pointer-events-none" : "opacity-100"
+                                }`}
                             />
-                        )}
+                            <div
+                                className={`absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-full animate-shimmer-input transition-opacity duration-500 ${
+                                    isGeneratingMeaning ? "opacity-100" : "opacity-0 pointer-events-none"
+                                }`}
+                            >
+                                <div className="h-3 w-[35%] skeleton-bar"></div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* 例文 */}
@@ -422,8 +427,21 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 AI生成
                             </button>
                         </div>
-                        {isGeneratingExample ? (
-                            <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-[102px] md:h-[66px] animate-shimmer-input">
+                        <div className="relative w-full h-[102px] md:h-[66px]">
+                            <textarea
+                                value={context}
+                                onChange={(e) => setContext(e.target.value)}
+                                rows={isMobile ? 3 : 2}
+                                suppressHydrationWarning
+                                className={`absolute inset-0 block w-full h-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-opacity duration-500 ${
+                                    isGeneratingExample ? "opacity-0 pointer-events-none" : "opacity-100"
+                                }`}
+                            />
+                            <div
+                                className={`absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input transition-opacity duration-500 ${
+                                    isGeneratingExample ? "opacity-100" : "opacity-0 pointer-events-none"
+                                }`}
+                            >
                                 <div className="h-6 md:h-5 flex items-center">
                                     <div className="h-3 w-[85%] skeleton-bar"></div>
                                 </div>
@@ -431,15 +449,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                     <div className="h-3 w-[55%] skeleton-bar"></div>
                                 </div>
                             </div>
-                        ) : (
-                            <textarea
-                                value={context}
-                                onChange={(e) => setContext(e.target.value)}
-                                rows={isMobile ? 3 : 2}
-                                suppressHydrationWarning
-                                className="block w-full h-[102px] md:h-[66px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                            />
-                        )}
+                        </div>
                         <button
                             type="button"
                             onClick={() => speak(context)}
