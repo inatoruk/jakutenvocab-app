@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
-import { Vocab, Category } from "@/types/vocab";
+import { Vocab, Category, Status } from "@/types/vocab";
+import { processDecay, calcReviewDueAt } from "@/lib/vocab";
 import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen } from "lucide-react";
 import { AppSettings } from "@/lib/settings";
 import nlp from "compromise";
@@ -64,8 +65,8 @@ function buildSession(allCards: Vocab[], mode: ReviewMode, settings: AppSettings
     if (mode === "writing") {
         // Writing カテゴリのみ。未習得を先、習得済みを末尾に固定
         const writingCards = allCards.filter((c) => c.category === "Writing");
-        const unmastered = writingCards.filter((c) => c.status !== 2);
-        const mastered = writingCards.filter((c) => c.status === 2);
+        const unmastered = writingCards.filter((c) => c.status < 2);
+        const mastered = writingCards.filter((c) => c.status >= 2);
         if (settings.reviewOrder === "random") {
             return applyLimit([...shuffleArr(unmastered), ...mastered]);
         }
@@ -109,7 +110,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             .from("vocab")
             .select("*")
             .order("created_at", { ascending: true });
-        const fetched = (data as Vocab[]) || [];
+        const raw = (data as Vocab[]) || [];
+        // 期限切れカードを降格処理（バックグラウンドでDB更新）
+        const fetched = processDecay(raw);
         setAllCards(fetched);
         setSessionCards(buildSession(fetched, reviewModeRef.current, settingsRef.current));
         setCurrentIndex(0);
@@ -152,19 +155,31 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     async function handleMastered() {
         if (!currentCard) return;
 
+        // 新しいステータス（最大 5）
+        const newStatus = Math.min(currentCard.status + 1, 5) as Status;
+
+        // Writing は降格スケジュール対象外なので review_due_at は更新しない
+        const isWriting = currentCard.category === "Writing";
+        const newDueAt = isWriting ? currentCard.review_due_at : calcReviewDueAt(newStatus);
+
         // DB 更新
-        await supabase.from("vocab").update({ status: 2 }).eq("id", currentCard.id);
+        await supabase
+            .from("vocab")
+            .update({ status: newStatus, review_due_at: newDueAt })
+            .eq("id", currentCard.id);
+
+        const updatedCard: Vocab = { ...currentCard, status: newStatus, review_due_at: newDueAt };
 
         // allCards を最新に保つ（次のセッション構築に使う）
         setAllCards((prev) =>
-            prev.map((c) => (c.id === currentCard.id ? { ...c, status: 2 } : c))
+            prev.map((c) => (c.id === currentCard.id ? updatedCard : c))
         );
 
         if (reviewMode === "writing") {
             // Writing: 覚えたカードを末尾に移動（セッションから消さない）
             setSessionCards((prev) => {
                 const rest = prev.filter((c) => c.id !== currentCard.id);
-                return [...rest, { ...currentCard, status: 2 }];
+                return [...rest, updatedCard];
             });
             // 最後のカードだった場合は先頭に戻す
             if (currentIndex >= sessionCards.length - 1) setCurrentIndex(0);
@@ -209,8 +224,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setSessionCards((prev) => {
             if (reviewMode === "writing") {
                 // Writing: 未習得グループのみシャッフル、習得済みは末尾固定
-                const unmastered = prev.filter((c) => c.status !== 2);
-                const mastered = prev.filter((c) => c.status === 2);
+                const unmastered = prev.filter((c) => c.status < 2);
+                const mastered = prev.filter((c) => c.status >= 2);
                 return [...shuffleArr(unmastered), ...mastered];
             }
             return shuffleArr(prev);

@@ -3,18 +3,28 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Vocab, Category, CATEGORIES, Status } from "@/types/vocab";
+import { processDecay } from "@/lib/vocab";
 import { Search, X, Check, Loader2, Link2 } from "lucide-react";
 
-const STATUS_LABELS: Record<Status, string> = {
+// 表面上の3段階（内部ステータス 2〜5 はまとめて「習得済み」）
+// フィルター・バッジを 0 / 1 / 2 の 3段階で分類
+const STATUS_LABELS: Record<0 | 1 | 2, string> = {
     0: "未学習",
     1: "学習中",
     2: "習得済み",
 };
-const STATUS_STYLES: Record<Status, string> = {
+const STATUS_STYLES: Record<0 | 1 | 2, string> = {
     0: "bg-red-50 text-red-600 border-red-200",
     1: "bg-orange-50 text-orange-600 border-orange-200",
     2: "bg-green-50 text-green-600 border-green-200",
 };
+
+/** 内部ステータス（0、5）を表面上の3段階（0/1/2）にマッピング */
+function toDisplayStatus(status: Status): 0 | 1 | 2 {
+    if (status === 0) return 0;
+    if (status === 1) return 1;
+    return 2;
+}
 const CATEGORY_STYLES: Record<Category, string> = {
     Vocab: "bg-blue-50 text-blue-600 border-blue-200",
     Paraphrase: "bg-purple-50 text-purple-600 border-purple-200",
@@ -74,7 +84,10 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             .from("vocab")
             .select("*")
             .order("created_at", { ascending: false });
-        if (data) setWords(data as Vocab[]);
+        if (data) {
+            // 期限切れカードを降格処理（バックグラウンドでDB更新）
+            setWords(processDecay(data as Vocab[]));
+        }
         if (!silent) setLoading(false);
     }, []);
 
@@ -97,7 +110,11 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
     // フィルタリング
     const filteredWords = words.filter((word) => {
         if (filterCategory !== "all" && word.category !== filterCategory) return false;
-        if (filterStatus !== "all" && word.status !== filterStatus) return false;
+        // 表面ステータスフィルター：status=2 のフィルターは内部ステータス、2「以上」にマッチ
+        if (filterStatus !== "all") {
+            const display = toDisplayStatus(word.status);
+            if (display !== filterStatus) return false;
+        }
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
             return (
@@ -301,7 +318,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     >
                         全ステータス
                     </button>
-                    {([0, 1, 2] as Status[]).map((s) => (
+                    {([0, 1, 2] as (0 | 1 | 2)[]).map((s) => (
                         <button
                             key={s}
                             onClick={() => {
@@ -401,9 +418,9 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                                 </span>
                                             </div>
                                             <span
-                                                className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[word.status]}`}
+                                                className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[toDisplayStatus(word.status)]}`}
                                             >
-                                                {STATUS_LABELS[word.status]}
+                                                {STATUS_LABELS[toDisplayStatus(word.status)]}
                                             </span>
                                         </div>
                                     </div>
@@ -541,7 +558,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     }
                                     className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
                                 >
-                                    {([0, 1, 2] as Status[]).map((s) => (
+                                    {([0, 1, 2] as (0 | 1 | 2)[]).map((s) => (
                                         <option key={s} value={s}>
                                             {STATUS_LABELS[s]}
                                         </option>

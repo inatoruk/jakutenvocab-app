@@ -2,7 +2,7 @@ export type Category = "Vocab" | "Paraphrase" | "Listening" | "Writing";
 
 export const CATEGORIES: Category[] = ["Vocab", "Paraphrase", "Listening", "Writing"];
 
-export type Status = 0 | 1 | 2;
+export type Status = 0 | 1 | 2 | 3 | 4 | 5;
 
 export type Vocab = {
     id: string;
@@ -12,4 +12,5 @@ export type Vocab = {
     category: Category;
     status: Status;
     created_at: string;
+    review_due_at: string | null;
 };
