@@ -526,6 +526,52 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         );
     }
 
+    function blankTermWithInput(context: string, term: string) {
+        if (!term || !context) return <span>{context}</span>;
+        
+        const regex = getMatchedTextsRegex(context, term);
+        
+        const cleanTerm = term.trim().replace(/^[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+|[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+$/g, "");
+        const fallbackRegex = cleanTerm 
+            ? new RegExp(`(${cleanTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
+            : null;
+            
+        const activeRegex = regex || fallbackRegex;
+        if (!activeRegex) return <span>{context}</span>;
+        
+        const parts = context.split(activeRegex);
+        return (
+            <span>
+                {parts.map((part, i) =>
+                    i % 2 === 1 ? (
+                        <input
+                            key={i}
+                            ref={inputRef}
+                            type="text"
+                            value={paraphraseInput}
+                            onChange={(e) => {
+                                setParaphraseInput(e.target.value);
+                                setSameWordWarning(false);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") handleParaphraseSubmit();
+                            }}
+                            placeholder="paraphrase"
+                            className="inline-block border-b-2 border-violet-400 bg-transparent text-center focus:ring-0 focus:outline-none focus:border-violet-600 text-violet-700 font-semibold px-1"
+                            style={{ 
+                                width: `${Math.max(part.length + 2, paraphraseInput.length + 1)}ch` 
+                            }}
+                            autoComplete="off"
+                            autoCapitalize="none"
+                        />
+                    ) : (
+                        <span key={i}>{part}</span>
+                    )
+                )}
+            </span>
+        );
+    }
+
     // ─── UI ──────────────────────────────────────────────────────────────────
 
     if (loading) {
@@ -669,7 +715,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     {/* 例文（空欄あり） */}
                                     {currentCard.context && (
                                         <p className="text-base leading-relaxed text-gray-700 text-center bg-gray-50 rounded-lg px-4 py-3">
-                                            {blankTermInContext(currentCard.context, currentCard.term)}
+                                            {blankTermWithInput(currentCard.context, currentCard.term)}
                                         </p>
                                     )}
                                     {/* グループ未登録の警告 */}
@@ -680,31 +726,33 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     )}
                                     {/* 入力フォーム */}
                                     <div className="space-y-2">
-                                        <div className="flex gap-2">
-                                            <input
-                                                ref={inputRef}
-                                                type="text"
-                                                value={paraphraseInput}
-                                                onChange={(e) => {
-                                                    setParaphraseInput(e.target.value);
-                                                    setSameWordWarning(false);
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter") handleParaphraseSubmit();
-                                                }}
-                                                placeholder="パラフレーズを入力..."
-                                                className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
-                                                autoComplete="off"
-                                                autoCapitalize="none"
-                                            />
-                                            <button
-                                                onClick={handleParaphraseSubmit}
-                                                disabled={!paraphraseInput.trim()}
-                                                className="rounded-lg bg-violet-600 px-4 py-3 text-white hover:bg-violet-700 active:bg-violet-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                                            >
-                                                <SendHorizontal size={18} />
-                                            </button>
-                                        </div>
+                                        {!currentCard.context && (
+                                            <div className="flex gap-2">
+                                                <input
+                                                    ref={inputRef}
+                                                    type="text"
+                                                    value={paraphraseInput}
+                                                    onChange={(e) => {
+                                                        setParaphraseInput(e.target.value);
+                                                        setSameWordWarning(false);
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") handleParaphraseSubmit();
+                                                    }}
+                                                    placeholder="パラフレーズを入力..."
+                                                    className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
+                                                    autoComplete="off"
+                                                    autoCapitalize="none"
+                                                />
+                                                <button
+                                                    onClick={handleParaphraseSubmit}
+                                                    disabled={!paraphraseInput.trim()}
+                                                    className="rounded-lg bg-violet-600 px-4 py-3 text-white hover:bg-violet-700 active:bg-violet-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                                >
+                                                    <SendHorizontal size={18} />
+                                                </button>
+                                            </div>
+                                        )}
                                         {/* 同じ単語の警告 */}
                                         {sameWordWarning && (
                                             <p className="text-xs text-red-500 px-1">
@@ -725,22 +773,31 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                 <div className="space-y-5">
                                     {/* 正誤バッジ */}
                                     {paraphraseResult !== null && (
-                                        <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold ${
+                                        <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                             paraphraseResult === "correct"
                                                 ? "bg-green-50 text-green-700 border border-green-200"
                                                 : paraphraseResult === "synonym"
                                                     ? "bg-blue-50 text-blue-700 border border-blue-200"
                                                     : "bg-red-50 text-red-700 border border-red-200"
                                         }`}>
-                                            {paraphraseResult === "correct" && "✅ 正解！"}
-                                            {paraphraseResult === "synonym" && "🔵 Nice synonym! (登録外の正解)"}
-                                            {paraphraseResult === "incorrect" && (
-                                                aiChecking
-                                                    ? <span className="inline-flex items-center gap-1.5"><Loader2 size={14} className="animate-spin" />AI判定中...</span>
-                                                    : "❌ 不正解"
-                                            )}
+                                            <span>
+                                                {paraphraseResult === "correct" && "✅ 正解！"}
+                                                {paraphraseResult === "synonym" && "🔵 Nice synonym! (登録外の正解)"}
+                                                {paraphraseResult === "incorrect" && (
+                                                    aiChecking
+                                                        ? <span className="inline-flex items-center justify-center gap-1.5"><Loader2 size={14} className="animate-spin" />AI判定中...</span>
+                                                        : "❌ 不正解"
+                                                )}
+                                            </span>
                                         </div>
                                     )}
+                                    {/* 入力された回答の表示 */}
+                                    <div className="text-center text-sm">
+                                        <span className="text-gray-500">あなたの回答: </span>
+                                        <span className={`font-semibold ${paraphraseInput.trim() ? "text-gray-800" : "text-gray-400 italic"}`}>
+                                            {paraphraseInput.trim() || "(未入力)"}
+                                        </span>
+                                    </div>
 
                                     {/* 出題単語の振り返り */}
                                     <div className="text-center">
