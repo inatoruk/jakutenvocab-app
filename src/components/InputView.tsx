@@ -251,7 +251,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                     {copied ? (
                         <Check size={16} className="text-green-500" />
                     ) : (
-                        <Copy size={16} className="-scale-y-100" />
+                        <Copy size={16} strokeWidth={1.5} style={{ transform: "scaleY(-1.1)" }} />
                     )}
                 </div>
             </div>

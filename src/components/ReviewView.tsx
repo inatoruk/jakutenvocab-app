@@ -5,11 +5,11 @@ import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Vocab, Category, Status } from "@/types/vocab";
 import { processDecay, calcReviewDueAt } from "@/lib/vocab";
-import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen } from "lucide-react";
+import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Loader2, Sparkles, SendHorizontal } from "lucide-react";
 import { AppSettings } from "@/lib/settings";
 import nlp from "compromise";
 
-type ReviewMode = "unlearned" | "all" | "writing";
+type ReviewMode = "unlearned" | "all" | "writing" | "paraphrase";
 
 const CATEGORY_STYLES: Record<Category, string> = {
     Vocab: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60",
@@ -73,11 +73,32 @@ function buildSession(allCards: Vocab[], mode: ReviewMode, settings: AppSettings
         return applyLimit([...sortGroup(unmastered), ...sortGroup(mastered)]);
     }
 
+    if (mode === "paraphrase") {
+        // Paraphrase カテゴリのうち、パラフレーズグループに属するもの優先。ランダムシャッフル。
+        const paraphraseCards = allCards.filter((c) => c.category === "Paraphrase");
+        if (settings.reviewOrder === "random") {
+            return applyLimit(shuffleArr([...paraphraseCards]));
+        }
+        return applyLimit(sortGroup([...paraphraseCards]));
+    }
+
     // all モード
     if (settings.reviewOrder === "random") {
         return applyLimit(shuffleArr([...allCards]));
     }
     return applyLimit(sortGroup([...allCards]));
+}
+
+/** compromise で入力単語を見出し語化して返す */
+function lemmatize(word: string): string {
+    const doc = nlp(word.trim());
+    // 動詞 → 原形
+    const verbBase = doc.verbs().toInfinitive().out("text");
+    if (verbBase) return verbBase.toLowerCase();
+    // 名詞 → 単数形
+    const nounSingular = doc.nouns().toSingular().out("text");
+    if (nounSingular) return nounSingular.toLowerCase();
+    return word.trim().toLowerCase();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -93,6 +114,25 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     const [reviewMode, setReviewMode] = useState<ReviewMode>("unlearned");
     const [showCompletion, setShowCompletion] = useState(false);
 
+    // ── パラフレーズグループデータ ──────────────────────────────────────────
+    // vocab_id → group_id のマッピング
+    const [paraphraseGroups, setParaphraseGroups] = useState<Record<string, string>>({});
+    // group_id → vocab_id[] のグループメンバーマッピング
+    const [groupMembers, setGroupMembers] = useState<Record<string, string[]>>({});
+    const paraphraseGroupsRef = useRef(paraphraseGroups);
+    const groupMembersRef = useRef(groupMembers);
+    useEffect(() => { paraphraseGroupsRef.current = paraphraseGroups; }, [paraphraseGroups]);
+    useEffect(() => { groupMembersRef.current = groupMembers; }, [groupMembers]);
+
+    // ── パラフレーズモード用の状態 ──────────────────────────────────────────
+    const [paraphraseInput, setParaphraseInput] = useState("");
+    const [paraphraseResult, setParaphraseResult] = useState<"correct" | "synonym" | "incorrect" | null>(null);
+    const [sameWordWarning, setSameWordWarning] = useState(false);
+    // AI非同期判定
+    const [aiChecking, setAiChecking] = useState(false);
+    const [aiHint, setAiHint] = useState<string | null>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
     // useEffect 内で最新値を参照するための Ref
     // （タブ開閉の effect は active だけを deps にするため）
     const allCardsRef = useRef(allCards);
@@ -103,6 +143,21 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     useEffect(() => { reviewModeRef.current = reviewMode; }, [reviewMode]);
 
     // ─── データ取得 ───────────────────────────────────────────────────────────
+
+    const fetchParaphraseGroups = useCallback(async () => {
+        const { data } = await supabase.from("paraphrase_groups").select("*");
+        if (data) {
+            const mapping: Record<string, string> = {};
+            const members: Record<string, string[]> = {};
+            (data as { vocab_id: string; group_id: string }[]).forEach(row => {
+                mapping[row.vocab_id] = row.group_id;
+                if (!members[row.group_id]) members[row.group_id] = [];
+                members[row.group_id].push(row.vocab_id);
+            });
+            setParaphraseGroups(mapping);
+            setGroupMembers(members);
+        }
+    }, []);
 
     const fetchAndBuildSession = useCallback(async () => {
         setLoading(true);
@@ -124,7 +179,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     // 初回ロード
     useEffect(() => {
         fetchAndBuildSession();
-    }, [fetchAndBuildSession]);
+        fetchParaphraseGroups();
+    }, [fetchAndBuildSession, fetchParaphraseGroups]);
 
     // 単語の追加・編集・削除があった時だけ再fetch（初回マウント時はスキップ）
     const vocabVersionInitialized = useRef(false);
@@ -134,12 +190,116 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             return;
         }
         fetchAndBuildSession();
-    }, [vocabVersion, fetchAndBuildSession]);
+        fetchParaphraseGroups();
+    }, [vocabVersion, fetchAndBuildSession, fetchParaphraseGroups]);
+
+    // パラフレーズモードに切り替わった時、入力欄にフォーカス
+    useEffect(() => {
+        if (reviewMode === "paraphrase" && !showAnswer) {
+            setTimeout(() => inputRef.current?.focus(), 100);
+        }
+    }, [reviewMode, currentIndex, showAnswer]);
 
     // ─── 現在のカード ──────────────────────────────────────────────────────────
 
     const currentCard = sessionCards[currentIndex] ?? null;
     const isWritingCard = currentCard?.category === "Writing";
+    const isParaphraseMode = reviewMode === "paraphrase";
+
+    // ─── パラフレーズ関連ロジック ──────────────────────────────────────────────
+
+    /** 現在のカードのグループメンバー (vocab) を取得 */
+    function getGroupSiblings(card: Vocab): Vocab[] {
+        const gid = paraphraseGroupsRef.current[card.id];
+        if (!gid) return [];
+        const memberIds = groupMembersRef.current[gid] ?? [];
+        return allCardsRef.current.filter(c => memberIds.includes(c.id) && c.id !== card.id);
+    }
+
+    /** パラフレーズ入力の送信ハンドラ */
+    async function handleParaphraseSubmit() {
+        if (!currentCard || !paraphraseInput.trim()) return;
+
+        const input = paraphraseInput.trim();
+        const inputLemma = lemmatize(input);
+        const displayedLemma = lemmatize(currentCard.term);
+
+        // 出題単語と同じ単語を入力した場合
+        if (inputLemma === displayedLemma) {
+            setSameWordWarning(true);
+            return;
+        }
+        setSameWordWarning(false);
+
+        const siblings = getGroupSiblings(currentCard);
+        // 登録済みグループ内に一致するかチェック
+        const matched = siblings.find(s => lemmatize(s.term) === inputLemma);
+
+        if (matched) {
+            // ローカル正解 (登録済みパラフレーズ)
+            setParaphraseResult("correct");
+            setShowAnswer(true);
+            // 非同期でIELTSヒントを取得
+            fetchAiHint(input, currentCard);
+        } else {
+            // 登録なし → とりあえず「不正解」表示して画面を展開
+            setParaphraseResult("incorrect");
+            setShowAnswer(true);
+            // 裏でAI判定
+            checkWithAi(input, currentCard);
+        }
+    }
+
+    /** AI非同期判定（未登録単語） */
+    async function checkWithAi(input: string, card: Vocab) {
+        setAiChecking(true);
+        setAiHint(null);
+        try {
+            const res = await fetch("/api/check-paraphrase", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    input,
+                    displayedTerm: card.term,
+                    meaning: card.meaning,
+                    context: card.context || "",
+                }),
+            });
+            const json = await res.json();
+            if (json.isValid) {
+                setParaphraseResult("synonym"); // Nice synonym
+            }
+            if (json.hint) setAiHint(json.hint);
+        } catch {
+            // AI判定失敗は無視
+        } finally {
+            setAiChecking(false);
+        }
+    }
+
+    /** 正解時のIELTSヒント取得（非同期）*/
+    async function fetchAiHint(input: string, card: Vocab) {
+        setAiChecking(true);
+        setAiHint(null);
+        try {
+            const res = await fetch("/api/check-paraphrase", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    input,
+                    displayedTerm: card.term,
+                    meaning: card.meaning,
+                    context: card.context || "",
+                }),
+            });
+            const json = await res.json();
+            if (json.hint) setAiHint(json.hint);
+        } catch {
+            // 無視
+        } finally {
+            setAiChecking(false);
+        }
+    }
 
     // ─── ハンドラ ─────────────────────────────────────────────────────────────
 
@@ -210,6 +370,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             setCurrentIndex(nextIndex);
             setShowAnswer(false);
         }
+        // パラフレーズモードのリセット
+        setParaphraseInput("");
+        setParaphraseResult(null);
+        setSameWordWarning(false);
+        setAiHint(null);
+        setAiChecking(false);
     }
 
     function handleStartNewSet() {
@@ -218,6 +384,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setCurrentIndex(0);
         setShowAnswer(false);
         setShowCompletion(false);
+        setParaphraseInput("");
+        setParaphraseResult(null);
+        setSameWordWarning(false);
+        setAiHint(null);
     }
 
     function handleShuffle() {
@@ -233,6 +403,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setCurrentIndex(0);
         setShowAnswer(false);
         setShowCompletion(false);
+        setParaphraseInput("");
+        setParaphraseResult(null);
+        setSameWordWarning(false);
+        setAiHint(null);
     }
 
     function handleModeChange(mode: ReviewMode) {
@@ -241,6 +415,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setCurrentIndex(0);
         setShowAnswer(false);
         setShowCompletion(false);
+        setParaphraseInput("");
+        setParaphraseResult(null);
+        setSameWordWarning(false);
+        setAiHint(null);
     }
 
     // ─── テキストユーティリティ ───────────────────────────────────────────────
@@ -249,7 +427,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         if (!term || !context) return null;
         
         // 検索する単語自体から、前後に付着しているピリオドや引用符などの記号をトリム
-        const cleanTerm = term.trim().replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+|[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+$/g, "");
+        const cleanTerm = term.trim().replace(/^[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+|[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+$/g, "");
         if (!cleanTerm) return null;
 
         // 単語を分割し、記号を除去して見出し語検索パターン（{word}）を作成
@@ -274,7 +452,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         // 実際にマッチした文字列のリストを取得し、その文字列からも前後の記号（ピリオド等）を除去する
         const matchedStrs = m.out("array")
             .filter(Boolean)
-            .map((s: string) => s.replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+|[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+$/g, ""))
+            .map((s: string) => s.replace(/^[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+|[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+$/g, ""))
             .filter(Boolean);
             
         if (matchedStrs.length === 0) return null;
@@ -290,7 +468,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         const regex = getMatchedTextsRegex(context, term);
         
         // フォールバック用の正規表現を作成する際も、termの前後の記号を除去する
-        const cleanTerm = term.trim().replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+|[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+$/g, "");
+        const cleanTerm = term.trim().replace(/^[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+|[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+$/g, "");
         const fallbackRegex = cleanTerm 
             ? new RegExp(`(${cleanTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
             : null;
@@ -320,7 +498,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         const regex = getMatchedTextsRegex(context, term);
         
         // フォールバック用の正規表現を作成する際も、termの前後の記号を除去する
-        const cleanTerm = term.trim().replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+|[.,\/#!$%\^&\*;:{}=\-_`~()?\"']+$/g, "");
+        const cleanTerm = term.trim().replace(/^[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+|[.,\/#!$%\^\&\*;:{}=\-_`~()?\\"']+$/g, "");
         const fallbackRegex = cleanTerm 
             ? new RegExp(`(${cleanTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
             : null;
@@ -360,16 +538,18 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
     const modeToggle = (
         <div className="flex rounded-lg border border-gray-200 bg-gray-100 p-1 mb-4">
-            {(["unlearned", "all", "writing"] as ReviewMode[]).map((mode, i, arr) => {
+            {(["unlearned", "all", "writing", "paraphrase"] as ReviewMode[]).map((mode, i, arr) => {
                 const labels: Record<ReviewMode, string> = {
                     unlearned: "未習得のみ",
                     all: "すべて",
                     writing: "Writing",
+                    paraphrase: "Paraphrase",
                 };
                 const activeColors: Record<ReviewMode, string> = {
                     unlearned: "bg-blue-600 text-white shadow-sm",
                     all: "bg-purple-600 text-white shadow-sm",
                     writing: "bg-pink-500 text-white shadow-sm",
+                    paraphrase: "bg-violet-600 text-white shadow-sm",
                 };
                 return (
                     <div key={mode} className="flex flex-1 items-center">
@@ -378,7 +558,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         )}
                         <button
                             onClick={() => handleModeChange(mode)}
-                            className={`flex-1 rounded-md px-2 py-2 text-sm font-medium transition-colors ${reviewMode === mode ? activeColors[mode] : "text-gray-600 hover:text-gray-800"}`}
+                            className={`flex-1 rounded-md px-2 py-2 text-xs font-medium transition-colors ${reviewMode === mode ? activeColors[mode] : "text-gray-600 hover:text-gray-800"}`}
                         >
                             {labels[mode]}
                         </button>
@@ -395,7 +575,17 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     {modeToggle}
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-                    <p className="text-gray-400">復習する単語がありません</p>
+                    {isParaphraseMode ? (
+                        <div className="text-center space-y-3 px-4">
+                            <div className="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center mx-auto">
+                                <Link2 size={28} className="text-violet-500" />
+                            </div>
+                            <p className="text-gray-500 text-sm">パラフレーズカードがありません</p>
+                            <p className="text-gray-400 text-xs">一覧タブでカテゴリを「Paraphrase」に設定し、グループ化してください</p>
+                        </div>
+                    ) : (
+                        <p className="text-gray-400">復習する単語がありません</p>
+                    )}
                     <button
                         onClick={fetchAndBuildSession}
                         className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
@@ -434,6 +624,215 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         );
     }
 
+    // ── パラフレーズモードのカードUI ────────────────────────────────────────────
+    if (isParaphraseMode && currentCard) {
+        const siblings = getGroupSiblings(currentCard);
+        const isGrouped = siblings.length > 0;
+
+        return (
+            <div className="flex-1 flex flex-col min-h-0">
+                {/* モード切替 */}
+                <div className="shrink-0 mb-4">
+                    {modeToggle}
+                </div>
+
+                {/* コンテンツエリア */}
+                <div className="flex-1 relative flex flex-col justify-center items-center">
+                    {/* 進捗 + シャッフル */}
+                    <div className="absolute -top-1 flex items-center justify-center gap-3">
+                        <div className="text-sm text-gray-400">
+                            {currentIndex + 1} / {sessionCards.length}
+                        </div>
+                        <button
+                            onClick={handleShuffle}
+                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                        >
+                            <Shuffle size={14} />
+                            シャッフル
+                        </button>
+                    </div>
+
+                    {/* カード */}
+                    <div className="w-full flex flex-col items-center justify-center gap-4 mt-4">
+                        <div className="w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-center p-6">
+                            {!showAnswer ? (
+                                /* ── 出題面 ── */
+                                <div className="space-y-5">
+                                    <p className="text-xs font-semibold text-violet-400 text-center uppercase tracking-widest">
+                                        Paraphrase — 言い換えを答えよ
+                                    </p>
+                                    {/* 出題単語 */}
+                                    <div className="text-center">
+                                        <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
+                                        <p className="text-sm text-gray-500 mt-1">{currentCard.meaning}</p>
+                                    </div>
+                                    {/* 例文（空欄あり） */}
+                                    {currentCard.context && (
+                                        <p className="text-base leading-relaxed text-gray-700 text-center bg-gray-50 rounded-lg px-4 py-3">
+                                            {blankTermInContext(currentCard.context, currentCard.term)}
+                                        </p>
+                                    )}
+                                    {/* グループ未登録の警告 */}
+                                    {!isGrouped && (
+                                        <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
+                                            ⚠️ このカードはまだグループ化されていません
+                                        </p>
+                                    )}
+                                    {/* 入力フォーム */}
+                                    <div className="space-y-2">
+                                        <div className="flex gap-2">
+                                            <input
+                                                ref={inputRef}
+                                                type="text"
+                                                value={paraphraseInput}
+                                                onChange={(e) => {
+                                                    setParaphraseInput(e.target.value);
+                                                    setSameWordWarning(false);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") handleParaphraseSubmit();
+                                                }}
+                                                placeholder="パラフレーズを入力..."
+                                                className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
+                                                autoComplete="off"
+                                                autoCapitalize="none"
+                                            />
+                                            <button
+                                                onClick={handleParaphraseSubmit}
+                                                disabled={!paraphraseInput.trim()}
+                                                className="rounded-lg bg-violet-600 px-4 py-3 text-white hover:bg-violet-700 active:bg-violet-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                <SendHorizontal size={18} />
+                                            </button>
+                                        </div>
+                                        {/* 同じ単語の警告 */}
+                                        {sameWordWarning && (
+                                            <p className="text-xs text-red-500 px-1">
+                                                それは出題された単語と同じです。別のパラフレーズを入力してください。
+                                            </p>
+                                        )}
+                                        {/* 答えを見るボタン */}
+                                        <button
+                                            onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
+                                            className="w-full text-xs text-gray-400 hover:text-gray-600 py-1 transition-colors"
+                                        >
+                                            わからない → 答えを見る
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                /* ── 解答面 ── */
+                                <div className="space-y-5">
+                                    {/* 正誤バッジ */}
+                                    {paraphraseResult !== null && (
+                                        <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold ${
+                                            paraphraseResult === "correct"
+                                                ? "bg-green-50 text-green-700 border border-green-200"
+                                                : paraphraseResult === "synonym"
+                                                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                                    : "bg-red-50 text-red-700 border border-red-200"
+                                        }`}>
+                                            {paraphraseResult === "correct" && "✅ 正解！"}
+                                            {paraphraseResult === "synonym" && "🔵 Nice synonym! (登録外の正解)"}
+                                            {paraphraseResult === "incorrect" && (
+                                                aiChecking
+                                                    ? <span className="inline-flex items-center gap-1.5"><Loader2 size={14} className="animate-spin" />AI判定中...</span>
+                                                    : "❌ 不正解"
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* 出題単語の振り返り */}
+                                    <div className="text-center">
+                                        <p className="text-xl font-bold text-gray-900">{currentCard.term}</p>
+                                        <p className="text-sm text-gray-500 mt-0.5">{currentCard.meaning}</p>
+                                    </div>
+
+                                    {/* 例文（完成形） */}
+                                    {currentCard.context && (
+                                        <p className="text-sm leading-relaxed text-gray-700 text-center bg-gray-50 rounded-lg px-4 py-3">
+                                            {highlightTerm(currentCard.context, currentCard.term)}
+                                        </p>
+                                    )}
+
+                                    {/* グループの全パラフレーズ一覧 */}
+                                    {siblings.length > 0 && (
+                                        <div className="space-y-1.5">
+                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                                                <Link2 size={10} />
+                                                パラフレーズ一覧
+                                            </p>
+                                            {siblings.map((s) => (
+                                                <div key={s.id} className="flex items-center justify-between rounded-lg bg-violet-50 border border-violet-100 px-3 py-2">
+                                                    <span className="text-sm font-medium text-violet-900">{s.term}</span>
+                                                    <span className="text-xs text-violet-600">{s.meaning}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* AI IELTS ヒント */}
+                                    {aiChecking && (
+                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                                            <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
+                                            <p className="text-xs text-amber-700">IELTSアドバイスを生成中...</p>
+                                        </div>
+                                    )}
+                                    {aiHint && !aiChecking && (
+                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                                            <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                                            <p className="text-xs text-amber-800">{aiHint}</p>
+                                        </div>
+                                    )}
+
+                                    {/* ナビゲーション */}
+                                    <div className="flex justify-center gap-3 pt-1">
+                                        <button
+                                            onClick={() => speak(currentCard.term)}
+                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            title="発音"
+                                        >
+                                            <Volume2 size={16} />
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setShowAnswer(false);
+                                                setParaphraseInput("");
+                                                setParaphraseResult(null);
+                                                setSameWordWarning(false);
+                                                setAiHint(null);
+                                                setTimeout(() => inputRef.current?.focus(), 50);
+                                            }}
+                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            title="再挑戦"
+                                        >
+                                            <RotateCcw size={16} />
+                                        </button>
+                                        <button
+                                            onClick={goNext}
+                                            className="flex-1 max-w-[200px] inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 bg-violet-50 px-4 py-2.5 text-sm font-medium text-violet-700 hover:bg-violet-100 active:bg-violet-200"
+                                        >
+                                            次へ
+                                            <ChevronRight size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* カテゴリ表示 */}
+                        <div className="text-center">
+                            <span className={`inline-block rounded-full border px-3 py-1 text-xs font-medium ${CATEGORY_STYLES[currentCard.category]}`}>
+                                {currentCard.category}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // ── 通常モード（unlearned / all / writing）のカードUI ─────────────────────
     return (
         <div className="flex-1 flex flex-col min-h-0">
             {/* モード切替 */}
