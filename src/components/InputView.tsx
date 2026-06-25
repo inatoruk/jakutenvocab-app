@@ -76,6 +76,7 @@ export default function InputView({ onAdded }: InputViewProps) {
 
     const [isGeneratingMeaning, setIsGeneratingMeaning] = useState(false);
     const [isGeneratingExample, setIsGeneratingExample] = useState(false);
+    const [exampleLevel, setExampleLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
 
     const generateAIContent = async (type: 'meaning' | 'example') => {
         if (!term.trim()) {
@@ -96,7 +97,7 @@ export default function InputView({ onAdded }: InputViewProps) {
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ term: term.trim(), type }),
+                body: JSON.stringify({ term: term.trim(), type, ...(type === 'example' ? { level: exampleLevel } : {}) }),
             });
 
             const data = await response.json();
@@ -415,15 +416,28 @@ export default function InputView({ onAdded }: InputViewProps) {
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => generateAIContent('example')}
-                                disabled={isGeneratingExample || !term.trim()}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
-                            >
-                                {isGeneratingExample ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                                AI生成
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                                <select
+                                    value={exampleLevel}
+                                    onChange={(e) => setExampleLevel(e.target.value as 'beginner' | 'intermediate' | 'advanced')}
+                                    disabled={isGeneratingExample}
+                                    className="h-[26px] rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-1.5 pr-5 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer appearance-none bg-no-repeat"
+                                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundPosition: 'right 4px center' }}
+                                >
+                                    <option value="beginner">初級</option>
+                                    <option value="intermediate">中級</option>
+                                    <option value="advanced">上級</option>
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={() => generateAIContent('example')}
+                                    disabled={isGeneratingExample || !term.trim()}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
+                                >
+                                    {isGeneratingExample ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                    AI生成
+                                </button>
+                            </div>
                         </div>
                         <div className="relative w-full">
                             <textarea
