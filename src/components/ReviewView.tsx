@@ -711,26 +711,26 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         return (
             <div className="flex-1 flex flex-col min-h-0">
                 {/* モード切替 */}
-                <div className="shrink-0 z-20 relative mb-4">
+                <div className="shrink-0 mb-2 relative z-20">
                     {modeToggle}
+                </div>
+
+                {/* 進捗 + シャッフル */}
+                <div className="flex items-center justify-center gap-3 shrink-0 -mt-1 sm:-mt-2 mb-2 sm:mb-4 relative z-10">
+                    <div className="text-sm text-gray-400">
+                        {currentIndex + 1} / {sessionCards.length}
+                    </div>
+                    <button
+                        onClick={handleShuffle}
+                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                    >
+                        <Shuffle size={14} />
+                        シャッフル
+                    </button>
                 </div>
 
                 {/* コンテンツエリア */}
                 <div className="flex-1 relative flex flex-col justify-center items-center">
-                    {/* 進捗 + シャッフル */}
-                    <div className="absolute -top-4 sm:-top-6 left-0 right-0 flex items-center justify-center gap-3 z-10">
-                        <div className="text-sm text-gray-400">
-                            {currentIndex + 1} / {sessionCards.length}
-                        </div>
-                        <button
-                            onClick={handleShuffle}
-                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
-                        >
-                            <Shuffle size={14} />
-                            シャッフル
-                        </button>
-                    </div>
-
                     {/* カード */}
                     <div className="w-full flex flex-col items-center justify-center gap-4">
                         <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6
@@ -944,26 +944,26 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     return (
         <div className="flex-1 flex flex-col min-h-0">
             {/* モード切替 */}
-            <div className="shrink-0 mb-4 relative z-20">
+            <div className="shrink-0 mb-2 relative z-20">
                 {modeToggle}
+            </div>
+
+            {/* 進捗 + シャッフル */}
+            <div className="flex items-center justify-center gap-3 shrink-0 mb-2 sm:mb-4 relative z-10">
+                <div className="text-sm text-gray-400">
+                    {currentIndex + 1} / {sessionCards.length}
+                </div>
+                <button
+                    onClick={handleShuffle}
+                    className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                >
+                    <Shuffle size={14} />
+                    シャッフル
+                </button>
             </div>
 
             {/* コンテンツエリア */}
             <div className="flex-1 relative flex flex-col justify-center items-center">
-                {/* 進捗 + シャッフル */}
-                <div className="absolute -top-2 sm:-top-4 left-0 right-0 flex items-center justify-center gap-3 z-10">
-                    <div className="text-sm text-gray-400">
-                        {currentIndex + 1} / {sessionCards.length}
-                    </div>
-                    <button
-                        onClick={handleShuffle}
-                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
-                    >
-                        <Shuffle size={14} />
-                        シャッフル
-                    </button>
-                </div>
-
                 {/* カード & カテゴリ表示 (上下中央) */}
                 <div className="w-full flex flex-col items-center justify-center gap-4 overflow-hidden py-4 px-2">
                     {/* カード */}
