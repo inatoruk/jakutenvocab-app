@@ -769,20 +769,13 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         setSameWordWarning(false);
                                                     }}
                                                     onKeyDown={(e) => {
-                                                        if (e.key === "Enter") handleParaphraseSubmit();
+                                                        if (e.key === "Enter" && paraphraseInput.trim()) handleParaphraseSubmit();
                                                     }}
                                                     placeholder="パラフレーズを入力..."
                                                     className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
                                                     autoComplete="off"
                                                     autoCapitalize="none"
                                                 />
-                                                <button
-                                                    onClick={handleParaphraseSubmit}
-                                                    disabled={!paraphraseInput.trim()}
-                                                    className="rounded-lg bg-violet-600 px-4 py-3 text-white hover:bg-violet-700 active:bg-violet-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                                                >
-                                                    <SendHorizontal size={18} />
-                                                </button>
                                             </div>
                                         )}
                                         {/* 同じ単語の警告 */}
@@ -791,13 +784,24 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 それは出題された単語と同じです。別のパラフレーズを入力してください。
                                             </p>
                                         )}
-                                        {/* 答えを見るボタン */}
-                                        <button
-                                            onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
-                                            className="w-full text-xs text-gray-400 hover:text-gray-600 py-1 transition-colors"
-                                        >
-                                            わからない → 答えを見る
-                                        </button>
+                                        {/* アクションボタン */}
+                                        <div className="flex justify-center gap-3 pt-2">
+                                            <button
+                                                onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
+                                                className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            >
+                                                <Eye size={16} />
+                                                わからない
+                                            </button>
+                                            <button
+                                                onClick={handleParaphraseSubmit}
+                                                disabled={!paraphraseInput.trim()}
+                                                className="inline-flex items-center gap-2 rounded-lg bg-pink-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-pink-600 active:bg-pink-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                <SendHorizontal size={16} />
+                                                回答する
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
