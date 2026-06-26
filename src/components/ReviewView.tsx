@@ -743,7 +743,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             {!showAnswer ? (
                                 /* ── 出題面 ── */
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-5">
+                                    <div className="flex-1 flex flex-col justify-center space-y-3">
                                         <p className="text-xs font-semibold text-violet-400 text-center uppercase tracking-widest">
                                             Paraphrase — 言い換えを答えよ
                                         </p>
@@ -795,7 +795,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                     </div>
                                     {/* アクションボタン */}
-                                    <div className="flex justify-center gap-3 pt-6 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
@@ -816,7 +816,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             ) : (
                                 /* ── 解答面 ── */
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-5">
+                                    <div className="flex-1 flex flex-col justify-center space-y-4">
                                         {/* 正誤バッジ */}
                                         {paraphraseResult !== null && (
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
@@ -894,7 +894,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         )}
                                     </div>
                                     {/* ナビゲーション */}
-                                    <div className="flex justify-center gap-3 pt-6 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => speak(currentCard.term)}
                                             className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
