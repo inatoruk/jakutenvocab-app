@@ -9,6 +9,16 @@ import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, 
 import { AppSettings } from "@/lib/settings";
 import nlp from "compromise";
 
+const animationStyles = `
+@keyframes swipe-out-tl {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-300px, -300px) rotate(-15deg); opacity: 0; }
+}
+.animate-swipe-out-left {
+    animation: swipe-out-tl 0.3s ease-in forwards;
+}
+`;
+
 type ReviewMode = "unlearned" | "all" | "writing" | "paraphrase";
 
 const CATEGORY_STYLES: Record<Category, string> = {
@@ -106,6 +116,17 @@ function lemmatize(word: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ReviewView({ active, settings, vocabVersion = 0 }: { active: boolean; settings: AppSettings; vocabVersion?: number }) {
+    // スタイルを注入
+    useEffect(() => {
+        const styleId = "review-view-animations";
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement("style");
+            style.id = styleId;
+            style.innerHTML = animationStyles;
+            document.head.appendChild(style);
+        }
+    }, []);
+
     const [allCards, setAllCards] = useState<Vocab[]>([]);
     const [sessionCards, setSessionCards] = useState<Vocab[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -711,12 +732,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         return (
             <div className="flex-1 flex flex-col min-h-0">
                 {/* モード切替 */}
-                <div className="shrink-0 mb-2 relative z-20">
+                <div className="shrink-0 mb-4 relative z-20">
                     {modeToggle}
                 </div>
 
                 {/* 進捗 + シャッフル */}
-                <div className="flex items-center justify-center gap-3 shrink-0 -mt-1 sm:-mt-2 mb-2 sm:mb-4 relative z-10">
+                <div className="flex items-center justify-center gap-3 shrink-0 mb-4 relative z-10">
                     <div className="text-sm text-gray-400">
                         {currentIndex + 1} / {sessionCards.length}
                     </div>
@@ -944,12 +965,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     return (
         <div className="flex-1 flex flex-col min-h-0">
             {/* モード切替 */}
-            <div className="shrink-0 mb-2 relative z-20">
+            <div className="shrink-0 mb-4 relative z-20">
                 {modeToggle}
             </div>
 
             {/* 進捗 + シャッフル */}
-            <div className="flex items-center justify-center gap-3 shrink-0 mb-2 sm:mb-4 relative z-10">
+            <div className="flex items-center justify-center gap-3 shrink-0 mb-4 relative z-10">
                 <div className="text-sm text-gray-400">
                     {currentIndex + 1} / {sessionCards.length}
                 </div>
