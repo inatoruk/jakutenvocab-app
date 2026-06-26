@@ -736,8 +736,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     {modeToggle}
                 </div>
 
-                {/* コンテンツエリア (ダミー要素でモード切替基準の中央にしつつ、狭い時は潰れる設定) */}
-                <div className="flex-1 relative flex flex-col justify-center items-center min-h-0 pt-4">
+                {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
+                <div className="flex-1 relative flex flex-col justify-center items-center min-h-0 pt-4 pb-4">
                     {/* カードとカテゴリをまとめるラッパー */}
                     <div className="w-full flex flex-col items-center justify-center gap-4 shrink-0">
                         {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
@@ -956,8 +956,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             </span>
                         </div>
                     </div>
-                    {/* 空間調整用ダミー */}
-                    <div className="h-12 shrink w-full" aria-hidden="true"></div>
                 </div>
             </div>
         );
@@ -971,8 +969,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 {modeToggle}
             </div>
 
-            {/* コンテンツエリア (ダミー要素でモード切替基準の中央にしつつ、狭い時は潰れる設定) */}
-            <div className="flex-1 relative flex flex-col justify-center items-center min-h-0 pt-4">
+            {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
+            <div className="flex-1 relative flex flex-col justify-center items-center min-h-0 pt-4 pb-4">
                 {/* カード & カテゴリ表示 (上下中央) */}
                 <div className="w-full flex flex-col items-center justify-center gap-4 py-4 px-2 shrink-0">
                     {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
@@ -1126,8 +1124,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         </span>
                     </div>
                 </div>
-                {/* 空間調整用ダミー */}
-                <div className="h-12 shrink w-full" aria-hidden="true"></div>
             </div>
         </div>
     );
