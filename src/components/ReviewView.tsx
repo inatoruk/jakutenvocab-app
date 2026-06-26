@@ -113,6 +113,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     const [loading, setLoading] = useState(true);
     const [reviewMode, setReviewMode] = useState<ReviewMode>("unlearned");
     const [showCompletion, setShowCompletion] = useState(false);
+    const [animationState, setAnimationState] = useState<"idle" | "flipping-out" | "flipping-in" | "swiping-out" | "swiping-in">("idle");
 
     // ── パラフレーズグループデータ ──────────────────────────────────────────
     // vocab_id → group_id のマッピング
@@ -238,16 +239,27 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         if (matched) {
             // ローカル正解 (登録済みパラフレーズ)
             setParaphraseResult("correct");
+            setAnimationState("flipping-out");
+            await sleep(150);
             setShowAnswer(true);
+            setAnimationState("flipping-in");
             // 非同期でIELTSヒントを取得
             fetchAiHint(input, currentCard);
+            await sleep(150);
+            setAnimationState("idle");
         } else {
             // 登録なし → とりあえず「不正解」表示して画面を展開
             setParaphraseResult("incorrect");
+            setAnimationState("flipping-out");
+            await sleep(150);
             setShowAnswer(true);
+            setAnimationState("flipping-in");
             // 裏でAI判定
             checkWithAi(input, currentCard);
+            await sleep(150);
+            setAnimationState("idle");
         }
+
     }
 
     /** AI非同期判定（未登録単語） */
@@ -303,9 +315,16 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
     // ─── ハンドラ ─────────────────────────────────────────────────────────────
 
-    function handleReveal() {
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    async function handleReveal() {
+        setAnimationState("flipping-out");
+        await sleep(150);
         setShowAnswer(true);
+        setAnimationState("flipping-in");
         if (currentCard && settings.autoSpeak) speak(currentCard.term);
+        await sleep(150);
+        setAnimationState("idle");
     }
 
     function handleKeep() {
@@ -315,6 +334,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     async function handleMastered() {
         if (!currentCard) return;
 
+        setAnimationState("swiping-out");
+        await sleep(300);
+
         // 新しいステータス（最大 5）
         const newStatus = Math.min(currentCard.status + 1, 5) as Status;
 
@@ -322,7 +344,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         const isWriting = currentCard.category === "Writing";
         const newDueAt = isWriting ? currentCard.review_due_at : calcReviewDueAt(newStatus);
 
-        // DB 更新
+        // DB 更新 (非同期に走らせつつ画面遷移を優先しても良いが、ここでは待つ)
         await supabase
             .from("vocab")
             .update({ status: newStatus, review_due_at: newDueAt })
@@ -351,16 +373,23 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 setShowCompletion(true);
                 setShowAnswer(false);
                 setSessionCards(next);
-                return;
+            } else {
+                setSessionCards(next);
+                // 末尾を覚えた場合は先頭に戻す（次の周回を始める）
+                if (currentIndex >= next.length) setCurrentIndex(0);
             }
-            setSessionCards(next);
-            // 末尾を覚えた場合は先頭に戻す（次の周回を始める）
-            if (currentIndex >= next.length) setCurrentIndex(0);
         }
         setShowAnswer(false);
+
+        setAnimationState("swiping-in");
+        await sleep(300);
+        setAnimationState("idle");
     }
 
-    function goNext() {
+    async function goNext() {
+        setAnimationState("swiping-out");
+        await sleep(300);
+
         const nextIndex = currentIndex + 1;
         if (nextIndex >= sessionCards.length) {
             // セット完了
@@ -376,6 +405,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setSameWordWarning(false);
         setAiHint(null);
         setAiChecking(false);
+
+        setAnimationState("swiping-in");
+        await sleep(300);
+        setAnimationState("idle");
     }
 
     function handleStartNewSet() {
@@ -914,9 +947,15 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 </div>
 
                 {/* カード & カテゴリ表示 (上下中央) */}
-                <div className="w-full flex flex-col items-center justify-center gap-4 mt-4">
+                <div className="w-full flex flex-col items-center justify-center gap-4 mt-4 overflow-hidden py-4 px-2">
                     {/* カード */}
-                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-center p-6 ${isWritingCard ? "border-pink-200" : "border-gray-200"}`}>
+                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-center p-6 
+                        ${isWritingCard ? "border-pink-200" : "border-gray-200"}
+                        ${animationState === "flipping-out" ? "animate-flip-out" : ""}
+                        ${animationState === "flipping-in" ? "animate-flip-in" : ""}
+                        ${animationState === "swiping-out" ? "animate-swipe-out" : ""}
+                        ${animationState === "swiping-in" ? "animate-swipe-in" : ""}
+                    `}>
                         {!showAnswer ? (
                             isWritingCard ? (
                                 <div className="space-y-6">
