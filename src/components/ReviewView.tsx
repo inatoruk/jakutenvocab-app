@@ -589,7 +589,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") handleParaphraseSubmit();
                             }}
-                            placeholder="paraphrase"
                             className="inline-block border-b-2 border-violet-400 bg-transparent text-center focus:ring-0 focus:outline-none focus:border-violet-600 text-violet-700 font-semibold px-1"
                             style={{ 
                                 width: `${Math.max(part.length + 2, paraphraseInput.length + 1)}ch` 
@@ -715,24 +714,24 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     {modeToggle}
                 </div>
 
+                {/* 進捗 + シャッフル */}
+                <div className="flex items-center justify-center gap-3 shrink-0 mb-2">
+                    <div className="text-sm text-gray-400">
+                        {currentIndex + 1} / {sessionCards.length}
+                    </div>
+                    <button
+                        onClick={handleShuffle}
+                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                    >
+                        <Shuffle size={14} />
+                        シャッフル
+                    </button>
+                </div>
+
                 {/* コンテンツエリア */}
                 <div className="flex-1 relative flex flex-col justify-center items-center">
-                    {/* 進捗 + シャッフル */}
-                    <div className="absolute -top-1 flex items-center justify-center gap-3">
-                        <div className="text-sm text-gray-400">
-                            {currentIndex + 1} / {sessionCards.length}
-                        </div>
-                        <button
-                            onClick={handleShuffle}
-                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
-                        >
-                            <Shuffle size={14} />
-                            シャッフル
-                        </button>
-                    </div>
-
                     {/* カード */}
-                    <div className="w-full flex flex-col items-center justify-center gap-4 mt-4">
+                    <div className="w-full flex flex-col items-center justify-center gap-4 mt-2">
                         <div className="w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-center p-6">
                             {!showAnswer ? (
                                 /* ── 出題面 ── */
@@ -824,18 +823,22 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             </span>
                                         </div>
                                     )}
-                                    {/* 入力された回答の表示 */}
+                                    {/* 出題単語の振り返り (サブ) */}
                                     <div className="text-center text-sm">
-                                        <span className="text-gray-500">あなたの回答: </span>
-                                        <span className={`font-semibold ${paraphraseInput.trim() ? "text-gray-800" : "text-gray-400 italic"}`}>
-                                            {paraphraseInput.trim() || "(未入力)"}
+                                        <span className="text-gray-500">元の単語: </span>
+                                        <span className="font-semibold text-gray-700">
+                                            {currentCard.term} <span className="text-gray-400 font-normal">({currentCard.meaning})</span>
                                         </span>
                                     </div>
 
-                                    {/* 出題単語の振り返り */}
+                                    {/* あなたの回答の表示 (メイン) */}
                                     <div className="text-center">
-                                        <p className="text-xl font-bold text-gray-900">{currentCard.term}</p>
-                                        <p className="text-sm text-gray-500 mt-0.5">{currentCard.meaning}</p>
+                                        <p className={`text-2xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
+                                            {paraphraseInput.trim() || "(未入力)"}
+                                        </p>
+                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-1">
+                                            あなたの回答
+                                        </p>
                                     </div>
 
                                     {/* 例文（完成形） */}
@@ -847,17 +850,18 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                     {/* グループの全パラフレーズ一覧 */}
                                     {siblings.length > 0 && (
-                                        <div className="space-y-1.5">
-                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                                        <div className="space-y-2">
+                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center justify-center gap-1">
                                                 <Link2 size={10} />
                                                 パラフレーズ一覧
                                             </p>
-                                            {siblings.map((s) => (
-                                                <div key={s.id} className="flex items-center justify-between rounded-lg bg-violet-50 border border-violet-100 px-3 py-2">
-                                                    <span className="text-sm font-medium text-violet-900">{s.term}</span>
-                                                    <span className="text-xs text-violet-600">{s.meaning}</span>
-                                                </div>
-                                            ))}
+                                            <div className="flex flex-wrap items-center justify-center gap-2">
+                                                {siblings.map((s) => (
+                                                    <div key={s.id} className="rounded-lg bg-violet-50 border border-violet-100 px-3 py-1.5">
+                                                        <span className="text-sm font-medium text-violet-900">{s.term}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
 
@@ -930,24 +934,24 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 {modeToggle}
             </div>
 
+            {/* 進捗 + シャッフル (位置は固定) */}
+            <div className="flex items-center justify-center gap-3 shrink-0 mb-2">
+                <div className="text-sm text-gray-400">
+                    {currentIndex + 1} / {sessionCards.length}
+                </div>
+                <button
+                    onClick={handleShuffle}
+                    className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                >
+                    <Shuffle size={14} />
+                    シャッフル
+                </button>
+            </div>
+
             {/* コンテンツエリア */}
             <div className="flex-1 relative flex flex-col justify-center items-center">
-                {/* 進捗 + シャッフル (位置は固定) */}
-                <div className="absolute -top-1 flex items-center justify-center gap-3">
-                    <div className="text-sm text-gray-400">
-                        {currentIndex + 1} / {sessionCards.length}
-                    </div>
-                    <button
-                        onClick={handleShuffle}
-                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
-                    >
-                        <Shuffle size={14} />
-                        シャッフル
-                    </button>
-                </div>
-
                 {/* カード & カテゴリ表示 (上下中央) */}
-                <div className="w-full flex flex-col items-center justify-center gap-4 mt-4 overflow-hidden py-4 px-2">
+                <div className="w-full flex flex-col items-center justify-center gap-4 mt-2 overflow-hidden py-4 px-2">
                     {/* カード */}
                     <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-center p-6 
                         ${isWritingCard ? "border-pink-200" : "border-gray-200"}
