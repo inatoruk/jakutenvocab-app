@@ -113,7 +113,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     const [loading, setLoading] = useState(true);
     const [reviewMode, setReviewMode] = useState<ReviewMode>("unlearned");
     const [showCompletion, setShowCompletion] = useState(false);
-    const [animationState, setAnimationState] = useState<"idle" | "flipping-out" | "flipping-in" | "swiping-out" | "swiping-in">("idle");
+    const [animationState, setAnimationState] = useState<"idle" | "flipping-out" | "flipping-in" | "swiping-out" | "swiping-out-left" | "swiping-in">("idle");
 
     // ── パラフレーズグループデータ ──────────────────────────────────────────
     // vocab_id → group_id のマッピング
@@ -328,7 +328,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     }
 
     function handleKeep() {
-        goNext();
+        goNext("left");
     }
 
     async function handleMastered() {
@@ -386,8 +386,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setAnimationState("idle");
     }
 
-    async function goNext() {
-        setAnimationState("swiping-out");
+    async function goNext(direction?: "left" | "right" | React.MouseEvent) {
+        const dir = typeof direction === "string" ? direction : "right";
+        setAnimationState(dir === "left" ? "swiping-out-left" : "swiping-out");
         await sleep(300);
 
         const nextIndex = currentIndex + 1;
@@ -715,7 +716,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 </div>
 
                 {/* 進捗 + シャッフル */}
-                <div className="flex items-center justify-center gap-3 shrink-0 mt-2 sm:-mt-2 mb-4 sm:mb-8 relative z-10">
+                <div className="flex items-center justify-center gap-3 shrink-0 -mt-1 sm:-mt-4 mb-7 sm:mb-10 relative z-10">
                     <div className="text-sm text-gray-400">
                         {currentIndex + 1} / {sessionCards.length}
                     </div>
@@ -732,7 +733,13 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 <div className="flex-1 relative flex flex-col justify-center items-center">
                     {/* カード */}
                     <div className="w-full flex flex-col items-center justify-center gap-4 mt-2">
-                        <div className="w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6">
+                        <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6
+                            ${animationState === "flipping-out" ? "animate-flip-out" : ""}
+                            ${animationState === "flipping-in" ? "animate-flip-in" : ""}
+                            ${animationState === "swiping-out" ? "animate-swipe-out" : ""}
+                            ${animationState === "swiping-out-left" ? "animate-swipe-out-left" : ""}
+                            ${animationState === "swiping-in" ? "animate-swipe-in" : ""}
+                        `}>
                             {!showAnswer ? (
                                 /* ── 出題面 ── */
                                 <>
@@ -965,6 +972,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                         ${animationState === "flipping-in" ? "animate-flip-in" : ""}
                         ${animationState === "swiping-out" ? "animate-swipe-out" : ""}
+                        ${animationState === "swiping-out-left" ? "animate-swipe-out-left" : ""}
                         ${animationState === "swiping-in" ? "animate-swipe-in" : ""}
                     `}>
                         {!showAnswer ? (
