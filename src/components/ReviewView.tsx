@@ -838,7 +838,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             ) : (
                                 /* ── 解答面 ── */
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-4">
+                                    <div className="flex-1 flex flex-col justify-center space-y-3">
                                         {/* 正誤バッジ */}
                                         {paraphraseResult !== null && (
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
@@ -859,22 +859,25 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 </span>
                                             </div>
                                         )}
-                                        {/* 出題単語の振り返り (サブ) */}
-                                        <div className="text-center text-sm">
-                                            <span className="text-gray-500">元の単語: </span>
-                                            <span className="font-semibold text-gray-700">
-                                                {currentCard.term} <span className="text-gray-400 font-normal">({currentCard.meaning})</span>
-                                            </span>
-                                        </div>
+                                        {/* 出題単語と回答をまとめるラッパー (余白を狭くする) */}
+                                        <div className="flex flex-col items-center gap-2">
+                                            {/* 出題単語の振り返り (サブ) */}
+                                            <div className="text-center text-sm">
+                                                <span className="text-gray-500">元の単語: </span>
+                                                <span className="font-semibold text-gray-700">
+                                                    {currentCard.term} <span className="text-gray-400 font-normal">({currentCard.meaning})</span>
+                                                </span>
+                                            </div>
 
-                                        {/* あなたの回答の表示 (メイン) */}
-                                        <div className="text-center">
-                                            <p className={`text-2xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
-                                                {paraphraseInput.trim() || "(未入力)"}
-                                            </p>
-                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-1">
-                                                あなたの回答
-                                            </p>
+                                            {/* あなたの回答の表示 (メイン) */}
+                                            <div className="text-center">
+                                                <p className={`text-2xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
+                                                    {paraphraseInput.trim() || "(未入力)"}
+                                                </p>
+                                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-1">
+                                                    あなたの回答
+                                                </p>
+                                            </div>
                                         </div>
 
                                         {/* 例文（完成形） */}
