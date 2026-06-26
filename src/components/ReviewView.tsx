@@ -750,8 +750,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     </button>
                 </div>
 
-                {/* コンテンツエリア */}
-                <div className="flex-1 relative flex flex-col justify-center items-center">
+                {/* コンテンツエリア (下部に進捗ボタンと同等の余白を設けて、全体の中心をモード切替基準に補正) */}
+                <div className="flex-1 relative flex flex-col justify-center items-center pb-12">
                     {/* カード */}
                     <div className="w-full flex flex-col items-center justify-center gap-4">
                         <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6
@@ -983,8 +983,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 </button>
             </div>
 
-            {/* コンテンツエリア */}
-            <div className="flex-1 relative flex flex-col justify-center items-center">
+            {/* コンテンツエリア (下部に進捗ボタンと同等の余白を設けて、全体の中心をモード切替基準に補正) */}
+            <div className="flex-1 relative flex flex-col justify-center items-center pb-12">
                 {/* カード & カテゴリ表示 (上下中央) */}
                 <div className="w-full flex flex-col items-center justify-center gap-4 overflow-hidden py-4 px-2">
                     {/* カード */}
