@@ -637,7 +637,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     }
 
     const modeToggle = (
-        <div className="flex rounded-lg border border-gray-200 bg-gray-100 p-1 mb-4">
+        <div className="flex rounded-lg border border-gray-200 bg-gray-100 p-1">
             {(["unlearned", "all", "writing", "paraphrase"] as ReviewMode[]).map((mode, i, arr) => {
                 const labels: Record<ReviewMode, string> = {
                     unlearned: "未習得のみ",
