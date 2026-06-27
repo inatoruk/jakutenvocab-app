@@ -972,23 +972,24 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 {modeToggle}
             </div>
 
-            {/* コンテンツエリア */}
-            <div className="flex-1 relative flex flex-col py-4">
+            {/* 進捗 + シャッフル (モード切替の下に16pxで固定) */}
+            <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10 mb-4">
+                <div className="text-sm text-gray-400">
+                    {currentIndex + 1} / {sessionCards.length}
+                </div>
+                <button
+                    onClick={handleShuffle}
+                    className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                >
+                    <Shuffle size={14} />
+                    シャッフル
+                </button>
+            </div>
+
+            {/* コンテンツエリア (残りの領域で中央寄せ) */}
+            <div className="flex-1 flex flex-col justify-center items-center py-4">
                 {/* カード & カテゴリ表示 */}
-                <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2 my-auto">
-                    {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
-                    <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
-                        <div className="text-sm text-gray-400">
-                            {currentIndex + 1} / {sessionCards.length}
-                        </div>
-                        <button
-                            onClick={handleShuffle}
-                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
-                        >
-                            <Shuffle size={14} />
-                            シャッフル
-                        </button>
-                    </div>
+                <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
 
                     {/* カード */}
                     <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
