@@ -501,7 +501,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             {isGroupMode && (
                 <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none">
                     <div className="mx-auto max-w-2xl pointer-events-auto">
-                        <div className="flex items-center gap-2 rounded-2xl border border-purple-200 bg-white shadow-lg px-4 py-3">
+                        <div className="flex items-center gap-2 rounded-2xl border border-purple-200 bg-white shadow-[0_0_15px_rgba(0,0,0,0.08)] px-4 py-3">
                             <p className="text-sm font-medium text-gray-700 flex-1">
                                 {selectedWordIds.size > 0
                                     ? `${selectedWordIds.size}件選択中`
