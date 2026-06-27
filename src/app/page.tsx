@@ -104,7 +104,7 @@ export default function Home() {
       <main className="flex-1 min-h-0 overflow-y-auto flex flex-col">
         {/* 登録/一覧タブのコンテンツ (高さ固定) */}
         {tab !== "review" && (
-          <div className="mx-auto w-full max-w-2xl px-4 py-6">
+          <div className="mx-auto w-full max-w-2xl px-4 py-5">
             <div style={{ display: tab === "input" ? "block" : "none" }}>
               <InputView onAdded={handleVocabMutated} />
             </div>
@@ -115,7 +115,7 @@ export default function Home() {
         )}
         {/* 復習タブのコンテンツ (画面いっぱいに伸びる) */}
         {tab === "review" && (
-          <div className="flex-1 flex flex-col mx-auto w-full max-w-2xl px-4 py-6">
+          <div className="flex-1 flex flex-col mx-auto w-full max-w-2xl px-4 py-5">
             <ReviewView
               active={true}
               settings={settings}
