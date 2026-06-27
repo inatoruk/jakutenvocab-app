@@ -738,11 +738,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                 {/* コンテンツエリア */}
                 <div className="flex-1 relative flex flex-col py-4">
-                    {/* 上のダミー余白（余裕があれば伸びて中央寄せし、狭くなれば縮んで上部マージンを16px(py-4)で守る） */}
-                    <div className="flex-1 min-h-0" aria-hidden="true"></div>
-
-                    {/* カードとカテゴリをまとめるラッパー */}
-                    <div className="w-full flex flex-col items-center shrink-0 gap-4">
+                    {/* カードとカテゴリをまとめるラッパー (my-autoで上下の余白を自動調整) */}
+                    <div className="w-full flex flex-col items-center shrink-0 gap-4 my-auto">
                         {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
                         <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
                             <div className="text-sm text-gray-400">
@@ -962,9 +959,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             </span>
                         </div>
                     </div>
-
-                    {/* 下のダミー余白 */}
-                    <div className="flex-1 min-h-0" aria-hidden="true"></div>
                 </div>
             </div>
         );
@@ -980,11 +974,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
             {/* コンテンツエリア */}
             <div className="flex-1 relative flex flex-col py-4">
-                {/* 上のダミー余白 */}
-                <div className="flex-1 min-h-0" aria-hidden="true"></div>
-
                 {/* カード & カテゴリ表示 */}
-                <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
+                <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2 my-auto">
                     {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
                     <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
                         <div className="text-sm text-gray-400">
@@ -1136,9 +1127,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         </span>
                     </div>
                 </div>
-
-                {/* 下のダミー余白 */}
-                <div className="flex-1 min-h-0" aria-hidden="true"></div>
             </div>
         </div>
     );
