@@ -785,19 +785,25 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             {!showAnswer ? (
                                 /* ── 出題面 ── */
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-4 md:space-y-6">
+                                    <div className="flex-1 flex flex-col justify-center space-y-3">
                                         <p className="text-xs font-semibold text-violet-400 text-center uppercase tracking-widest">
                                             Paraphrase — 言い換えを答えよ
                                         </p>
                                         {/* 出題単語 */}
                                         <div className="text-center">
-                                            <p className="text-2xl md:text-3xl font-bold text-gray-900">{currentCard.term}</p>
+                                            <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
                                             <p className="text-sm text-gray-500 mt-1">{currentCard.meaning}</p>
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-base md:text-lg leading-relaxed text-gray-700 text-center bg-violet-50 rounded-lg px-4 py-3">
+                                            <p className="text-base leading-relaxed text-gray-700 text-center bg-gray-50 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
+                                            </p>
+                                        )}
+                                        {/* グループ未登録の警告 */}
+                                        {!isGrouped && (
+                                            <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
+                                                ⚠️ このカードはまだグループ化されていません
                                             </p>
                                         )}
                                         {/* 入力フォーム */}
@@ -815,7 +821,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         onKeyDown={(e) => {
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
-                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg md:text-xl border-violet-400 focus:border-violet-600"
+                                                        placeholder="パラフレーズを入力..."
+                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-violet-400 focus:border-violet-600"
                                                         style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
                                                         autoCapitalize="none"
@@ -829,18 +836,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 </p>
                                             )}
                                         </div>
-                                        {/* グループ未登録の警告 */}
-                                        {!isGrouped && (
-                                            <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
-                                                ⚠️ このカードはまだグループ化されていません
-                                            </p>
-                                        )}
                                     </div>
                                     {/* アクションボタン */}
-                                    <div className="flex justify-center gap-3 pt-6 md:pt-8 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
-                                            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm md:text-base border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                                         >
                                             <Eye size={16} />
                                             わからない
@@ -848,7 +849,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         <button
                                             onClick={handleSubmitAnswer}
                                             disabled={!paraphraseInput.trim()}
-                                            className="inline-flex items-center gap-2 rounded-lg bg-pink-500 px-6 py-2.5 text-sm md:text-base font-medium text-white hover:bg-pink-600 active:bg-pink-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                            className="inline-flex items-center gap-2 rounded-lg bg-pink-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-pink-600 active:bg-pink-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                         >
                                             <SendHorizontal size={16} />
                                             回答する
@@ -891,7 +892,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                             {/* あなたの回答の表示 (メイン) */}
                                             <div className="text-center">
-                                                <p className={`text-2xl md:text-3xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
+                                                <p className={`text-2xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
                                                     {paraphraseInput.trim() || "(未入力)"}
                                                 </p>
                                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-1">
@@ -902,7 +903,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* 例文（完成形） */}
                                         {currentCard.context && (
-                                            <p className="text-sm md:text-base leading-relaxed text-gray-700 text-center bg-violet-50 rounded-lg px-4 py-3">
+                                            <p className="text-sm leading-relaxed text-gray-700 text-center bg-gray-50 rounded-lg px-4 py-3">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1024,12 +1025,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         {!showAnswer ? (
                             isWritingCard ? (
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-4 md:space-y-6">
+                                    <div className="flex-1 flex flex-col justify-center space-y-3">
                                         <p className="text-xs font-semibold text-pink-400 text-center uppercase tracking-widest">
                                             Writing — 単語を答えよ
                                         </p>
                                         <div className="text-center">
-                                            <p className="text-xl md:text-2xl font-bold text-gray-900">{currentCard.meaning}</p>
+                                            <p className="text-2xl font-bold text-gray-900">{currentCard.meaning}</p>
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
@@ -1040,7 +1041,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         
                                         {/* 入力フォーム */}
                                         {!currentCard.context && (
-                                            <div className="space-y-2 mt-4 md:mt-6">
+                                            <div className="space-y-2 mt-4">
                                                 <div className="text-center">
                                                     <input
                                                         ref={inputRef}
@@ -1053,6 +1054,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         onKeyDown={(e) => {
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
+                                                        placeholder="英単語を入力..."
                                                         className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-pink-400 focus:border-pink-600"
                                                         style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
@@ -1062,7 +1064,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex justify-center gap-3 pt-6 md:pt-8 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
@@ -1091,7 +1093,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             )}
                                         </p>
                                     </div>
-                                    <div className="flex justify-center gap-3 pt-6 md:pt-8 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => speak(currentCard.context || currentCard.term)}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border speak-button"
@@ -1145,9 +1147,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </>
                                     )}
 
-                                    <div className="text-center space-y-2 md:space-y-3">
-                                        <p className="text-2xl md:text-3xl font-bold text-gray-900">{currentCard.term}</p>
-                                        <p className="text-base md:text-lg text-gray-600">{currentCard.meaning}</p>
+                                    <div className="text-center space-y-2">
+                                        <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
+                                        <p className="text-base text-gray-600">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
                                             <p className="text-sm text-gray-500 mt-1 leading-relaxed">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
@@ -1169,7 +1171,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex justify-center gap-3 pt-6 md:pt-8 shrink-0">
+                                <div className="flex justify-center gap-3 pt-4 shrink-0">
                                     <button
                                         onClick={() => speak(currentCard.term)}
                                         className="inline-flex items-center gap-1 rounded-lg px-3 py-2.5 text-sm border speak-button"
