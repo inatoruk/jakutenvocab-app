@@ -38,8 +38,13 @@ YES
 
         const raw = response.text?.trim() || '';
         const lines = raw.split('\n').map((l: string) => l.trim()).filter(Boolean);
-        const isValid = lines[0]?.toUpperCase() === 'YES';
-        const hint = lines[1] || '';
+        
+        // Clean up the first line (remove punctuation/formatting) to check for YES/NO
+        const firstLineClean = lines[0]?.replace(/[^a-zA-Z]/g, '').toUpperCase() || '';
+        const isValid = firstLineClean === 'YES';
+        
+        // Preserve all lines after the first line as the hint
+        const hint = lines.slice(1).join('\n');
 
         return NextResponse.json({ isValid, hint });
     } catch (error: unknown) {

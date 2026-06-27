@@ -913,7 +913,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {aiHint && !aiChecking && (
                                             <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                                 <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                                <p className="text-xs text-amber-800">{aiHint}</p>
+                                                <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
                                             </div>
                                         )}
                                     </div>
