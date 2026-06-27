@@ -990,7 +990,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     return (
         <div className="flex-1 flex flex-col">
             {/* モード切替 */}
-            <div className={`shrink-0 relative z-20 ${reviewMode === "writing" ? "mb-4 md:mb-3" : "mb-5"}`}>
+            <div className={`shrink-0 relative z-20 ${
+                reviewMode === "writing"
+                    ? (showAnswer ? "mb-3" : "mb-5")
+                    : "mb-5"
+            }`}>
                 {modeToggle}
             </div>
 
