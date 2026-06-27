@@ -101,26 +101,28 @@ export default function Home() {
       </header>
 
       {/* メインコンテンツ */}
-      {/* flexの代わりにgridを使うことで、子要素が安全に高さを確保しつつ、中身に合わせて伸びるようになる */}
-      <main className="flex-1 min-h-0 overflow-y-auto grid">
-        <div className={`mx-auto w-full max-w-2xl px-4 py-6 flex flex-col ${tab === "review" ? "" : "self-start"}`}>
-          <div style={{ display: tab === "input" ? "block" : "none" }}>
-            <InputView onAdded={handleVocabMutated} />
+      <main className="flex-1 min-h-0 overflow-y-auto flex flex-col">
+        {/* 登録/一覧タブのコンテンツ (高さ固定) */}
+        {tab !== "review" && (
+          <div className="mx-auto w-full max-w-2xl px-4 py-6">
+            <div style={{ display: tab === "input" ? "block" : "none" }}>
+              <InputView onAdded={handleVocabMutated} />
+            </div>
+            <div style={{ display: tab === "list" ? "block" : "none" }}>
+              <WordListView active={tab === "list"} onMutated={handleVocabMutated} />
+            </div>
           </div>
-          <div style={{ display: tab === "list" ? "block" : "none" }}>
-            <WordListView active={tab === "list"} onMutated={handleVocabMutated} />
-          </div>
-          <div
-            style={{ display: tab === "review" ? "flex" : "none" }}
-            className="flex-1 flex flex-col"
-          >
+        )}
+        {/* 復習タブのコンテンツ (画面いっぱいに伸びる) */}
+        {tab === "review" && (
+          <div className="flex-1 flex flex-col mx-auto w-full max-w-2xl px-4 py-6">
             <ReviewView
-              active={tab === "review"}
+              active={true}
               settings={settings}
               vocabVersion={vocabVersion}
             />
           </div>
-        </div>
+        )}
       </main>
 
       {/* タブナビゲーション */}
