@@ -895,7 +895,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <p className={`text-2xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
                                                     {paraphraseInput.trim() || "(未入力)"}
                                                 </p>
-                                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-1">
+                                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-0.5">
                                                     あなたの回答
                                                 </p>
                                             </div>
@@ -1143,7 +1143,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <p className={`text-xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
                                                     {paraphraseInput.trim() || "(未入力)"}
                                                 </p>
-                                                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-1">
+                                                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-0.5">
                                                     あなたの回答
                                                 </p>
                                             </div>
