@@ -736,8 +736,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     {modeToggle}
                 </div>
 
-                {/* 進捗 + シャッフル (モード切替の下に16pxで固定) */}
-                <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10 mb-4">
+                {/* 進捗 + シャッフル */}
+                <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
                     <div className="text-sm text-gray-400">
                         {currentIndex + 1} / {sessionCards.length}
                     </div>
@@ -972,8 +972,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 {modeToggle}
             </div>
 
-            {/* 進捗 + シャッフル (モード切替の下に16pxで固定) */}
-            <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10 mb-4">
+            {/* 進捗 + シャッフル */}
+            <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
                 <div className="text-sm text-gray-400">
                     {currentIndex + 1} / {sessionCards.length}
                 </div>
