@@ -102,7 +102,7 @@ export default function Home() {
 
       {/* メインコンテンツ */}
       <main className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-        <div className={`mx-auto w-full max-w-2xl px-4 py-6 flex flex-col min-h-0 ${tab === "review" ? "flex-1 h-full" : "h-auto"}`}>
+        <div className={`mx-auto w-full max-w-2xl px-4 py-6 flex flex-col ${tab === "review" ? "flex-1 min-h-full" : ""}`}>
           <div style={{ display: tab === "input" ? "block" : "none" }}>
             <InputView onAdded={handleVocabMutated} />
           </div>
@@ -111,7 +111,7 @@ export default function Home() {
           </div>
           <div
             style={{ display: tab === "review" ? "flex" : "none" }}
-            className="flex-1 flex flex-col min-h-0"
+            className="flex-1 flex flex-col"
           >
             <ReviewView
               active={tab === "review"}

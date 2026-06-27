@@ -730,7 +730,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         const isGrouped = siblings.length > 0;
 
         return (
-            <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 flex flex-col">
                 {/* モード切替 */}
                 <div className="shrink-0 mb-4 relative z-20">
                     {modeToggle}
@@ -738,7 +738,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                 {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
                 {/* justify-center ではなく、中身の my-auto を使うことで、要素がはみ出た際に「上が切れる」のを防ぐ */}
-                <div className="flex-1 relative flex flex-col items-center min-h-0 pt-4 pb-4 overflow-y-auto">
+                <div className="flex-1 relative flex flex-col items-center pt-4 pb-4">
                     {/* カードとカテゴリをまとめるラッパー */}
                     <div className="w-full flex flex-col items-center my-auto shrink-0 py-2">
                         {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
@@ -967,7 +967,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
     // ── 通常モード（unlearned / all / writing）のカードUI ─────────────────────
     return (
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col">
             {/* モード切替 */}
             <div className="shrink-0 mb-4 relative z-20">
                 {modeToggle}
@@ -975,7 +975,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
             {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
             {/* justify-center ではなく、中身の my-auto を使うことで、要素がはみ出た際に「上が切れる」のを防ぐ */}
-            <div className="flex-1 relative flex flex-col items-center min-h-0 pt-4 pb-4 overflow-y-auto">
+            <div className="flex-1 relative flex flex-col items-center pt-4 pb-4">
                 {/* カード & カテゴリ表示 (上下中央) */}
                 <div className="w-full flex flex-col items-center my-auto px-2 shrink-0 py-2">
                     {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
