@@ -732,7 +732,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         return (
             <div className="flex-1 flex flex-col">
                 {/* モード切替 */}
-                <div className="shrink-0 mb-4 relative z-20">
+                <div className="shrink-0 mb-4 md:mb-3 relative z-20">
                     {modeToggle}
                 </div>
 
@@ -751,7 +751,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 </div>
 
                 {/* カード & カテゴリ表示 (残りの領域で中央寄せ) */}
-                <div className="flex-1 flex flex-col justify-center items-center py-4">
+                <div className="flex-1 flex flex-col justify-center items-center py-4 md:py-3">
                     {/* カードとカテゴリをまとめるラッパー */}
                     <div className="w-full flex flex-col items-center shrink-0 gap-4">
                         <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
