@@ -1029,7 +1029,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             Writing — 単語を答えよ
                                         </p>
                                         <div className="text-center">
-                                            <p className="text-2xl md:text-3xl font-bold text-gray-900">{currentCard.meaning}</p>
+                                            <p className="text-xl md:text-2xl font-bold text-gray-900">{currentCard.meaning}</p>
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
