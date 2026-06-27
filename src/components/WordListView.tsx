@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Vocab, Category, CATEGORIES, Status } from "@/types/vocab";
 import { processDecay } from "@/lib/vocab";
-import { Search, X, Check, Loader2, Link2 } from "lucide-react";
+import { Search, X, Check, Loader2, Link2, Sparkles, Info, AlertCircle } from "lucide-react";
 
 // 表面上の3段階（内部ステータス 2〜5 はまとめて「習得済み」）
 // フィルター・バッジを 0 / 1 / 2 の 3段階で分類
@@ -52,6 +52,12 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
     const [editContext, setEditContext] = useState("");
     const [editCategory, setEditCategory] = useState<Category>("Vocab");
     const [editStatus, setEditStatus] = useState<Status>(0);
+
+    // AI生成用のstate
+    const [isGeneratingMeaning, setIsGeneratingMeaning] = useState(false);
+    const [isGeneratingExample, setIsGeneratingExample] = useState(false);
+    const [exampleLevel, setExampleLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
+    const [aiError, setAiError] = useState<string | null>(null);
 
     // ── グループ化機能 ──────────────────────────────────────────────────────
     const [isGroupMode, setIsGroupMode] = useState(false);
@@ -125,6 +131,57 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
         return true;
     });
 
+    const generateAIContent = async (type: 'meaning' | 'example') => {
+        if (!editTerm.trim()) {
+            setAiError("単語を入力してください");
+            setTimeout(() => setAiError(null), 3000);
+            return;
+        }
+
+        setAiError(null);
+        if (type === 'meaning') {
+            setEditMeaning('');
+            setIsGeneratingMeaning(true);
+        } else {
+            setEditContext('');
+            setIsGeneratingExample(true);
+        }
+
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    term: editTerm.trim(),
+                    type,
+                    ...(type === 'example' ? { level: exampleLevel } : {})
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || '生成に失敗しました');
+            }
+
+            if (type === 'meaning') {
+                setEditMeaning(data.result);
+            } else {
+                setEditContext(data.result);
+            }
+        } catch (error: any) {
+            let userMessage = error.message || 'エラーが発生しました。';
+            if (userMessage.includes('Failed to fetch') || userMessage.includes('NetworkError') || userMessage.includes('fetch')) {
+                userMessage = 'サーバーとの通信に失敗しました。ネットワークの接続状況を確認してください。';
+            }
+            setAiError(userMessage);
+            setTimeout(() => setAiError(null), 5000);
+        } finally {
+            if (type === 'meaning') setIsGeneratingMeaning(false);
+            else setIsGeneratingExample(false);
+        }
+    };
+
     function openEdit(word: Vocab) {
         setEditingWord(word);
         setIsClosing(false);
@@ -133,6 +190,9 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
         setEditContext(word.context);
         setEditCategory(word.category);
         setEditStatus(word.status);
+        setAiError(null);
+        setIsGeneratingMeaning(false);
+        setIsGeneratingExample(false);
     }
 
     function closeEdit() {
@@ -140,6 +200,9 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
         setTimeout(() => {
             setEditingWord(null);
             setIsClosing(false);
+            setAiError(null);
+            setIsGeneratingMeaning(false);
+            setIsGeneratingExample(false);
         }, 250);
     }
 
@@ -506,28 +569,90 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
 
                         {/* 意味 */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                意味
-                            </label>
-                            <input
-                                type="text"
-                                value={editMeaning}
-                                onChange={(e) => setEditMeaning(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
+                            <div className="flex items-center gap-3 mb-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    意味
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={() => generateAIContent('meaning')}
+                                    disabled={isGeneratingMeaning || !editTerm.trim()}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
+                                >
+                                    {isGeneratingMeaning ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                    AI生成
+                                </button>
+                            </div>
+                            <div className="relative w-full">
+                                <input
+                                    type="text"
+                                    value={editMeaning}
+                                    onChange={(e) => setEditMeaning(e.target.value)}
+                                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                                <div
+                                    className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 bg-white dark:bg-gray-800 flex items-center h-full animate-shimmer-input transition-opacity duration-500 ${
+                                        isGeneratingMeaning ? "opacity-100" : "opacity-0"
+                                    }`}
+                                >
+                                    {isGeneratingMeaning && <div className="h-3 w-[35%] skeleton-bar"></div>}
+                                </div>
+                            </div>
                         </div>
 
                         {/* 例文 */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                例文
-                            </label>
-                            <textarea
-                                value={editContext}
-                                onChange={(e) => setEditContext(e.target.value)}
-                                rows={2}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                            />
+                            <div className="flex items-center gap-3 mb-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    例文
+                                </label>
+                                <div className="flex items-center gap-1.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => generateAIContent('example')}
+                                        disabled={isGeneratingExample || !editTerm.trim()}
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
+                                    >
+                                        {isGeneratingExample ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                        AI生成
+                                    </button>
+                                    <select
+                                        value={exampleLevel}
+                                        onChange={(e) => setExampleLevel(e.target.value as 'beginner' | 'intermediate' | 'advanced')}
+                                        disabled={isGeneratingExample}
+                                        className="h-[26px] rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-1.5 pr-5 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer appearance-none bg-no-repeat"
+                                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundPosition: 'right 4px center' }}
+                                    >
+                                        <option value="beginner">初級</option>
+                                        <option value="intermediate">中級</option>
+                                        <option value="advanced">上級</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="relative w-full">
+                                <textarea
+                                    value={editContext}
+                                    onChange={(e) => setEditContext(e.target.value)}
+                                    rows={2}
+                                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                                />
+                                <div
+                                    className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input transition-opacity duration-500 ${
+                                        isGeneratingExample ? "opacity-100" : "opacity-0"
+                                    }`}
+                                >
+                                    {isGeneratingExample && (
+                                        <>
+                                            <div className="h-6 md:h-5 flex items-center">
+                                                <div className="h-3 w-[85%] skeleton-bar"></div>
+                                            </div>
+                                            <div className="h-6 md:h-5 flex items-center">
+                                                <div className="h-3 w-[60%] skeleton-bar"></div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         {/* カテゴリ & ステータス */}
@@ -569,6 +694,13 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 </select>
                             </div>
                         </div>
+
+                        {aiError && (
+                            <div className="flex items-center gap-1.5 text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg p-2.5">
+                                <AlertCircle size={14} className="shrink-0" />
+                                <span>{aiError}</span>
+                            </div>
+                        )}
 
                         {/* アクションボタン */}
                         <div className="flex gap-3 pt-1">

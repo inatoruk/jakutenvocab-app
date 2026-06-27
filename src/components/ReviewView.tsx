@@ -389,10 +389,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             if (groupError) throw groupError;
             
             // 3. データ再取得
-            await Promise.all([
-                fetchParaphraseGroups(),
-                fetchAndBuildSession()
-            ]);
+            await fetchParaphraseGroups();
+            setAllCards(prev => [...prev, newVocab]);
             
             // 4. 正解として表示更新
             setParaphraseResult("correct");
@@ -473,6 +471,13 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             }
         }
         setShowAnswer(false);
+        
+        // パラフレーズモード等の入力リセット
+        setParaphraseInput("");
+        setParaphraseResult(null);
+        setSameWordWarning(false);
+        setAiHint(null);
+        setAiChecking(false);
 
         setAnimationState("swiping-in");
         await sleep(300);
