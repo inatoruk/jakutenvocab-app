@@ -229,7 +229,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
     const isParaphraseFilter = filterCategory === "Paraphrase";
 
     return (
-        <div className="space-y-4 pb-6">
+        <div className="space-y-4 pb-5">
             {/* 検索 */}
             <div className="relative">
                 <Search
@@ -364,7 +364,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     </p>
                 </div>
             ) : (
-                <ul className={`space-y-2 ${isGroupMode ? "pb-24" : ""}`}>
+                <ul className={`space-y-2 ${isGroupMode ? "pb-23" : ""}`}>
                     {filteredWords.map((word) => {
                         const groupId = paraphraseGroups[word.id];
                         const groupLabel = groupId ? groupLabels[groupId] : null;

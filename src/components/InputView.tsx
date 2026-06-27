@@ -343,7 +343,7 @@ export default function InputView({ onAdded }: InputViewProps) {
 
             {mode === "single" ? (
                 /* ── 1件ずつモード（既存） ── */
-                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-2.5 pb-8 md:pb-10">
+                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-2.5 pb-7">
                     {/* 単語 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -524,7 +524,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                 </form>
             ) : (
                 /* ── 一括登録モード ── */
-                <div className="space-y-4 md:space-y-5 pb-8 has-[.group:focus-within_details[open]]:pb-56 has-[.group:hover_details[open]]:pb-56 md:pb-10">
+                <div className="space-y-4 md:space-y-5 pb-7 has-[.group:focus-within_details[open]]:pb-56 has-[.group:hover_details[open]]:pb-56">
                     {/* 区切り文字 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">

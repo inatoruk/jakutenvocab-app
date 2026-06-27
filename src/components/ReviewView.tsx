@@ -625,7 +625,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") handleSubmitAnswer();
                             }}
-                            className="inline-block border-b-2 border-violet-400 bg-transparent text-center focus:ring-0 focus:outline-none focus:border-violet-600 text-violet-700 font-semibold px-1"
+                            className={`inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-1 text-gray-900 ${
+                                reviewMode === "writing"
+                                    ? "border-pink-400 focus:border-pink-600"
+                                    : "border-violet-400 focus:border-violet-600"
+                            }`}
                             style={{ 
                                 width: `${Math.max(part.length + 2, paraphraseInput.length + 1)}ch` 
                             }}
@@ -1020,7 +1024,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         {!showAnswer ? (
                             isWritingCard ? (
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-4">
+                                    <div className="flex-1 flex flex-col justify-center space-y-3">
                                         <p className="text-xs font-semibold text-pink-400 text-center uppercase tracking-widest">
                                             Writing — 単語を答えよ
                                         </p>
@@ -1035,8 +1039,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         )}
                                         
                                         {/* 入力フォーム */}
-                                        <div className="space-y-2 mt-4">
-                                            {!currentCard.context && (
+                                        {!currentCard.context && (
+                                            <div className="space-y-2 mt-4">
                                                 <div className="flex gap-2">
                                                     <input
                                                         ref={inputRef}
@@ -1055,8 +1059,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         autoCapitalize="none"
                                                     />
                                                 </div>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
@@ -1087,7 +1091,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             )}
                                         </p>
                                     </div>
-                                    <div className="flex justify-center gap-3 pt-6 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => speak(currentCard.context || currentCard.term)}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border speak-button"
@@ -1107,7 +1111,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             )
                         ) : (
                             <>
-                                <div className="flex-1 flex flex-col justify-center space-y-4">
+                                <div className="flex-1 flex flex-col justify-center space-y-3">
                                     {isWritingCard && paraphraseResult !== null && (
                                         <>
                                             {/* 正誤バッジ */}
@@ -1165,7 +1169,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex justify-center gap-3 pt-6 shrink-0">
+                                <div className="flex justify-center gap-3 pt-4 shrink-0">
                                     <button
                                         onClick={() => speak(currentCard.term)}
                                         className="inline-flex items-center gap-1 rounded-lg px-3 py-2.5 text-sm border speak-button"
