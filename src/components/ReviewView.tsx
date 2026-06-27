@@ -821,7 +821,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         onKeyDown={(e) => {
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
-                                                        placeholder="パラフレーズを入力..."
                                                         className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-violet-400 focus:border-violet-600"
                                                         style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
@@ -1034,7 +1033,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             Writing — 単語を答えよ
                                         </p>
                                         <div className="text-center">
-                                            <p className="text-2xl font-bold text-gray-900">{currentCard.meaning}</p>
+                                            <p className="text-xl font-bold text-gray-900">{currentCard.meaning}</p>
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
@@ -1058,7 +1057,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         onKeyDown={(e) => {
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
-                                                        placeholder="英単語を入力..."
                                                         className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-pink-400 focus:border-pink-600"
                                                         style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
