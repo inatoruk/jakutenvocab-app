@@ -621,3 +621,18 @@ html[data-theme="system"] .copy-btn-icon:hover {
 .animate-swipe-in {
     animation: swipe-in-bottom 0.3s ease-out forwards;
 }
+
+/* グループ選択アクションバーのカスタムシャドウ */
+.selection-action-bar {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-theme="dark"] .selection-action-bar {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.25) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] .selection-action-bar {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.25) !important;
+    }
+}
