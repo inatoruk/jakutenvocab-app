@@ -736,24 +736,24 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     {modeToggle}
                 </div>
 
-                {/* コンテンツエリア */}
-                <div className="flex-1 relative flex flex-col py-4">
-                    {/* カードとカテゴリをまとめるラッパー (my-autoで上下の余白を自動調整) */}
-                    <div className="w-full flex flex-col items-center shrink-0 gap-4 my-auto">
-                        {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
-                        <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
-                            <div className="text-sm text-gray-400">
-                                {currentIndex + 1} / {sessionCards.length}
-                            </div>
-                            <button
-                                onClick={handleShuffle}
-                                className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
-                            >
-                                <Shuffle size={14} />
-                                シャッフル
-                            </button>
-                        </div>
+                {/* 進捗 + シャッフル (モード切替の下に16pxで固定) */}
+                <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10 mb-4">
+                    <div className="text-sm text-gray-400">
+                        {currentIndex + 1} / {sessionCards.length}
+                    </div>
+                    <button
+                        onClick={handleShuffle}
+                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                    >
+                        <Shuffle size={14} />
+                        シャッフル
+                    </button>
+                </div>
 
+                {/* カード & カテゴリ表示 (残りの領域で中央寄せ) */}
+                <div className="flex-1 flex flex-col justify-center items-center py-4">
+                    {/* カードとカテゴリをまとめるラッパー */}
+                    <div className="w-full flex flex-col items-center shrink-0 gap-4">
                         <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
                             ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                             ${animationState === "flipping-in" ? "animate-flip-in" : ""}
