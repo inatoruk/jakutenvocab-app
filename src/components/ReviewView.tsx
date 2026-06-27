@@ -736,8 +736,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     {modeToggle}
                 </div>
 
-                {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
-                <div className="flex-1 relative flex flex-col justify-center items-center py-4">
+                {/* コンテンツエリア */}
+                <div className="flex-1 relative flex flex-col py-4">
+                    {/* 上のダミー余白（余裕があれば伸びて中央寄せし、狭くなれば縮んで上部マージンを16px(py-4)で守る） */}
+                    <div className="flex-1 min-h-0" aria-hidden="true"></div>
+
                     {/* カードとカテゴリをまとめるラッパー */}
                     <div className="w-full flex flex-col items-center shrink-0 gap-4">
                         {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
@@ -959,6 +962,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             </span>
                         </div>
                     </div>
+
+                    {/* 下のダミー余白 */}
+                    <div className="flex-1 min-h-0" aria-hidden="true"></div>
                 </div>
             </div>
         );
@@ -972,9 +978,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 {modeToggle}
             </div>
 
-            {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
-            <div className="flex-1 relative flex flex-col justify-center items-center py-4">
-                {/* カード & カテゴリ表示 (上下中央) */}
+            {/* コンテンツエリア */}
+            <div className="flex-1 relative flex flex-col py-4">
+                {/* 上のダミー余白 */}
+                <div className="flex-1 min-h-0" aria-hidden="true"></div>
+
+                {/* カード & カテゴリ表示 */}
                 <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
                     {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
                     <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
@@ -1127,6 +1136,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         </span>
                     </div>
                 </div>
+
+                {/* 下のダミー余白 */}
+                <div className="flex-1 min-h-0" aria-hidden="true"></div>
             </div>
         </div>
     );
