@@ -427,7 +427,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     </p>
                 </div>
             ) : (
-                <ul className={`space-y-2 ${isGroupMode ? "pb-20" : ""}`}>
+                <ul className={`space-y-2 ${isGroupMode ? "pb-10" : ""}`}>
                     {filteredWords.map((word) => {
                         const groupId = paraphraseGroups[word.id];
                         const groupLabel = groupId ? groupLabels[groupId] : null;
