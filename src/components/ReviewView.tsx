@@ -809,7 +809,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {/* 入力フォーム */}
                                         <div className="space-y-2">
                                             {!currentCard.context && (
-                                                <div className="flex gap-2">
+                                                <div className="text-center">
                                                     <input
                                                         ref={inputRef}
                                                         type="text"
@@ -822,7 +822,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
                                                         placeholder="パラフレーズを入力..."
-                                                        className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
+                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-violet-400 focus:border-violet-600"
+                                                        style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
                                                         autoCapitalize="none"
                                                     />
@@ -1041,7 +1042,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {/* 入力フォーム */}
                                         {!currentCard.context && (
                                             <div className="space-y-2 mt-4">
-                                                <div className="flex gap-2">
+                                                <div className="text-center">
                                                     <input
                                                         ref={inputRef}
                                                         type="text"
@@ -1054,7 +1055,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
                                                         placeholder="英単語を入力..."
-                                                        className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-pink-400 focus:border-pink-600"
+                                                        style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
                                                         autoCapitalize="none"
                                                     />
@@ -1115,7 +1117,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     {isWritingCard && paraphraseResult !== null && (
                                         <>
                                             {/* 正誤バッジ */}
-                                            <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 mx-auto w-full max-w-sm ${
+                                            <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                                 paraphraseResult === "correct"
                                                     ? "bg-green-50 text-green-700 border border-green-200"
                                                     : paraphraseResult === "synonym"
@@ -1157,13 +1159,13 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                     {/* AIヒント */}
                                     {isWritingCard && aiChecking && (
-                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2 mx-auto w-full max-w-sm">
+                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                             <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
                                             <p className="text-xs text-amber-700">AIアドバイスを生成中...</p>
                                         </div>
                                     )}
                                     {isWritingCard && aiHint && !aiChecking && (
-                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2 mx-auto w-full max-w-sm">
+                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                             <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
                                             <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
                                         </div>
