@@ -689,7 +689,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                 if (e.key === "Enter") handleSubmitAnswer();
                             }}
                             className={`inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-1 text-gray-900 ${
-                                reviewMode === "writing"
+                                isWritingCard
                                     ? "border-pink-400 focus:border-pink-600"
                                     : "border-violet-400 focus:border-violet-600"
                             }`}
