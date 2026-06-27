@@ -215,18 +215,18 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         fetchParaphraseGroups();
     }, [vocabVersion, fetchAndBuildSession, fetchParaphraseGroups]);
 
-    // パラフレーズモードに切り替わった時、入力欄にフォーカス
-    useEffect(() => {
-        if (reviewMode === "paraphrase" && !showAnswer) {
-            setTimeout(() => inputRef.current?.focus(), 100);
-        }
-    }, [reviewMode, currentIndex, showAnswer]);
-
     // ─── 現在のカード ──────────────────────────────────────────────────────────
 
     const currentCard = sessionCards[currentIndex] ?? null;
     const isWritingCard = currentCard?.category === "Writing";
     const isParaphraseMode = reviewMode === "paraphrase";
+
+    // パラフレーズまたはWritingモードに切り替わった時、入力欄にフォーカス
+    useEffect(() => {
+        if ((isParaphraseMode || isWritingCard) && !showAnswer) {
+            setTimeout(() => inputRef.current?.focus(), 100);
+        }
+    }, [isParaphraseMode, isWritingCard, currentIndex, showAnswer]);
 
     // ─── パラフレーズ関連ロジック ──────────────────────────────────────────────
 
@@ -238,19 +238,34 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         return allCardsRef.current.filter(c => memberIds.includes(c.id) && c.id !== card.id);
     }
 
-    /** パラフレーズ入力の送信ハンドラ */
-    async function handleParaphraseSubmit() {
+    /** 入力の送信ハンドラ（Writing / Paraphrase 共通） */
+    async function handleSubmitAnswer() {
         if (!currentCard || !paraphraseInput.trim()) return;
 
         const input = paraphraseInput.trim();
         const inputLemma = lemmatize(input);
         const displayedLemma = lemmatize(currentCard.term);
 
-        // 出題単語と同じ単語を入力した場合
+        // 出題単語と完全一致した場合
         if (inputLemma === displayedLemma) {
-            setSameWordWarning(true);
-            return;
+            if (isParaphraseMode) {
+                // Paraphraseモードでは、同じ単語はNG
+                setSameWordWarning(true);
+                return;
+            } else {
+                // Writingモードでは、これこそが「正解」
+                setSameWordWarning(false);
+                setParaphraseResult("correct");
+                setAnimationState("flipping-out");
+                await sleep(150);
+                setShowAnswer(true);
+                setAnimationState("flipping-in");
+                await sleep(150);
+                setAnimationState("idle");
+                return;
+            }
         }
+        
         setSameWordWarning(false);
 
         const siblings = getGroupSiblings(currentCard);
@@ -258,7 +273,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         const matched = siblings.find(s => lemmatize(s.term) === inputLemma);
 
         if (matched) {
-            // ローカル正解 (登録済みパラフレーズ)
+            // ローカル正解 (登録済みパラフレーズ、またはWritingでの別解正解)
             setParaphraseResult("correct");
             setAnimationState("flipping-out");
             await sleep(150);
@@ -280,7 +295,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             await sleep(150);
             setAnimationState("idle");
         }
-
     }
 
     /** AI非同期判定（未登録単語） */
@@ -609,7 +623,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                 setSameWordWarning(false);
                             }}
                             onKeyDown={(e) => {
-                                if (e.key === "Enter") handleParaphraseSubmit();
+                                if (e.key === "Enter") handleSubmitAnswer();
                             }}
                             className="inline-block border-b-2 border-violet-400 bg-transparent text-center focus:ring-0 focus:outline-none focus:border-violet-600 text-violet-700 font-semibold px-1"
                             style={{ 
@@ -801,7 +815,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                             setSameWordWarning(false);
                                                         }}
                                                         onKeyDown={(e) => {
-                                                            if (e.key === "Enter" && paraphraseInput.trim()) handleParaphraseSubmit();
+                                                            if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
                                                         placeholder="パラフレーズを入力..."
                                                         className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
@@ -828,7 +842,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             わからない
                                         </button>
                                         <button
-                                            onClick={handleParaphraseSubmit}
+                                            onClick={handleSubmitAnswer}
                                             disabled={!paraphraseInput.trim()}
                                             className="inline-flex items-center gap-2 rounded-lg bg-pink-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-pink-600 active:bg-pink-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                         >
@@ -1006,37 +1020,59 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         {!showAnswer ? (
                             isWritingCard ? (
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-6">
-                                        <div className="space-y-3">
-                                            <p className="text-xs font-semibold text-pink-400 text-center uppercase tracking-widest">
-                                                Writing — 単語を答えよ
+                                    <div className="flex-1 flex flex-col justify-center space-y-4">
+                                        <p className="text-xs font-semibold text-pink-400 text-center uppercase tracking-widest">
+                                            Writing — 単語を答えよ
+                                        </p>
+                                        <div className="text-center">
+                                            <p className="text-2xl font-bold text-gray-900">{currentCard.meaning}</p>
+                                        </div>
+                                        {/* 例文（空欄あり） */}
+                                        {currentCard.context && (
+                                            <p className="text-lg leading-relaxed text-gray-700 text-center bg-pink-50 rounded-lg px-4 py-3">
+                                                {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
-                                            <p className="text-base font-medium text-gray-700 text-center">
-                                                {currentCard.meaning}
-                                            </p>
-                                            {currentCard.context && (
-                                                <p className="text-lg leading-relaxed text-gray-800 text-center">
-                                                    {blankTermInContext(currentCard.context, currentCard.term)}
-                                                </p>
+                                        )}
+                                        
+                                        {/* 入力フォーム */}
+                                        <div className="space-y-2 mt-4">
+                                            {!currentCard.context && (
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        ref={inputRef}
+                                                        type="text"
+                                                        value={paraphraseInput}
+                                                        onChange={(e) => {
+                                                            setParaphraseInput(e.target.value);
+                                                            setSameWordWarning(false);
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
+                                                        }}
+                                                        placeholder="英単語を入力..."
+                                                        className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                                                        autoComplete="off"
+                                                        autoCapitalize="none"
+                                                    />
+                                                </div>
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex justify-center gap-3 pt-6 shrink-0">
-                                        {currentCard.context && (
-                                            <button
-                                                onClick={() => speak(currentCard.context)}
-                                                className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border speak-button"
-                                            >
-                                                <Volume2 size={16} />
-                                                再生
-                                            </button>
-                                        )}
+                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
-                                            onClick={handleReveal}
-                                            className="inline-flex items-center gap-2 rounded-lg bg-pink-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-pink-600 active:bg-pink-700"
+                                            onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
+                                            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                                         >
                                             <Eye size={16} />
-                                            答えを見る
+                                            わからない
+                                        </button>
+                                        <button
+                                            onClick={handleSubmitAnswer}
+                                            disabled={!paraphraseInput.trim()}
+                                            className="inline-flex items-center gap-2 rounded-lg bg-pink-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-pink-600 active:bg-pink-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            <SendHorizontal size={16} />
+                                            回答する
                                         </button>
                                     </div>
                                 </>
@@ -1071,16 +1107,63 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             )
                         ) : (
                             <>
-                                <div className="flex-1 flex flex-col justify-center space-y-6">
+                                <div className="flex-1 flex flex-col justify-center space-y-4">
+                                    {isWritingCard && paraphraseResult !== null && (
+                                        <>
+                                            {/* 正誤バッジ */}
+                                            <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 mx-auto w-full max-w-sm ${
+                                                paraphraseResult === "correct"
+                                                    ? "bg-green-50 text-green-700 border border-green-200"
+                                                    : paraphraseResult === "synonym"
+                                                        ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                                        : "bg-red-50 text-red-700 border border-red-200"
+                                            }`}>
+                                                <span>
+                                                    {paraphraseResult === "correct" && "✅ 正解！"}
+                                                    {paraphraseResult === "synonym" && "🔵 Nice synonym! (登録外の正解)"}
+                                                    {paraphraseResult === "incorrect" && (
+                                                        aiChecking
+                                                            ? <span className="inline-flex items-center justify-center gap-1.5"><Loader2 size={14} className="animate-spin" />AI判定中...</span>
+                                                            : "❌ 不正解"
+                                                    )}
+                                                </span>
+                                            </div>
+
+                                            {/* あなたの回答 */}
+                                            <div className="text-center">
+                                                <p className={`text-xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
+                                                    {paraphraseInput.trim() || "(未入力)"}
+                                                </p>
+                                                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-1">
+                                                    あなたの回答
+                                                </p>
+                                            </div>
+                                        </>
+                                    )}
+
                                     <div className="text-center space-y-2">
                                         <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
                                         <p className="text-base text-gray-600">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
                                             <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                                                {currentCard.context}
+                                                {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
                                     </div>
+
+                                    {/* AIヒント */}
+                                    {isWritingCard && aiChecking && (
+                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2 mx-auto w-full max-w-sm">
+                                            <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
+                                            <p className="text-xs text-amber-700">AIアドバイスを生成中...</p>
+                                        </div>
+                                    )}
+                                    {isWritingCard && aiHint && !aiChecking && (
+                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2 mx-auto w-full max-w-sm">
+                                            <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                                            <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex justify-center gap-3 pt-6 shrink-0">
                                     <button
