@@ -737,12 +737,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 </div>
 
                 {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
-                {/* justify-center ではなく、中身の my-auto を使うことで、要素がはみ出た際に「上が切れる」のを防ぐ */}
-                <div className="flex-1 relative flex flex-col items-center pt-4 pb-4">
+                <div className="flex-1 relative flex flex-col justify-center items-center py-4">
                     {/* カードとカテゴリをまとめるラッパー */}
-                    <div className="w-full flex flex-col items-center my-auto shrink-0 py-2">
+                    <div className="w-full flex flex-col items-center shrink-0 gap-4">
                         {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
-                        <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10 mb-4">
+                        <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
                             <div className="text-sm text-gray-400">
                                 {currentIndex + 1} / {sessionCards.length}
                             </div>
@@ -755,7 +754,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             </button>
                         </div>
 
-                        <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50 mb-4
+                        <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
                             ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                             ${animationState === "flipping-in" ? "animate-flip-in" : ""}
                             ${animationState === "swiping-out" ? "animate-swipe-out" : ""}
@@ -974,12 +973,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             </div>
 
             {/* コンテンツエリア (全体のブロックを進捗ボタン〜カテゴリの範囲で中央に配置) */}
-            {/* justify-center ではなく、中身の my-auto を使うことで、要素がはみ出た際に「上が切れる」のを防ぐ */}
-            <div className="flex-1 relative flex flex-col items-center pt-4 pb-4">
+            <div className="flex-1 relative flex flex-col justify-center items-center py-4">
                 {/* カード & カテゴリ表示 (上下中央) */}
-                <div className="w-full flex flex-col items-center my-auto px-2 shrink-0 py-2">
+                <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
                     {/* 進捗 + シャッフル (カードと連動して動くようにラッパー内に移動) */}
-                    <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10 mb-4">
+                    <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
                         <div className="text-sm text-gray-400">
                             {currentIndex + 1} / {sessionCards.length}
                         </div>
@@ -993,7 +991,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     </div>
 
                     {/* カード */}
-                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50 mb-4
+                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
                         ${isWritingCard ? "border-pink-200" : "border-gray-200"}
                         ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                         ${animationState === "flipping-in" ? "animate-flip-in" : ""}
