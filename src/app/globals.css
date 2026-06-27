@@ -484,7 +484,6 @@ html[data-theme="dark"] .animate-shimmer-input {
     background-color: #ffffff;
     border-color: #d1d5db; /* border-gray-300 */
     color: #374151; /* text-gray-700 */
-    transition: color 0.2s, background-color 0.2s, border-color 0.2s;
 }
 
 .speak-button:hover:not(:disabled) {
