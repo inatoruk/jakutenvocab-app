@@ -985,7 +985,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     return (
         <div className="flex-1 flex flex-col">
             {/* モード切替 */}
-            <div className="shrink-0 mb-4 relative z-20">
+            <div className={`shrink-0 relative z-20 ${reviewMode === "writing" ? "mb-4 md:mb-3" : "mb-4"}`}>
                 {modeToggle}
             </div>
 
@@ -1004,7 +1004,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             </div>
 
             {/* コンテンツエリア (残りの領域で中央寄せ) */}
-            <div className="flex-1 flex flex-col justify-center items-center py-4">
+            <div className={`flex-1 flex flex-col justify-center items-center ${reviewMode === "writing" ? "py-4 md:py-3" : "py-4"}`}>
                 {/* カード & カテゴリ表示 */}
                 <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
 
