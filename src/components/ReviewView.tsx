@@ -775,7 +775,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 <div className="flex-1 flex flex-col justify-center items-center py-4 md:py-3">
                     {/* カードとカテゴリをまとめるラッパー */}
                     <div className="w-full flex flex-col items-center shrink-0 gap-4">
-                        <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[260px] md:min-h-[300px] flex flex-col justify-between p-6 md:p-8 relative z-50
+                        <div className={`w-full rounded-2xl border border-violet-200 bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
                             ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                             ${animationState === "flipping-in" ? "animate-flip-in" : ""}
                             ${animationState === "swiping-out" ? "animate-swipe-out" : ""}
@@ -1013,7 +1013,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
 
                     {/* カード */}
-                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[260px] md:min-h-[300px] flex flex-col justify-between p-6 md:p-8 relative z-50
+                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
                         ${isWritingCard ? "border-pink-200" : "border-gray-200"}
                         ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                         ${animationState === "flipping-in" ? "animate-flip-in" : ""}
