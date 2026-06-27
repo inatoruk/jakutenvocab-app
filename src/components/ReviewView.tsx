@@ -630,8 +630,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
     if (loading) {
         return (
-            <div className="flex-1 flex items-center justify-center">
-                <p className="text-gray-400">読み込み中...</p>
+            <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-400 text-sm">読み込み中...</p>
+                </div>
             </div>
         );
     }
