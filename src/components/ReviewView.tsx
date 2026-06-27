@@ -903,7 +903,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* 例文（完成形） */}
                                         {currentCard.context && (
-                                            <p className="text-sm leading-relaxed text-gray-700 text-center bg-violet-50 rounded-lg px-4 py-3">
+                                            <p className="text-sm leading-relaxed text-gray-500 text-center mt-1">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
