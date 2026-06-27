@@ -292,7 +292,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
     const isParaphraseFilter = filterCategory === "Paraphrase";
 
     return (
-        <div className="space-y-4 pb-5">
+        <div className="space-y-4">
             {/* 検索 */}
             <div className="relative">
                 <Search
