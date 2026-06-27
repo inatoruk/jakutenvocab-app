@@ -605,6 +605,15 @@ html[data-theme="system"] .copy-btn-icon:hover {
     animation: swipe-out-tr 0.3s ease-in forwards;
 }
 
+@keyframes swipe-out-tl {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-300px, -300px) rotate(-15deg); opacity: 0; }
+}
+
+.animate-swipe-out-left {
+    animation: swipe-out-tl 0.3s ease-in forwards;
+}
+
 @keyframes swipe-in-bottom {
     0% { transform: translate(0, 30px); opacity: 0; }
     100% { transform: translate(0, 0); opacity: 1; }
