@@ -1044,7 +1044,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         
                                         {/* 入力フォーム */}
                                         {!currentCard.context && (
-                                            <div className="space-y-2 mt-4">
+                                            <div className="space-y-2">
                                                 <div className="text-center">
                                                     <input
                                                         ref={inputRef}
