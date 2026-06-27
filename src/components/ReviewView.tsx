@@ -859,7 +859,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             ) : (
                                 /* ── 解答面 ── */
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-3">
+                                    <div className="flex-1 flex flex-col justify-center space-y-2">
                                         {/* 正誤バッジ */}
                                         {paraphraseResult !== null && (
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
@@ -1116,7 +1116,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             )
                         ) : (
                             <>
-                                <div className="flex-1 flex flex-col justify-center space-y-3">
+                                <div className="flex-1 flex flex-col justify-center space-y-2">
                                     {isWritingCard && paraphraseResult !== null && (
                                         <>
                                             {/* 正誤バッジ */}
