@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Vocab, Category, Status } from "@/types/vocab";
 import { processDecay, calcReviewDueAt } from "@/lib/vocab";
-import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Loader2, Sparkles, SendHorizontal } from "lucide-react";
+import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Loader2, Sparkles, SendHorizontal, Plus } from "lucide-react";
 import { AppSettings } from "@/lib/settings";
 import nlp from "compromise";
 
@@ -153,6 +153,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     // AI非同期判定
     const [aiChecking, setAiChecking] = useState(false);
     const [aiHint, setAiHint] = useState<string | null>(null);
+    const [registering, setRegistering] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // useEffect 内で最新値を参照するための Ref
@@ -345,6 +346,63 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             // 無視
         } finally {
             setAiChecking(false);
+        }
+    }
+
+    /** パラフレーズをその場で登録する */
+    async function handleRegisterParaphrase() {
+        if (!currentCard || !paraphraseInput.trim()) return;
+        setRegistering(true);
+        
+        const inputTerm = paraphraseInput.trim();
+        
+        try {
+            // 1. 新しい Vocab として登録
+            const { data: newVocab, error: vocabError } = await supabase
+                .from("vocab")
+                .insert({
+                    term: inputTerm,
+                    meaning: currentCard.meaning, // 意味を引き継ぐ
+                    context: "",
+                    category: "Paraphrase",
+                    status: 0,
+                })
+                .select()
+                .single();
+                
+            if (vocabError || !newVocab) throw vocabError;
+            
+            // 2. パラフレーズグループへの追加
+            const existingGroupId = paraphraseGroupsRef.current[currentCard.id];
+            const groupId = existingGroupId || crypto.randomUUID();
+            
+            const rowsToUpsert = [{ vocab_id: newVocab.id, group_id: groupId }];
+            // 新規グループの場合は現在のカードも追加
+            if (!existingGroupId) {
+                rowsToUpsert.push({ vocab_id: currentCard.id, group_id: groupId });
+            }
+            
+            const { error: groupError } = await supabase
+                .from("paraphrase_groups")
+                .upsert(rowsToUpsert, { onConflict: "vocab_id" });
+                
+            if (groupError) throw groupError;
+            
+            // 3. データ再取得
+            await Promise.all([
+                fetchParaphraseGroups(),
+                fetchAndBuildSession()
+            ]);
+            
+            // 4. 正解として表示更新
+            setParaphraseResult("correct");
+            setAiHint("別解として登録し、正解にしました！");
+            
+        } catch (e) {
+            console.error("Paraphrase registration failed:", e);
+            alert("登録に失敗しました");
+        } finally {
+            setRegistering(false);
         }
     }
 
@@ -938,6 +996,20 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
                                             </div>
                                         )}
+
+                                        {/* 別解として登録ボタン */}
+                                        {paraphraseResult === "synonym" && paraphraseInput.trim() && (
+                                            <div className="flex justify-center pt-1">
+                                                <button
+                                                    onClick={handleRegisterParaphrase}
+                                                    disabled={registering}
+                                                    className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-4 py-2 text-xs font-medium text-violet-700 hover:bg-violet-100 active:bg-violet-200 transition-colors disabled:opacity-50"
+                                                >
+                                                    {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                                    別解として登録
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                     {/* ナビゲーション */}
                                     <div className="flex justify-center gap-3 pt-4 shrink-0">
@@ -1171,6 +1243,20 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                             <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
                                             <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
+                                        </div>
+                                    )}
+
+                                    {/* 別解として登録ボタン (Writing) */}
+                                    {isWritingCard && paraphraseResult === "synonym" && paraphraseInput.trim() && (
+                                        <div className="flex justify-center pt-1">
+                                            <button
+                                                onClick={handleRegisterParaphrase}
+                                                disabled={registering}
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-pink-300 bg-pink-50 px-4 py-2 text-xs font-medium text-pink-700 hover:bg-pink-100 active:bg-pink-200 transition-colors disabled:opacity-50"
+                                            >
+                                                {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                                別解として登録
+                                            </button>
                                         </div>
                                     )}
                                 </div>
