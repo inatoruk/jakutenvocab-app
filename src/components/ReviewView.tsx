@@ -796,16 +796,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-base leading-relaxed text-gray-700 text-center bg-gray-50 rounded-lg px-4 py-3">
+                                            <p className="text-base leading-relaxed text-gray-700 text-center bg-violet-50 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
-                                        {/* グループ未登録の警告 */}
-                                        {!isGrouped && (
-                                            <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
-                                                ⚠️ このカードはまだグループ化されていません
-                                            </p>
-                                        )}
+
                                         {/* 入力フォーム */}
                                         <div className="space-y-2">
                                             {!currentCard.context && (
@@ -835,6 +830,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 </p>
                                             )}
                                         </div>
+                                        {/* グループ未登録の警告 */}
+                                        {!isGrouped && (
+                                            <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
+                                                ⚠️ このカードはまだグループ化されていません
+                                            </p>
+                                        )}
                                     </div>
                                     {/* アクションボタン */}
                                     <div className="flex justify-center gap-3 pt-4 shrink-0">
@@ -902,7 +903,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* 例文（完成形） */}
                                         {currentCard.context && (
-                                            <p className="text-sm leading-relaxed text-gray-700 text-center bg-gray-50 rounded-lg px-4 py-3">
+                                            <p className="text-sm leading-relaxed text-gray-700 text-center bg-violet-50 rounded-lg px-4 py-3">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
