@@ -832,7 +832,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             {/* 同じ単語の警告 */}
                                             {sameWordWarning && (
                                                 <p className="text-xs text-red-500 px-1">
-                                                    それは出題された単語と同じです。別のパラフレーズを入力してください。
+                                                    出題された単語と同じです。別のパラフレーズを入力してください。
                                                 </p>
                                             )}
                                         </div>
