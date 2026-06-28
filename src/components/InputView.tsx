@@ -358,6 +358,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             )}
                         </div>
                     </div>
+                    </div>
                 </div>
             </div>
 
