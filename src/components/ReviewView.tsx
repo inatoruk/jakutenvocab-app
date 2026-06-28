@@ -895,7 +895,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* グループ未登録の警告 */}
                                         {!isGrouped && (
-                                            <p className="text-xs text-amber-600 dark:text-amber-300 text-center bg-amber-50 dark:bg-amber-950/20 rounded-lg px-3 py-2">
+                                            <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
                                                 ⚠️ このカードはまだグループ化されていません
                                             </p>
                                         )}
@@ -927,10 +927,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {paraphraseResult !== null && (
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                                 paraphraseResult === "correct"
-                                                    ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-900/40"
+                                                    ? "bg-green-50 text-green-700 border border-green-200"
                                                     : paraphraseResult === "synonym"
-                                                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40"
-                                                        : "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40"
+                                                        ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                                        : "bg-red-50 text-red-700 border border-red-200"
                                             }`}>
                                                 <span>
                                                     {paraphraseResult === "correct" && "✅ 正解！"}
@@ -990,15 +990,15 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* AI IELTS ヒント */}
                                         {aiChecking && (
-                                            <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
+                                            <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                                 <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
-                                                <p className="text-xs text-amber-700 dark:text-amber-300">IELTSアドバイスを生成中...</p>
+                                                <p className="text-xs text-amber-700">IELTSアドバイスを生成中...</p>
                                             </div>
                                         )}
                                         {aiHint && !aiChecking && (
-                                            <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
+                                            <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                                 <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                                <p className="text-xs text-amber-800 dark:text-amber-200 whitespace-pre-wrap">{aiHint}</p>
+                                                <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
                                             </div>
                                         )}
 
@@ -1199,10 +1199,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             {/* 正誤バッジ */}
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                                 paraphraseResult === "correct"
-                                                    ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-900/40"
+                                                    ? "bg-green-50 text-green-700 border border-green-200"
                                                     : paraphraseResult === "synonym"
-                                                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40"
-                                                        : "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40"
+                                                        ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                                        : "bg-red-50 text-red-700 border border-red-200"
                                             }`}>
                                                 <span>
                                                     {paraphraseResult === "correct" && "✅ 正解！"}
@@ -1239,15 +1239,15 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                     {/* AIヒント */}
                                     {isWritingCard && aiChecking && (
-                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
+                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                             <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
-                                            <p className="text-xs text-amber-700 dark:text-amber-300">AIアドバイスを生成中...</p>
+                                            <p className="text-xs text-amber-700">AIアドバイスを生成中...</p>
                                         </div>
                                     )}
                                     {isWritingCard && aiHint && !aiChecking && (
-                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
+                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                                             <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                            <p className="text-xs text-amber-800 dark:text-amber-200 whitespace-pre-wrap">{aiHint}</p>
+                                            <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
                                         </div>
                                     )}
 
