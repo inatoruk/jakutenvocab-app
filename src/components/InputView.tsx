@@ -6,6 +6,7 @@ import { speak } from "@/lib/speech";
 import { Category, CATEGORIES } from "@/types/vocab";
 import { filterDuplicates } from "@/lib/vocab";
 import { Plus, Volume2, Upload, CheckCircle, AlertCircle, Info, Copy, Check, Sparkles, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 type InputMode = "single" | "bulk";
 type Delimiter = "tab" | "comma" | "semicolon";
@@ -270,12 +271,21 @@ export default function InputView({ onAdded }: InputViewProps) {
                         setMode("single");
                         setBulkResult(null);
                     }}
-                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${mode === "single"
-                        ? "bg-white text-gray-800 shadow-sm"
+                    className={`relative flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none ${mode === "single"
+                        ? "text-gray-800"
                         : "text-gray-500 hover:text-gray-700"
                         }`}
+                    style={{ WebkitTapHighlightColor: "transparent" }}
                 >
-                    1件ずつ
+                    {mode === "single" && (
+                        <motion.div
+                            layoutId="inputModeIndicator"
+                            className="absolute inset-0 rounded-md bg-white shadow-sm"
+                            style={{ zIndex: 0 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                        />
+                    )}
+                    <span className="relative z-10">1件ずつ</span>
                 </button>
                 <div
                     role="button"
@@ -291,17 +301,27 @@ export default function InputView({ onAdded }: InputViewProps) {
                             setBulkResult(null);
                         }
                     }}
-                    className={`flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors cursor-pointer outline-none ${mode === "bulk"
-                        ? "bg-white text-gray-800 shadow-sm"
+                    className={`relative flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors cursor-pointer outline-none ${mode === "bulk"
+                        ? "text-gray-800"
                         : "text-gray-500 hover:text-gray-700"
                         }`}
+                    style={{ WebkitTapHighlightColor: "transparent" }}
                 >
-                    <Upload size={14} />
-                    <span>一括登録</span>
-                    <div
-                        className="group flex items-center outline-none"
-                        tabIndex={-1}
-                    >
+                    {mode === "bulk" && (
+                        <motion.div
+                            layoutId="inputModeIndicator"
+                            className="absolute inset-0 rounded-md bg-white shadow-sm"
+                            style={{ zIndex: 0 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                        />
+                    )}
+                    <div className="relative z-10 flex items-center justify-center gap-1.5">
+                        <Upload size={14} />
+                        <span>一括登録</span>
+                        <div
+                            className="group flex items-center outline-none"
+                            tabIndex={-1}
+                        >
                         <button
                             type="button"
                             className="focus:outline-none"
