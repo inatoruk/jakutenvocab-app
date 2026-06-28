@@ -688,7 +688,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") handleSubmitAnswer();
                             }}
-                            className={`inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-1 text-gray-900 ${
+                            className={`inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-1 text-slate-900 dark:text-white ${
                                 isWritingCard
                                     ? "border-pink-400 focus:border-pink-600"
                                     : "border-violet-400 focus:border-violet-600"
@@ -714,7 +714,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             <div className="flex-1 flex items-center justify-center min-h-[50vh]">
                 <div className="flex flex-col items-center gap-3">
                     <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-400 text-sm">読み込み中...</p>
+                    <p className="text-slate-400 dark:text-gray-300 text-sm">読み込み中...</p>
                 </div>
             </div>
         );
@@ -793,7 +793,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         <CheckCircle size={40} className="text-green-500" />
                     </div>
                     <div className="text-center space-y-2">
-                        <h2 className="text-xl font-bold text-gray-800">今日の学習が完了しました！</h2>
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white">今日の学習が完了しました！</h2>
                         <p className="text-sm text-slate-500 dark:text-gray-300">学習を続けますか？</p>
                     </div>
                     <button
@@ -854,7 +854,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </p>
                                         {/* 出題単語 */}
                                         <div className="text-center">
-                                            <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
+                                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                             <p className="text-sm text-slate-500 dark:text-gray-300 mt-1">{currentCard.meaning}</p>
                                         </div>
                                         {/* 例文（空欄あり） */}
@@ -879,7 +879,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         onKeyDown={(e) => {
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
-                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-violet-400 focus:border-violet-600"
+                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-slate-900 dark:text-white text-lg border-violet-400 focus:border-violet-600"
                                                         style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
                                                         autoCapitalize="none"
@@ -947,18 +947,18 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         <div className="flex flex-col items-center gap-2">
                                             {/* 出題単語の振り返り (サブ) */}
                                             <div className="text-center text-sm">
-                                                <span className="text-gray-500">元の単語: </span>
-                                                <span className="font-semibold text-gray-700">
-                                                    {currentCard.term} <span className="text-gray-400 font-normal">({currentCard.meaning})</span>
+                                                <span className="text-slate-500 dark:text-gray-300">元の単語: </span>
+                                                <span className="font-semibold text-slate-700 dark:text-white">
+                                                    {currentCard.term} <span className="text-slate-400 dark:text-gray-300 font-normal">({currentCard.meaning})</span>
                                                 </span>
                                             </div>
 
                                             {/* あなたの回答の表示 (メイン) */}
                                             <div className="text-center">
-                                                <p className={`text-2xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
+                                                <p className={`text-2xl font-bold ${paraphraseInput.trim() ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-gray-300 italic"}`}>
                                                     {paraphraseInput.trim() || "(未入力)"}
                                                 </p>
-                                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-0.5">
+                                                <p className="text-xs font-semibold text-slate-400 dark:text-gray-300 uppercase tracking-widest mt-0.5">
                                                     あなたの回答
                                                 </p>
                                             </div>
@@ -974,7 +974,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {/* グループの全パラフレーズ一覧 */}
                                         {siblings.length > 0 && (
                                             <div className="space-y-2">
-                                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center justify-center gap-1">
+                                                <p className="text-xs font-semibold text-slate-400 dark:text-gray-300 uppercase tracking-widest flex items-center justify-center gap-1">
                                                     <Link2 size={10} />
                                                     パラフレーズ一覧
                                                 </p>
@@ -1111,7 +1111,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             Writing — 単語を答えよ
                                         </p>
                                         <div className="text-center">
-                                            <p className="text-xl font-bold text-gray-900">{currentCard.meaning}</p>
+                                            <p className="text-xl font-bold text-slate-900 dark:text-white">{currentCard.meaning}</p>
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
@@ -1135,7 +1135,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                         onKeyDown={(e) => {
                                                             if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
                                                         }}
-                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-gray-900 text-lg border-pink-400 focus:border-pink-600"
+                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-slate-900 dark:text-white text-lg border-pink-400 focus:border-pink-600"
                                                         style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
                                                         autoComplete="off"
                                                         autoCapitalize="none"
@@ -1165,7 +1165,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             ) : (
                                 <>
                                     <div className="flex-1 flex flex-col justify-center space-y-6">
-                                        <p className="text-lg leading-relaxed text-gray-800 text-center">
+                                        <p className="text-lg leading-relaxed text-slate-800 dark:text-white text-center">
                                             {currentCard.context ? (
                                                 highlightTerm(currentCard.context, currentCard.term)
                                             ) : (
@@ -1217,10 +1217,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                             {/* あなたの回答 */}
                                             <div className="text-center">
-                                                <p className={`text-xl font-bold ${paraphraseInput.trim() ? "text-gray-900" : "text-gray-400 italic"}`}>
+                                                <p className={`text-xl font-bold ${paraphraseInput.trim() ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-gray-300 italic"}`}>
                                                     {paraphraseInput.trim() || "(未入力)"}
                                                 </p>
-                                                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-0.5">
+                                                <p className="text-[10px] font-semibold text-slate-400 dark:text-gray-300 uppercase tracking-widest mt-0.5">
                                                     あなたの回答
                                                 </p>
                                             </div>
@@ -1228,7 +1228,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     )}
 
                                     <div className="text-center space-y-2">
-                                        <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
+                                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                         <p className="text-base text-slate-600 dark:text-gray-300">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
                                             <p className="text-sm text-slate-500 dark:text-gray-300 mt-1 leading-relaxed">
