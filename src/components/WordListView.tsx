@@ -79,14 +79,56 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
     const [approvedCount, setApprovedCount] = useState(0);
 
     const fetchParaphraseGroups = useCallback(async () => {
-        const { data } = await supabase.from("paraphrase_groups").select("*");
-        if (data) {
+        // 全ての vocab と paraphrase_groups を取得
+        const [vocabRes, groupRes] = await Promise.all([
+            supabase.from("vocab").select("id"),
+            supabase.from("paraphrase_groups").select("*")
+        ]);
+
+        if (vocabRes.data && groupRes.data) {
+            const validVocabIds = new Set(vocabRes.data.map((v: any) => v.id));
+            const groupsMap = new Map<string, string[]>(); // groupId -> valid vocabIds
+            
+            // 孤立した（vocabが存在しない）行を収集
+            const orphanVocabIds: string[] = [];
+            
+            groupRes.data.forEach((row: any) => {
+                if (!validVocabIds.has(row.vocab_id)) {
+                    orphanVocabIds.push(row.vocab_id);
+                } else {
+                    if (!groupsMap.has(row.group_id)) groupsMap.set(row.group_id, []);
+                    groupsMap.get(row.group_id)!.push(row.vocab_id);
+                }
+            });
+
+            // 1件しかないグループの ID を収集
+            const singleMemberGroupIds: string[] = [];
+            groupsMap.forEach((vocabIds, groupId) => {
+                if (vocabIds.length < 2) {
+                    singleMemberGroupIds.push(groupId);
+                }
+            });
+
+            // バックグラウンドでDBクリーンアップを実行（ブロックしない）
+            if (orphanVocabIds.length > 0) {
+                supabase.from("paraphrase_groups").delete().in("vocab_id", orphanVocabIds).then();
+            }
+            if (singleMemberGroupIds.length > 0) {
+                supabase.from("paraphrase_groups").delete().in("group_id", singleMemberGroupIds).then();
+            }
+
+            // クリーンアップ対象を除外して UI用ステートを構築
             const mapping: Record<string, string> = {};
             const seenGroups: string[] = [];
-            (data as { vocab_id: string; group_id: string }[]).forEach(row => {
+            
+            groupRes.data.forEach((row: any) => {
+                if (!validVocabIds.has(row.vocab_id)) return; // 削除済みvocabは無視
+                if (singleMemberGroupIds.includes(row.group_id)) return; // 1件しかないグループは無視
+                
                 mapping[row.vocab_id] = row.group_id;
                 if (!seenGroups.includes(row.group_id)) seenGroups.push(row.group_id);
             });
+            
             setParaphraseGroups(mapping);
             const labels: Record<string, string> = {};
             seenGroups.forEach((gid, i) => { labels[gid] = `G${i + 1}`; });
@@ -245,11 +287,33 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             .from("vocab")
             .delete()
             .eq("id", editingWord.id);
+        
+        // 紐づく paraphrase_groups の行を削除（SupabaseのCASCADE設定がない場合の安全策）
+        await supabase.from("paraphrase_groups").delete().eq("vocab_id", editingWord.id);
+
         setSaving(false);
         if (!error) {
             closeEdit();
             fetchWords();
+            fetchParaphraseGroups(); // グループ情報の再取得（クリーンアップも走る）
             onMutated?.();
+        }
+    }
+
+    async function handleRemoveFromGroup(vocabId: string) {
+        if (!confirm("この単語をグループから外しますか？")) return;
+        
+        // ローディング状態は一旦setGroupingやsetSavingを利用するか、サイレントで実行する
+        // 今回はリストの再読み込みで対応
+        const { error } = await supabase
+            .from("paraphrase_groups")
+            .delete()
+            .eq("vocab_id", vocabId);
+            
+        if (!error) {
+            await fetchParaphraseGroups();
+        } else {
+            alert("グループからの除外に失敗しました");
         }
     }
 
@@ -535,9 +599,19 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                             <div className="flex items-center gap-1">
                                                 {/* グループバッジ */}
                                                 {groupLabel && (
-                                                    <span className="inline-flex items-center gap-0.5 rounded-full border border-purple-300 bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-600">
+                                                    <span className="inline-flex items-center gap-1 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 pl-2 pr-1 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
                                                         <Link2 size={9} />
                                                         {groupLabel}
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRemoveFromGroup(word.id);
+                                                            }}
+                                                            className="hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5 transition-colors"
+                                                            title="グループから外す"
+                                                        >
+                                                            <X size={10} />
+                                                        </button>
                                                     </span>
                                                 )}
                                                 <span
@@ -564,8 +638,8 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             {isGroupMode && (
                 <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none">
                     <div className="mx-auto max-w-2xl pointer-events-auto">
-                        <div className="flex items-center gap-2 rounded-2xl border border-purple-200 bg-white selection-action-bar px-4 py-3">
-                            <p className="text-sm font-medium text-gray-700 flex-1">
+                        <div className="flex items-center gap-2 rounded-2xl border border-purple-200 dark:border-purple-900/60 bg-white dark:bg-gray-900 selection-action-bar px-4 py-3">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 flex-1">
                                 {selectedWordIds.size > 0
                                     ? `${selectedWordIds.size}件選択中`
                                     : "カードを選択してください"}
@@ -578,7 +652,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                             </button>
                             <button
                                 onClick={handleAISuggest}
-                                className="flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-700 hover:bg-violet-100 active:bg-violet-200 transition-colors"
+                                className="flex items-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-3 py-2 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors"
                             >
                                 <Wand2 size={14} />
                                 AI提案
@@ -808,7 +882,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={() => setShowAISuggestModal(false)}>
                         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
                         <div
-                            className="relative w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-violet-100 overflow-hidden"
+                            className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-violet-100 dark:border-violet-900/60 overflow-hidden"
                             onClick={e => e.stopPropagation()}
                         >
                             {/* ヘッダー */}
@@ -831,39 +905,39 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                             <div className="w-12 h-12 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
                                             <Sparkles size={16} className="absolute inset-0 m-auto text-violet-500" />
                                         </div>
-                                        <p className="text-sm text-gray-500">AIが単語リストを分析中...</p>
-                                        <p className="text-xs text-gray-400">しばらくお待ちください</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">AIが単語リストを分析中...</p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500">しばらくお待ちください</p>
                                     </div>
                                 )}
 
                                 {/* エラー */}
                                 {!aiSuggesting && aiSuggestError && (
                                     <div className="flex flex-col items-center gap-3 py-6">
-                                        <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center">
+                                        <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
                                             <Sparkles size={20} className="text-amber-500" />
                                         </div>
-                                        <p className="text-sm text-gray-600 text-center">{aiSuggestError}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 text-center">{aiSuggestError}</p>
                                     </div>
                                 )}
 
                                 {/* 提案カード */}
                                 {!aiSuggesting && !aiSuggestError && currentSuggestion && (
                                     <>
-                                        <div className="flex items-center justify-between text-xs text-gray-400">
+                                        <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
                                             <span>提案 {aiSuggestIndex + 1} / {aiSuggestions.length}</span>
                                             {approvedCount > 0 && (
-                                                <span className="text-green-600 font-medium">✓ {approvedCount}件 承認済み</span>
+                                                <span className="text-green-600 dark:text-green-400 font-medium">✓ {approvedCount}件 承認済み</span>
                                             )}
                                         </div>
-                                        <div className="w-full bg-gray-100 rounded-full h-1">
+                                        <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1">
                                             <div
                                                 className="bg-violet-500 h-1 rounded-full transition-all duration-300"
                                                 style={{ width: `${(aiSuggestIndex / aiSuggestions.length) * 100}%` }}
                                             />
                                         </div>
 
-                                        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                                            <p className="text-xs text-amber-800 flex items-start gap-1.5">
+                                        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-lg px-3 py-2">
+                                            <p className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-1.5">
                                                 <Sparkles size={12} className="shrink-0 mt-0.5" />
                                                 {currentSuggestion.reason}
                                             </p>
@@ -872,9 +946,9 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                         <div className="flex items-center justify-center gap-3 flex-wrap">
                                             {currentSuggestion.words.map((word, i) => (
                                                 <>
-                                                    <div key={word.id} className="flex flex-col items-center bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 min-w-[100px]">
-                                                        <span className="text-base font-bold text-violet-900">{word.term}</span>
-                                                        <span className="text-xs text-gray-500 mt-0.5">{word.meaning}</span>
+                                                    <div key={word.id} className="flex flex-col items-center bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-700/50 rounded-xl px-4 py-3 min-w-[100px]">
+                                                        <span className="text-base font-bold text-violet-900 dark:text-violet-200">{word.term}</span>
+                                                        <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{word.meaning}</span>
                                                     </div>
                                                     {i < currentSuggestion.words.length - 1 && (
                                                         <span key={`sep-${i}`} className="text-violet-400 font-bold text-lg">↔</span>
@@ -887,7 +961,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                             <button
                                                 onClick={() => setAiSuggestIndex(prev => prev + 1)}
                                                 disabled={approving}
-                                                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 active:bg-gray-100 transition-colors disabled:opacity-50"
+                                                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700 transition-colors disabled:opacity-50"
                                             >
                                                 <X size={14} />
                                                 スキップ
@@ -910,11 +984,11 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                         <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
                                             <CheckCircle size={24} className="text-green-500" />
                                         </div>
-                                        <p className="text-sm font-semibold text-gray-700">すべての提案を確認しました</p>
+                                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">すべての提案を確認しました</p>
                                         {approvedCount > 0 ? (
-                                            <p className="text-xs text-green-600">{approvedCount}件のグループを追加しました！</p>
+                                            <p className="text-xs text-green-600 dark:text-green-400">{approvedCount}件のグループを追加しました！</p>
                                         ) : (
-                                            <p className="text-xs text-gray-400">承認された提案はありませんでした</p>
+                                            <p className="text-xs text-gray-400 dark:text-gray-500">承認された提案はありませんでした</p>
                                         )}
                                         <button
                                             onClick={() => setShowAISuggestModal(false)}
