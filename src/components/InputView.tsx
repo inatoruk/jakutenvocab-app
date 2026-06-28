@@ -408,11 +408,41 @@ export default function InputView({ onAdded }: InputViewProps) {
                                         <Info size={14} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
                                     </button>
                                     <div 
-                                        className="absolute left-0 top-[25px] w-[310px] md:left-full md:top-0 md:ml-4 transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-top-left after:content-[''] after:absolute after:-top-2 after:left-0 after:w-full after:h-2 md:after:right-full md:after:top-0 md:after:w-5 md:after:h-full md:after:left-auto opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
+                                        className="absolute left-full ml-3 top-1/2 -translate-y-1/2 w-[310px] md:w-[450px] transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-left after:content-[''] after:absolute after:right-full after:top-0 after:w-4 after:h-full opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
                                     >
-                                        <p className="mb-1.5">登録する単語と例文の単語の時制や形が違っても、自動認識できます。</p>
-                                        <p className="mb-1.5">また、例文がない場合や用意できない場合は、何も書かなくても普通の単語カードとして使えます。</p>
-                                        <p>ただ、単語を覚える時には例文と一緒に覚えた方が、イメージとして記憶に残りやすいのでおすすめです。</p>
+                                        <p className="mb-1.5">登録する単語と例文内の単語の形（時制や単複など）が異なっていても、自動的に認識されます。</p>
+                                        <p className="mb-1.5">例文がない、または用意が難しい場合は、空欄のままでも通常の単語カードとして登録・利用できます。</p>
+                                        <p className={isMobile ? "mb-1.5" : "mb-2"}>ただし、単語は例文とセットで覚える方が、状況や文脈のイメージと結びついて記憶に残りやすいためおすすめです。</p>
+
+                                        {isMobile ? (
+                                            <details className="border-t border-gray-100 dark:border-gray-700 my-1.5 pt-2">
+                                                <summary className="font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 cursor-pointer select-none outline-none list-none [&::-webkit-details-marker]:hidden">
+                                                    💡 AI活用のすすめ <span className="text-[10px] font-normal text-gray-400 ml-1">(クリックで展開)</span>
+                                                </summary>
+                                                <div className="mt-2 space-y-1.5 text-gray-600 dark:text-gray-400">
+                                                    <p>単語の意味と例文をAIで自動生成できるようになりました。これにより、簡易的な辞書としてもご活用いただけます。例文を生成する際は、ご自身の英語レベルに合わせて難易度を選択してください。レベルの目安は以下の通りです。</p>
+                                                    <ul className="list-disc list-inside space-y-1 pl-1">
+                                                        <li><strong>初級:</strong> 中学英語レベルの基本的な文法と日常的な基礎語彙による、短くシンプルな1文</li>
+                                                        <li><strong>中級:</strong> 高校英語レベルの標準的な文法と語彙による、分かりやすい1文</li>
+                                                        <li><strong>上級:</strong> TOEIC 800点以上やIELTS 6.5以上レベルの高度なビジネス・学術語彙、複雑な構文による洗練された1文</li>
+                                                    </ul>
+                                                </div>
+                                            </details>
+                                        ) : (
+                                            <div className="border-t border-gray-100 dark:border-gray-700 my-1.5 pt-2">
+                                                <p className="font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-1">
+                                                    💡 AI活用のすすめ
+                                                </p>
+                                                <p className="mb-1.5 text-gray-600 dark:text-gray-400">
+                                                    単語の意味と例文をAIで自動生成できるようになりました。これにより、簡易的な辞書としてもご活用いただけます。例文を生成する際は、ご自身の英語レベルに合わせて難易度を選択してください。レベルの目安は以下の通りです。
+                                                </p>
+                                                <ul className="list-disc list-inside space-y-1 text-gray-500 dark:text-gray-400 pl-1">
+                                                    <li><strong>初級:</strong> 中学英語レベルの基本的な文法と日常的な基礎語彙による、短くシンプルな1文</li>
+                                                    <li><strong>中級:</strong> 高校英語レベルの標準的な文法と語彙による、分かりやすい1文</li>
+                                                    <li><strong>上級:</strong> TOEIC 800点以上やIELTS 6.5以上レベルの高度なビジネス・学術語彙、複雑な構文による洗練された1文</li>
+                                                </ul>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

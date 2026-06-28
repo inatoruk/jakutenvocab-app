@@ -628,11 +628,11 @@ html[data-theme="system"] .copy-btn-icon:hover {
 }
 
 html[data-theme="dark"] .selection-action-bar {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.25) !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.35) !important;
 }
 
 @media (prefers-color-scheme: dark) {
     html[data-theme="system"] .selection-action-bar {
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.25) !important;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.35) !important;
     }
 }
