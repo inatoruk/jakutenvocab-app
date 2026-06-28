@@ -20,12 +20,6 @@ const animationStyles = `
 }
 `;
 
-const DoubleCircle = ({ size = 15 }: { size?: number }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="shrink-0">
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="5" strokeWidth="2.5" />
-    </svg>
-);
 
 type ReviewMode = "unlearned" | "all" | "writing" | "paraphrase";
 
@@ -1044,7 +1038,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <span className="flex items-center justify-center gap-1.5 py-0.5">
                                                     {paraphraseResult === "correct" && (
                                                         <>
-                                                            <DoubleCircle size={15} />
+                                                            <Check size={16} className="stroke-[3]" />
                                                             <span>正解</span>
                                                         </>
                                                     )}
@@ -1462,7 +1456,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <span className="flex items-center justify-center gap-1.5 py-0.5">
                                                     {paraphraseResult === "correct" && (
                                                         <>
-                                                            <DoubleCircle size={15} />
+                                                            <Check size={16} className="stroke-[3]" />
                                                             <span>正解</span>
                                                         </>
                                                     )}
@@ -1492,7 +1486,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </>
                                     )}
 
-                                    <div className="text-center space-y-2">
+                                    <div className="text-center space-y-1">
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                         <p className="text-base text-slate-600 dark:text-gray-400">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
