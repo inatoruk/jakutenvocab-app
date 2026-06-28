@@ -315,7 +315,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             transition={{ type: "spring", stiffness: 500, damping: 35 }}
                         />
                     )}
-                    <div className="relative z-10 flex items-center justify-center gap-1.5">
+                    <div className="z-10 flex items-center justify-center gap-1.5">
                         <Upload size={14} />
                         <span>一括登録</span>
                         <div
@@ -329,7 +329,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             <Info size={14} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
                         </button>
                         <div 
-                            className="absolute left-0 right-0 mx-auto w-full sm:w-[400px] top-[45px] transition-all duration-300 py-3 px-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-xl z-50 leading-normal text-left origin-top-right md:w-[550px] after:content-[''] after:absolute after:-top-5 after:left-0 after:w-full after:h-5 opacity-0 invisible pointer-events-none scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100 cursor-default"
+                            className="absolute w-[calc(200%+4px)] right-[-2px] sm:right-auto sm:left-0 sm:-translate-x-1/2 sm:w-[400px] top-[45px] transition-all duration-300 py-3 px-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-xl z-50 leading-normal text-left origin-top-right md:w-[550px] after:content-[''] after:absolute after:-top-5 after:left-0 after:w-full after:h-5 opacity-0 invisible pointer-events-none scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100 cursor-default"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <p className="font-semibold mb-1 text-gray-900 dark:text-white">複数の単語をまとめて登録できる機能です。</p>
