@@ -859,7 +859,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-base leading-relaxed text-gray-700 text-center bg-violet-50 rounded-lg px-4 py-3">
+                                            <p className="text-base leading-relaxed text-gray-700 dark:text-gray-200 text-center bg-violet-50 dark:bg-violet-950/40 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1115,7 +1115,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-lg leading-relaxed text-gray-700 text-center bg-pink-50 rounded-lg px-4 py-3">
+                                            <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-200 text-center bg-pink-50 dark:bg-pink-950/40 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
