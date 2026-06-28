@@ -944,7 +944,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             </div>
                                         )}
                                         {/* 出題単語と回答をまとめるラッパー (余白を狭くする) */}
-                                        <div className="flex flex-col items-center gap-2">
+                                        <div className="flex flex-col items-center gap-1.5">
                                             {/* 出題単語の振り返り (サブ) */}
                                             <div className="text-center text-sm">
                                                 <span className="text-slate-500 dark:text-gray-400">元の単語: </span>
@@ -1193,7 +1193,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             )
                         ) : (
                             <>
-                                <div className="flex-1 flex flex-col justify-center space-y-2">
+                                <div className="flex-1 flex flex-col justify-center space-y-1.5">
                                     {isWritingCard && paraphraseResult !== null && (
                                         <>
                                             {/* 正誤バッジ */}
