@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Vocab, Category, Status } from "@/types/vocab";
 import { processDecay, calcReviewDueAt } from "@/lib/vocab";
-import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Loader2, Sparkles, SendHorizontal, Plus, Check, X, Circle, Wand2 } from "lucide-react";
+import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Loader2, Sparkles, SendHorizontal, Plus, Check, X, Circle } from "lucide-react";
 import { AppSettings } from "@/lib/settings";
 import nlp from "compromise";
 import { motion } from "framer-motion";
@@ -157,16 +157,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     const [aiHint, setAiHint] = useState<string | null>(null);
     const [registering, setRegistering] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-
-    // ── AI自動提案モーダル ─────────────────────────────────────────────────────
-    type AISuggestion = { reason: string; words: { id: string; term: string; meaning: string }[] };
-    const [showAISuggestModal, setShowAISuggestModal] = useState(false);
-    const [aiSuggesting, setAiSuggesting] = useState(false);
-    const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
-    const [aiSuggestIndex, setAiSuggestIndex] = useState(0);
-    const [aiSuggestError, setAiSuggestError] = useState<string | null>(null);
-    const [approving, setApproving] = useState(false);
-    const [approvedCount, setApprovedCount] = useState(0);
 
     // useEffect 内で最新値を参照するための Ref
     // （タブ開閉の effect は active だけを deps にするため）
@@ -361,61 +351,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         }
     }
 
-    /** パラフレーズをその場で登録する */
-    /** AIによるパラフレーズ自動提案を呼び出す */
-    async function handleAISuggest() {
-        setAiSuggesting(true);
-        setAiSuggestError(null);
-        setAiSuggestions([]);
-        setAiSuggestIndex(0);
-        setApprovedCount(0);
-        setShowAISuggestModal(true);
-        try {
-            const res = await fetch("/api/suggest-paraphrase-groups", { method: "POST" });
-            const json = await res.json();
-            if (!res.ok) throw new Error(json.error || "エラーが発生しました");
-            setAiSuggestions(json.suggestions || []);
-            if ((json.suggestions || []).length === 0) {
-                setAiSuggestError("新しいパラフレーズの候補が見つかりませんでした。");
-            }
-        } catch (e: unknown) {
-            setAiSuggestError(e instanceof Error ? e.message : "エラーが発生しました");
-        } finally {
-            setAiSuggesting(false);
-        }
-    }
-
-    /** 提案されたグループを承認してDBに保存する */
-    async function handleApproveGroup(suggestion: AISuggestion) {
-        if (suggestion.words.length < 2) return;
-        setApproving(true);
-        try {
-            // 既存グループIDを確認（提案の単語のいずれかが既存グループに属している場合）
-            let groupId: string | null = null;
-            for (const word of suggestion.words) {
-                const existing = paraphraseGroupsRef.current[word.id];
-                if (existing) { groupId = existing; break; }
-            }
-            if (!groupId) groupId = crypto.randomUUID();
-
-            const rows = suggestion.words.map(w => ({ vocab_id: w.id, group_id: groupId as string }));
-            const { error } = await supabase
-                .from("paraphrase_groups")
-                .upsert(rows, { onConflict: "vocab_id" });
-            if (error) throw error;
-
-            await fetchParaphraseGroups();
-            setApprovedCount(prev => prev + 1);
-        } catch (e) {
-            console.error("Approve group failed:", e);
-            alert("グループ化に失敗しました");
-        } finally {
-            setApproving(false);
-            // 次の提案へ進む
-            setAiSuggestIndex(prev => prev + 1);
-        }
-    }
-
     async function handleRegisterParaphrase() {
         if (!currentCard || !paraphraseInput.trim()) return;
         setRegistering(true);
@@ -512,7 +447,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         const newStatus = Math.min(currentCard.status + 1, 5) as Status;
 
         // Writing は降格スケジュール対象外なので review_due_at は更新しない
-        const isWriting = currentCard.category === "Writing";
+        // 最新のallCardsからカテゴリを取得（Paraphraseに変更されている可能性があるため）
+        const latestCard = allCardsRef.current.find(c => c.id === currentCard.id) || currentCard;
+        const isWriting = latestCard.category === "Writing";
         const newDueAt = isWriting ? currentCard.review_due_at : calcReviewDueAt(newStatus);
 
         // DB 更新 (非同期に走らせつつ画面遷移を優先しても良いが、ここでは待つ)
@@ -844,7 +781,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     if (sessionCards.length === 0) {
         return (
             <div className="flex-1 flex flex-col min-h-0">
-                <div className="shrink-0 mb-4">
+                <div key="mode-toggle-container" className="shrink-0 mb-4">
                     {modeToggle}
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center space-y-4">
@@ -855,13 +792,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             </div>
                             <p className="text-slate-500 dark:text-gray-400 text-sm">パラフレーズカードがありません</p>
                             <p className="text-slate-400 dark:text-gray-400 text-xs">一覧タブでカテゴリを「Paraphrase」に設定し、グループ化してください</p>
-                            <button
-                                onClick={handleAISuggest}
-                                className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-violet-700 active:bg-violet-800 transition-colors"
-                            >
-                                <Wand2 size={16} />
-                                AIが自動提案
-                            </button>
                         </div>
                     ) : (
                         <p className="text-slate-400 dark:text-gray-400">復習する単語がありません</p>
@@ -881,7 +811,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     if (showCompletion) {
         return (
             <div className="flex-1 flex flex-col min-h-0">
-                <div className="shrink-0 mb-4">
+                <div key="mode-toggle-container" className="shrink-0 mb-4">
                     {modeToggle}
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center space-y-6">
@@ -912,11 +842,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         return (
             <div className="flex-1 flex flex-col">
                 {/* モード切替 */}
-                <div className="shrink-0 mb-4 md:mb-3 relative z-20">
+                <div key="mode-toggle-container" className="shrink-0 mb-4 md:mb-3 relative z-20">
                     {modeToggle}
                 </div>
 
-                {/* 進捗 + シャッフル + AI提案 */}
+                {/* 進捗 + シャッフル */}
                 <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
                     <div className="text-sm text-slate-400 dark:text-gray-400">
                         {currentIndex + 1} / {sessionCards.length}
@@ -927,13 +857,6 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     >
                         <Shuffle size={14} />
                         シャッフル
-                    </button>
-                    <button
-                        onClick={handleAISuggest}
-                        className="inline-flex items-center gap-1 rounded-lg border border-violet-300 bg-violet-50 dark:bg-violet-900/30 px-2.5 py-1.5 text-xs text-violet-700 dark:text-violet-300 hover:bg-violet-100 active:bg-violet-200 dark:hover:bg-violet-900/50 shadow-sm transition-colors"
-                    >
-                        <Wand2 size={14} />
-                        AI提案
                     </button>
                 </div>
 
@@ -1176,147 +1099,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         );
     }
 
-    // ── AI提案モーダル ─────────────────────────────────────────────────────────
-    const currentSuggestion = aiSuggestions[aiSuggestIndex] ?? null;
-    const aiSuggestModal = showAISuggestModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={() => setShowAISuggestModal(false)}>
-            {/* オーバーレイ */}
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-            {/* モーダル本体 */}
-            <div
-                className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-violet-100 dark:border-violet-900/60 overflow-hidden"
-                onClick={e => e.stopPropagation()}
-            >
-                {/* ヘッダー */}
-                <div className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Wand2 size={18} className="text-white" />
-                        <span className="text-white font-semibold text-sm">AIパラフレーズ自動提案</span>
-                    </div>
-                    <button onClick={() => setShowAISuggestModal(false)} className="text-white/70 hover:text-white transition-colors">
-                        <X size={18} />
-                    </button>
-                </div>
-
-                {/* コンテンツ */}
-                <div className="p-5 space-y-4">
-                    {/* ローディング */}
-                    {aiSuggesting && (
-                        <div className="flex flex-col items-center gap-3 py-8">
-                            <div className="relative">
-                                <div className="w-12 h-12 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
-                                <Sparkles size={16} className="absolute inset-0 m-auto text-violet-500" />
-                            </div>
-                            <p className="text-sm text-slate-500 dark:text-gray-400">AIが単語リストを分析中...</p>
-                            <p className="text-xs text-slate-400 dark:text-gray-500">しばらくお待ちください</p>
-                        </div>
-                    )}
-
-                    {/* エラー */}
-                    {!aiSuggesting && aiSuggestError && (
-                        <div className="flex flex-col items-center gap-3 py-6">
-                            <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center">
-                                <Sparkles size={20} className="text-amber-500" />
-                            </div>
-                            <p className="text-sm text-slate-600 dark:text-gray-300 text-center">{aiSuggestError}</p>
-                        </div>
-                    )}
-
-                    {/* 提案カード */}
-                    {!aiSuggesting && !aiSuggestError && currentSuggestion && (
-                        <>
-                            {/* 進捗 */}
-                            <div className="flex items-center justify-between text-xs text-slate-400 dark:text-gray-500">
-                                <span>提案 {aiSuggestIndex + 1} / {aiSuggestions.length}</span>
-                                {approvedCount > 0 && (
-                                    <span className="text-green-600 dark:text-green-400 font-medium">✓ {approvedCount}件 承認済み</span>
-                                )}
-                            </div>
-                            {/* プログレスバー */}
-                            <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1">
-                                <div
-                                    className="bg-violet-500 h-1 rounded-full transition-all duration-300"
-                                    style={{ width: `${((aiSuggestIndex) / aiSuggestions.length) * 100}%` }}
-                                />
-                            </div>
-
-                            {/* 理由 */}
-                            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-lg px-3 py-2">
-                                <p className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-1.5">
-                                    <Sparkles size={12} className="shrink-0 mt-0.5" />
-                                    {currentSuggestion.reason}
-                                </p>
-                            </div>
-
-                            {/* 単語ペア */}
-                            <div className="flex items-center justify-center gap-3 flex-wrap">
-                                {currentSuggestion.words.map((word, i) => (
-                                    <>
-                                        <div key={word.id} className="flex flex-col items-center bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-700/50 rounded-xl px-4 py-3 min-w-[100px]">
-                                            <span className="text-base font-bold text-violet-900 dark:text-violet-200">{word.term}</span>
-                                            <span className="text-xs text-slate-500 dark:text-gray-400 mt-0.5">{word.meaning}</span>
-                                        </div>
-                                        {i < currentSuggestion.words.length - 1 && (
-                                            <span key={`sep-${i}`} className="text-violet-400 font-bold text-lg">↔</span>
-                                        )}
-                                    </>
-                                ))}
-                            </div>
-
-                            {/* 承認 / スキップボタン */}
-                            <div className="flex gap-3 pt-1">
-                                <button
-                                    onClick={() => setAiSuggestIndex(prev => prev + 1)}
-                                    disabled={approving}
-                                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 transition-colors disabled:opacity-50"
-                                >
-                                    <X size={14} />
-                                    スキップ
-                                </button>
-                                <button
-                                    onClick={() => handleApproveGroup(currentSuggestion)}
-                                    disabled={approving}
-                                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 active:bg-violet-800 transition-colors disabled:opacity-50"
-                                >
-                                    {approving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                                    グループ化する
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {/* 全提案を処理済み */}
-                    {!aiSuggesting && !aiSuggestError && aiSuggestions.length > 0 && aiSuggestIndex >= aiSuggestions.length && (
-                        <div className="flex flex-col items-center gap-3 py-6">
-                            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
-                                <CheckCircle size={24} className="text-green-500" />
-                            </div>
-                            <p className="text-sm font-semibold text-slate-700 dark:text-gray-200">すべての提案を確認しました</p>
-                            {approvedCount > 0 ? (
-                                <p className="text-xs text-green-600 dark:text-green-400">{approvedCount}件のグループを追加しました！</p>
-                            ) : (
-                                <p className="text-xs text-slate-400 dark:text-gray-500">承認された提案はありませんでした</p>
-                            )}
-                            <button
-                                onClick={() => setShowAISuggestModal(false)}
-                                className="mt-2 inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 active:bg-violet-800 transition-colors"
-                            >
-                                閉じる
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-
     // ── 通常モード（unlearned / all / writing）のカードUI ─────────────────────
     return (
         <div className="flex-1 flex flex-col">
-            {/* AI提案モーダル */}
-            {aiSuggestModal}
             {/* モード切替 */}
-            <div className={`shrink-0 relative z-20 ${
+            <div key="mode-toggle-container" className={`shrink-0 relative z-20 ${
                 reviewMode === "writing"
                     ? (showAnswer ? "mb-3" : "mb-5")
                     : "mb-5"
@@ -1486,7 +1273,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </>
                                     )}
 
-                                    <div className="text-center space-y-1">
+                                    <div className="text-center space-y-0">
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                         <p className="text-base text-slate-600 dark:text-gray-400">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
