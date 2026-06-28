@@ -357,11 +357,12 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
         setShowAISuggestModal(true);
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            const accessToken = session?.access_token ?? null;
             const res = await fetch("/api/suggest-paraphrase-groups", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ accessToken }),
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {})
+                }
             });
             const json = await res.json();
             if (!res.ok) throw new Error(json.error || "エラーが発生しました");

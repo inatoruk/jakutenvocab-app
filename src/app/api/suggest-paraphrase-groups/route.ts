@@ -16,14 +16,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Supabase環境変数が未設定です。' }, { status: 500 });
         }
 
-        const body = await request.json().catch(() => ({}));
-        const accessToken: string | null = body.accessToken ?? null;
+        // フロントエンドから送られたAuthorizationヘッダーを取得
+        const authHeader = request.headers.get('Authorization');
 
         // ユーザーのアクセストークンをセットしてRLSを通過させる
         const supabase = createClient(supabaseUrl, supabaseKey, {
             global: {
-                headers: accessToken
-                    ? { Authorization: `Bearer ${accessToken}` }
+                headers: authHeader
+                    ? { Authorization: authHeader }
                     : {},
             },
         });
@@ -104,10 +104,19 @@ If no new paraphrase groups are found, return an empty array: []`;
         // JSONのみを抽出（マークダウンコードブロック対策）
         const jsonMatch = raw.match(/\[[\s\S]*\]/);
         if (!jsonMatch) {
+            console.warn('AI Output did not contain JSON array. Raw:', raw);
             return NextResponse.json({ suggestions: [] });
         }
 
-        const parsed = JSON.parse(jsonMatch[0]);
+        // 安全なJSONパース（ここでクラッシュさせない）
+        let parsed;
+        try {
+            parsed = JSON.parse(jsonMatch[0]);
+        } catch (e) {
+            console.error('Failed to parse AI JSON. Raw:', raw, 'Error:', e);
+            // サーバーエラーにはせず、候補なしとしてフロントに返す
+            return NextResponse.json({ suggestions: [] });
+        }
 
         // 4. 提案に単語情報を付与して返す
         const vocabMap: Record<string, { id: string; term: string; meaning: string }> = {};
