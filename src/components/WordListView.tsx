@@ -14,7 +14,7 @@ const STATUS_LABELS: Record<0 | 1 | 2, string> = {
     2: "習得済み",
 };
 const STATUS_STYLES: Record<0 | 1 | 2, string> = {
-    0: "bg-red-50 text-red-600 border-red-300 dark:bg-red-500/20 dark:text-red-400 dark:border-red-800",
+    0: "bg-red-50 text-red-600 border-red-300 dark:bg-red-400/20 dark:text-red-300 dark:border-red-700",
     1: "bg-orange-50 text-orange-600 border-orange-300 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-800",
     2: "bg-green-50 text-green-600 border-green-300 dark:bg-green-500/20 dark:text-green-300 dark:border-green-800",
 };
@@ -554,7 +554,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     </p>
                 </div>
             ) : (
-                <ul className={`space-y-2 ${isGroupMode ? "pb-20 sm:pb-15" : ""}`}>
+                <ul className={`space-y-2 ${isGroupMode ? "pb-21 sm:pb-15" : ""}`}>
                     {filteredWords.map((word) => {
                         const groupId = paraphraseGroups[word.id];
                         const groupLabel = groupId ? groupLabels[groupId] : null;
