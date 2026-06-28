@@ -1004,7 +1004,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         )}
                                     </div>
                                     {/* アクションボタン */}
-                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-1 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
@@ -1130,7 +1130,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         )}
                                     </div>
                                     {/* ナビゲーション */}
-                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-1 shrink-0">
                                         <button
                                             onClick={() => speak(currentCard.term)}
                                             className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
@@ -1393,7 +1393,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-1 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
@@ -1422,7 +1422,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             )}
                                         </p>
                                     </div>
-                                    <div className="flex justify-center gap-3 pt-4 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-1 shrink-0">
                                         <button
                                             onClick={() => speak(currentCard.context || currentCard.term)}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border speak-button"
@@ -1524,7 +1524,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex justify-center gap-3 pt-4 shrink-0">
+                                <div className="flex justify-center gap-3 pt-1 shrink-0">
                                     <button
                                         onClick={() => speak(currentCard.term)}
                                         className="inline-flex items-center gap-1 rounded-lg px-3 py-2.5 text-sm border speak-button"
