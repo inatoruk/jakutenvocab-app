@@ -772,7 +772,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     )}
                     <button
                         onClick={fetchAndBuildSession}
-                        className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                        className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
                     >
                         <RotateCcw size={16} />
                         再読み込み
@@ -827,7 +827,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     </div>
                     <button
                         onClick={handleShuffle}
-                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900 shadow-sm transition-colors"
                     >
                         <Shuffle size={14} />
                         シャッフル
@@ -859,7 +859,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-base leading-relaxed text-slate-700 dark:text-white text-center bg-violet-50 dark:bg-violet-300/[0.06] border border-transparent dark:border-violet-300/15 rounded-lg px-4 py-3">
+                                            <p className="text-base leading-relaxed text-slate-700 dark:text-gray-200 text-center bg-violet-50 dark:bg-violet-300/[0.06] border border-transparent dark:border-violet-300/15 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -904,7 +904,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
-                                            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
                                         >
                                             <Eye size={16} />
                                             わからない
@@ -966,7 +966,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* 例文（完成形） */}
                                         {currentCard.context && (
-                                            <p className="text-sm leading-relaxed text-slate-500 dark:text-gray-300 text-center mt-1">
+                                            <p className="text-sm leading-relaxed text-slate-500 dark:text-gray-200 text-center mt-1">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1020,7 +1020,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => speak(currentCard.term)}
-                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
                                             title="発音"
                                         >
                                             <Volume2 size={16} />
@@ -1034,7 +1034,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 setAiHint(null);
                                                 setTimeout(() => inputRef.current?.focus(), 50);
                                             }}
-                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
                                             title="再挑戦"
                                         >
                                             <RotateCcw size={16} />
@@ -1082,7 +1082,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 </div>
                 <button
                     onClick={handleShuffle}
-                    className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 shadow-sm transition-colors"
+                    className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900 shadow-sm transition-colors"
                 >
                     <Shuffle size={14} />
                     シャッフル
@@ -1115,7 +1115,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-lg leading-relaxed text-slate-700 dark:text-white text-center bg-pink-50 dark:bg-pink-300/[0.06] border border-transparent dark:border-pink-300/15 rounded-lg px-4 py-3">
+                                            <p className="text-lg leading-relaxed text-slate-700 dark:text-gray-200 text-center bg-pink-50 dark:bg-pink-300/[0.06] border border-transparent dark:border-pink-300/15 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1147,7 +1147,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
-                                            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
                                         >
                                             <Eye size={16} />
                                             わからない
@@ -1165,7 +1165,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             ) : (
                                 <>
                                     <div className="flex-1 flex flex-col justify-center space-y-6">
-                                        <p className="text-lg leading-relaxed text-slate-800 dark:text-white text-center">
+                                        <p className="text-lg leading-relaxed text-slate-800 dark:text-gray-200 text-center">
                                             {currentCard.context ? (
                                                 highlightTerm(currentCard.context, currentCard.term)
                                             ) : (
@@ -1231,7 +1231,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                         <p className="text-base text-slate-600 dark:text-gray-400">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
-                                            <p className="text-sm text-slate-500 dark:text-gray-300 mt-1 leading-relaxed">
+                                            <p className="text-sm text-slate-500 dark:text-gray-200 mt-1 leading-relaxed">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1297,7 +1297,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     )}
                                     <button
                                         onClick={() => setShowAnswer(false)}
-                                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                        className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
                                         title="問題に戻る"
                                     >
                                         <RotateCcw size={16} />

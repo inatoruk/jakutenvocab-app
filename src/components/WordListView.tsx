@@ -328,7 +328,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                             }}
                             className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterCategory === "all"
                                 ? "filter-btn-active"
-                                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                                 }`}
                         >
                             全カテゴリ
@@ -342,7 +342,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 }}
                                 className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterCategory === c
                                     ? CATEGORY_STYLES[c]
-                                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                                     }`}
                             >
                                 {c}
@@ -362,7 +362,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         className={`flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium border transition-colors shrink-0 ${
                             isGroupMode
                                 ? "border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100"
-                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                         }`}
                     >
                         <Link2 size={12} />
@@ -379,7 +379,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         }}
                         className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterStatus === "all"
                             ? "filter-btn-active"
-                            : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                            : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                             }`}
                     >
                         全ステータス
@@ -393,7 +393,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                             }}
                             className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${filterStatus === s
                                 ? STATUS_STYLES[s]
-                                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                                 }`}
                         >
                             {STATUS_LABELS[s]}

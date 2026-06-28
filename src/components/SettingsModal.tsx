@@ -467,7 +467,7 @@ export default function SettingsModal({ settings, onChange, onClose, user }: Pro
                   <ul className="space-y-1">
                     {CATEGORIES.map(cat => (
                       <li key={cat}>
-                        <label className="flex items-center gap-3 px-1 py-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <label className="flex items-center gap-3 px-1 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:active:bg-gray-900 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={exportCategories.has(cat)}
@@ -483,7 +483,7 @@ export default function SettingsModal({ settings, onChange, onClose, user }: Pro
                   <div className="flex gap-2 pt-1">
                     <button
                       onClick={handleCloseExport}
-                      className="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                      className="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                     >
                       キャンセル
                     </button>
