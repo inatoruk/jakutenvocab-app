@@ -356,7 +356,13 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
         setApprovedCount(0);
         setShowAISuggestModal(true);
         try {
-            const res = await fetch("/api/suggest-paraphrase-groups", { method: "POST" });
+            const { data: { session } } = await supabase.auth.getSession();
+            const accessToken = session?.access_token ?? null;
+            const res = await fetch("/api/suggest-paraphrase-groups", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ accessToken }),
+            });
             const json = await res.json();
             if (!res.ok) throw new Error(json.error || "エラーが発生しました");
             setAiSuggestions(json.suggestions || []);

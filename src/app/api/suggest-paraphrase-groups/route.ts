@@ -16,7 +16,17 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Supabase環境変数が未設定です。' }, { status: 500 });
         }
 
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        const body = await request.json().catch(() => ({}));
+        const accessToken: string | null = body.accessToken ?? null;
+
+        // ユーザーのアクセストークンをセットしてRLSを通過させる
+        const supabase = createClient(supabaseUrl, supabaseKey, {
+            global: {
+                headers: accessToken
+                    ? { Authorization: `Bearer ${accessToken}` }
+                    : {},
+            },
+        });
 
         // 1. カテゴリが「Paraphrase」の単語データのみを取得
         const { data: vocabData, error: vocabError } = await supabase
