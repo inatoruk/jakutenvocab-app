@@ -410,9 +410,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                     <div 
                                         className="absolute left-full ml-3 top-1/2 -translate-y-1/2 w-[310px] md:w-[550px] transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-left after:content-[''] after:absolute after:right-full after:top-0 after:w-4 after:h-full opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
                                     >
-                                        <p className="mb-1.5">登録する単語と例文内の単語の形（時制や単複など）が異なっていても、自動的に認識されます。</p>
-                                        <p className="mb-1.5">例文がない、または用意が難しい場合は、空欄のままでも通常の単語カードとして登録・利用できます。</p>
-                                        <p className="mb-2">ただし、単語は例文とセットで覚える方が、状況や文脈のイメージと結びついて記憶に残りやすいためおすすめです。</p>
+                                        <p className="mb-2">登録する単語と例文内の単語の形（時制や単複など）が異なっていても、自動的に認識されます。例文がない、または用意が難しい場合は、空欄のままでも通常の単語カードとして登録・利用できます。ただし、単語は例文とセットで覚える方が、状況や文脈のイメージと結びついて記憶に残りやすいためおすすめです。</p>
 
                                         {isMobile ? (
                                             <details className="border-t border-gray-100 dark:border-gray-700 my-1.5 pt-2">

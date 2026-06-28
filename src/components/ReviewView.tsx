@@ -764,11 +764,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             <div className="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center mx-auto">
                                 <Link2 size={28} className="text-violet-500" />
                             </div>
-                            <p className="text-gray-500 dark:text-gray-300 text-sm">パラフレーズカードがありません</p>
-                            <p className="text-gray-400 dark:text-gray-300 text-xs">一覧タブでカテゴリを「Paraphrase」に設定し、グループ化してください</p>
+                            <p className="text-slate-500 dark:text-gray-300 text-sm">パラフレーズカードがありません</p>
+                            <p className="text-slate-400 dark:text-gray-300 text-xs">一覧タブでカテゴリを「Paraphrase」に設定し、グループ化してください</p>
                         </div>
                     ) : (
-                        <p className="text-gray-400 dark:text-gray-300">復習する単語がありません</p>
+                        <p className="text-slate-400 dark:text-gray-300">復習する単語がありません</p>
                     )}
                     <button
                         onClick={fetchAndBuildSession}
@@ -794,7 +794,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     </div>
                     <div className="text-center space-y-2">
                         <h2 className="text-xl font-bold text-gray-800">今日の学習が完了しました！</h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-300">学習を続けますか？</p>
+                        <p className="text-sm text-slate-500 dark:text-gray-300">学習を続けますか？</p>
                     </div>
                     <button
                         onClick={handleStartNewSet}
@@ -822,7 +822,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                 {/* 進捗 + シャッフル */}
                 <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
-                    <div className="text-sm text-gray-400 dark:text-gray-300">
+                    <div className="text-sm text-slate-400 dark:text-gray-300">
                         {currentIndex + 1} / {sessionCards.length}
                     </div>
                     <button
@@ -855,11 +855,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {/* 出題単語 */}
                                         <div className="text-center">
                                             <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
-                                            <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">{currentCard.meaning}</p>
+                                            <p className="text-sm text-slate-500 dark:text-gray-300 mt-1">{currentCard.meaning}</p>
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-base leading-relaxed text-gray-700 dark:text-white text-center bg-violet-50 dark:bg-violet-300/[0.06] border border-transparent dark:border-violet-300/15 rounded-lg px-4 py-3">
+                                            <p className="text-base leading-relaxed text-slate-700 dark:text-white text-center bg-violet-50 dark:bg-violet-300/[0.06] border border-transparent dark:border-violet-300/15 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -966,7 +966,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* 例文（完成形） */}
                                         {currentCard.context && (
-                                            <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-300 text-center mt-1">
+                                            <p className="text-sm leading-relaxed text-slate-500 dark:text-gray-300 text-center mt-1">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1077,7 +1077,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
             {/* 進捗 + シャッフル */}
             <div className="flex items-center justify-center gap-3 shrink-0 w-full relative z-10">
-                <div className="text-sm text-gray-400 dark:text-gray-300">
+                <div className="text-sm text-slate-400 dark:text-gray-300">
                     {currentIndex + 1} / {sessionCards.length}
                 </div>
                 <button
@@ -1115,7 +1115,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* 例文（空欄あり） */}
                                         {currentCard.context && (
-                                            <p className="text-lg leading-relaxed text-gray-700 dark:text-white text-center bg-pink-50 dark:bg-pink-300/[0.06] border border-transparent dark:border-pink-300/15 rounded-lg px-4 py-3">
+                                            <p className="text-lg leading-relaxed text-slate-700 dark:text-white text-center bg-pink-50 dark:bg-pink-300/[0.06] border border-transparent dark:border-pink-300/15 rounded-lg px-4 py-3">
                                                 {blankTermWithInput(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1229,9 +1229,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                     <div className="text-center space-y-2">
                                         <p className="text-2xl font-bold text-gray-900">{currentCard.term}</p>
-                                        <p className="text-base text-gray-600 dark:text-gray-300">{currentCard.meaning}</p>
+                                        <p className="text-base text-slate-600 dark:text-gray-300">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
-                                            <p className="text-sm text-gray-500 dark:text-gray-300 mt-1 leading-relaxed">
+                                            <p className="text-sm text-slate-500 dark:text-gray-300 mt-1 leading-relaxed">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
