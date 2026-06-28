@@ -895,7 +895,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </div>
                                         {/* グループ未登録の警告 */}
                                         {!isGrouped && (
-                                            <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
+                                            <p className="text-xs text-amber-600 dark:text-amber-300 text-center bg-amber-50 dark:bg-amber-950/20 rounded-lg px-3 py-2">
                                                 ⚠️ このカードはまだグループ化されていません
                                             </p>
                                         )}
@@ -927,10 +927,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {paraphraseResult !== null && (
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                                 paraphraseResult === "correct"
-                                                    ? "bg-green-50 text-green-700 border border-green-200"
+                                                    ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-900/40"
                                                     : paraphraseResult === "synonym"
-                                                        ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                                        : "bg-red-50 text-red-700 border border-red-200"
+                                                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40"
+                                                        : "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40"
                                             }`}>
                                                 <span>
                                                     {paraphraseResult === "correct" && "✅ 正解！"}
@@ -990,15 +990,15 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* AI IELTS ヒント */}
                                         {aiChecking && (
-                                            <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                                            <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
                                                 <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
-                                                <p className="text-xs text-amber-700">IELTSアドバイスを生成中...</p>
+                                                <p className="text-xs text-amber-700 dark:text-amber-300">IELTSアドバイスを生成中...</p>
                                             </div>
                                         )}
                                         {aiHint && !aiChecking && (
-                                            <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                                            <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
                                                 <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                                <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
+                                                <p className="text-xs text-amber-800 dark:text-amber-200 whitespace-pre-wrap">{aiHint}</p>
                                             </div>
                                         )}
 
@@ -1008,7 +1008,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <button
                                                     onClick={handleRegisterParaphrase}
                                                     disabled={registering}
-                                                    className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-4 py-2 text-xs font-medium text-violet-700 hover:bg-violet-100 active:bg-violet-200 transition-colors disabled:opacity-50"
+                                                    className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-800/80 bg-violet-50 dark:bg-violet-950/40 px-4 py-2 text-xs font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40 active:bg-violet-200 dark:active:bg-violet-800/40 transition-colors duration-200 disabled:opacity-50"
                                                 >
                                                     {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                                     別解として登録
@@ -1020,7 +1020,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     <div className="flex justify-center gap-3 pt-4 shrink-0">
                                         <button
                                             onClick={() => speak(currentCard.term)}
-                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200"
                                             title="発音"
                                         >
                                             <Volume2 size={16} />
@@ -1034,14 +1034,14 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 setAiHint(null);
                                                 setTimeout(() => inputRef.current?.focus(), 50);
                                             }}
-                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200"
                                             title="再挑戦"
                                         >
                                             <RotateCcw size={16} />
                                         </button>
                                         <button
                                             onClick={goNext}
-                                            className="flex-1 max-w-[200px] inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 bg-violet-50 px-4 py-2.5 text-sm font-medium text-violet-700 hover:bg-violet-100 active:bg-violet-200"
+                                            className="flex-1 max-w-[200px] inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-800/80 bg-violet-50 dark:bg-violet-950/40 px-4 py-2.5 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40 active:bg-violet-200 dark:active:bg-violet-800/40 transition-colors duration-200"
                                         >
                                             次へ
                                             <ChevronRight size={16} />
@@ -1199,10 +1199,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             {/* 正誤バッジ */}
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                                 paraphraseResult === "correct"
-                                                    ? "bg-green-50 text-green-700 border border-green-200"
+                                                    ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-900/40"
                                                     : paraphraseResult === "synonym"
-                                                        ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                                        : "bg-red-50 text-red-700 border border-red-200"
+                                                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40"
+                                                        : "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40"
                                             }`}>
                                                 <span>
                                                     {paraphraseResult === "correct" && "✅ 正解！"}
@@ -1239,15 +1239,15 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                     {/* AIヒント */}
                                     {isWritingCard && aiChecking && (
-                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
                                             <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
-                                            <p className="text-xs text-amber-700">AIアドバイスを生成中...</p>
+                                            <p className="text-xs text-amber-700 dark:text-amber-300">AIアドバイスを生成中...</p>
                                         </div>
                                     )}
                                     {isWritingCard && aiHint && !aiChecking && (
-                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                                        <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 px-3 py-2">
                                             <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                            <p className="text-xs text-amber-800 whitespace-pre-wrap">{aiHint}</p>
+                                            <p className="text-xs text-amber-800 dark:text-amber-200 whitespace-pre-wrap">{aiHint}</p>
                                         </div>
                                     )}
 
@@ -1257,7 +1257,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             <button
                                                 onClick={handleRegisterParaphrase}
                                                 disabled={registering}
-                                                className="inline-flex items-center gap-1.5 rounded-lg border border-pink-300 bg-pink-50 px-4 py-2 text-xs font-medium text-pink-700 hover:bg-pink-100 active:bg-pink-200 transition-colors disabled:opacity-50"
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-pink-300 dark:border-pink-800/80 bg-pink-50 dark:bg-pink-950/40 px-4 py-2 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-900/40 active:bg-pink-200 dark:active:bg-pink-800/40 transition-colors duration-200 disabled:opacity-50"
                                             >
                                                 {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                                 別解として登録
@@ -1275,21 +1275,21 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     </button>
                                     <button
                                         onClick={handleKeep}
-                                        className="flex-1 max-w-[140px] rounded-lg border border-orange-300 bg-orange-50 px-4 py-3 text-sm font-medium text-orange-700 hover:bg-orange-100 active:bg-orange-200"
+                                        className="flex-1 max-w-[140px] rounded-lg border border-orange-300 dark:border-orange-850/80 bg-orange-50 dark:bg-orange-950/40 px-4 py-3 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/40 active:bg-orange-200 dark:active:bg-orange-800/40 transition-colors duration-200"
                                     >
                                         まだ（Keep）
                                     </button>
                                     {(reviewMode === "unlearned" || reviewMode === "writing") ? (
                                         <button
                                             onClick={handleMastered}
-                                            className="flex-1 max-w-[140px] rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 hover:bg-green-100 active:bg-green-200"
+                                            className="flex-1 max-w-[140px] rounded-lg border border-green-300 dark:border-green-800/80 bg-green-50 dark:bg-green-950/40 px-4 py-3 text-sm font-medium text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/40 active:bg-green-200 dark:active:bg-green-800/40 transition-colors duration-200"
                                         >
                                             覚えた（Mastered）
                                         </button>
                                     ) : (
                                         <button
                                             onClick={goNext}
-                                            className="flex-1 max-w-[140px] inline-flex items-center justify-center gap-1 rounded-lg border border-blue-300 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700 hover:bg-blue-100 active:bg-blue-200"
+                                            className="flex-1 max-w-[140px] inline-flex items-center justify-center gap-1 rounded-lg border border-blue-300 dark:border-blue-800/80 bg-blue-50 dark:bg-blue-950/40 px-4 py-3 text-sm font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 active:bg-blue-200 dark:active:bg-blue-800/40 transition-colors duration-200"
                                         >
                                             次へ
                                             <ChevronRight size={16} />
