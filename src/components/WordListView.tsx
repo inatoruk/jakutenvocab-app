@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Vocab, Category, CATEGORIES, Status } from "@/types/vocab";
 import { processDecay } from "@/lib/vocab";
-import { Search, X, Check, Loader2, Link2, Sparkles, Info, AlertCircle } from "lucide-react";
+import { Search, X, Check, Loader2, Link2, Sparkles, Info, AlertCircle, Wand2, CheckCircle } from "lucide-react";
 
 // 表面上の3段階（内部ステータス 2〜5 はまとめて「習得済み」）
 // フィルター・バッジを 0 / 1 / 2 の 3段階で分類
@@ -67,6 +67,16 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
     // group_id → "G1", "G2"... の表示ラベル
     const [groupLabels, setGroupLabels] = useState<Record<string, string>>({});
     const [grouping, setGrouping] = useState(false);
+
+    // ── AI自動提案 ─────────────────────────────────────────────────────────
+    type AISuggestion = { reason: string; words: { id: string; term: string; meaning: string }[] };
+    const [showAISuggestModal, setShowAISuggestModal] = useState(false);
+    const [aiSuggesting, setAiSuggesting] = useState(false);
+    const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
+    const [aiSuggestIndex, setAiSuggestIndex] = useState(0);
+    const [aiSuggestError, setAiSuggestError] = useState<string | null>(null);
+    const [approving, setApproving] = useState(false);
+    const [approvedCount, setApprovedCount] = useState(0);
 
     const fetchParaphraseGroups = useCallback(async () => {
         const { data } = await supabase.from("paraphrase_groups").select("*");
@@ -270,6 +280,59 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             setSelectedWordIds(new Set());
             setIsGroupMode(false);
             await fetchParaphraseGroups();
+        }
+    }
+
+    /** AIによるパラフレーズ自動提案を呼び出す */
+    async function handleAISuggest() {
+        setAiSuggesting(true);
+        setAiSuggestError(null);
+        setAiSuggestions([]);
+        setAiSuggestIndex(0);
+        setApprovedCount(0);
+        setShowAISuggestModal(true);
+        try {
+            const res = await fetch("/api/suggest-paraphrase-groups", { method: "POST" });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.error || "エラーが発生しました");
+            setAiSuggestions(json.suggestions || []);
+            if ((json.suggestions || []).length === 0) {
+                setAiSuggestError("新しいパラフレーズの候補が見つかりませんでした。");
+            }
+        } catch (e: unknown) {
+            setAiSuggestError(e instanceof Error ? e.message : "エラーが発生しました");
+        } finally {
+            setAiSuggesting(false);
+        }
+    }
+
+    /** 提案されたグループを承認してDBに保存する */
+    async function handleApproveGroup(suggestion: AISuggestion) {
+        if (suggestion.words.length < 2) return;
+        setApproving(true);
+        try {
+            // 既存グループIDを確認（提案の単語のいずれかが既存グループに属している場合）
+            let groupId: string | null = null;
+            for (const word of suggestion.words) {
+                const existing = paraphraseGroups[word.id];
+                if (existing) { groupId = existing; break; }
+            }
+            if (!groupId) groupId = crypto.randomUUID();
+
+            const rows = suggestion.words.map(w => ({ vocab_id: w.id, group_id: groupId as string }));
+            const { error } = await supabase
+                .from("paraphrase_groups")
+                .upsert(rows, { onConflict: "vocab_id" });
+            if (error) throw error;
+
+            await fetchParaphraseGroups();
+            setApprovedCount(prev => prev + 1);
+        } catch (e) {
+            console.error("Approve group failed:", e);
+            alert("グループ化に失敗しました");
+        } finally {
+            setApproving(false);
+            setAiSuggestIndex(prev => prev + 1);
         }
     }
 
@@ -514,6 +577,13 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 キャンセル
                             </button>
                             <button
+                                onClick={handleAISuggest}
+                                className="flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-700 hover:bg-violet-100 active:bg-violet-200 transition-colors"
+                            >
+                                <Wand2 size={14} />
+                                AI提案
+                            </button>
+                            <button
                                 onClick={handleGroup}
                                 disabled={selectedWordIds.size < 2 || grouping}
                                 className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -731,6 +801,134 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     </div>
                 </div>
             )}
+            {/* AI提案モーダル */}
+            {showAISuggestModal && (() => {
+                const currentSuggestion = aiSuggestions[aiSuggestIndex] ?? null;
+                return (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={() => setShowAISuggestModal(false)}>
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+                        <div
+                            className="relative w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-violet-100 overflow-hidden"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            {/* ヘッダー */}
+                            <div className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Wand2 size={18} className="text-white" />
+                                    <span className="text-white font-semibold text-sm">AIパラフレーズ自動提案</span>
+                                </div>
+                                <button onClick={() => setShowAISuggestModal(false)} className="text-white/70 hover:text-white transition-colors">
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            {/* コンテンツ */}
+                            <div className="p-5 space-y-4">
+                                {/* ローディング */}
+                                {aiSuggesting && (
+                                    <div className="flex flex-col items-center gap-3 py-8">
+                                        <div className="relative">
+                                            <div className="w-12 h-12 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
+                                            <Sparkles size={16} className="absolute inset-0 m-auto text-violet-500" />
+                                        </div>
+                                        <p className="text-sm text-gray-500">AIが単語リストを分析中...</p>
+                                        <p className="text-xs text-gray-400">しばらくお待ちください</p>
+                                    </div>
+                                )}
+
+                                {/* エラー */}
+                                {!aiSuggesting && aiSuggestError && (
+                                    <div className="flex flex-col items-center gap-3 py-6">
+                                        <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center">
+                                            <Sparkles size={20} className="text-amber-500" />
+                                        </div>
+                                        <p className="text-sm text-gray-600 text-center">{aiSuggestError}</p>
+                                    </div>
+                                )}
+
+                                {/* 提案カード */}
+                                {!aiSuggesting && !aiSuggestError && currentSuggestion && (
+                                    <>
+                                        <div className="flex items-center justify-between text-xs text-gray-400">
+                                            <span>提案 {aiSuggestIndex + 1} / {aiSuggestions.length}</span>
+                                            {approvedCount > 0 && (
+                                                <span className="text-green-600 font-medium">✓ {approvedCount}件 承認済み</span>
+                                            )}
+                                        </div>
+                                        <div className="w-full bg-gray-100 rounded-full h-1">
+                                            <div
+                                                className="bg-violet-500 h-1 rounded-full transition-all duration-300"
+                                                style={{ width: `${(aiSuggestIndex / aiSuggestions.length) * 100}%` }}
+                                            />
+                                        </div>
+
+                                        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                                            <p className="text-xs text-amber-800 flex items-start gap-1.5">
+                                                <Sparkles size={12} className="shrink-0 mt-0.5" />
+                                                {currentSuggestion.reason}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center justify-center gap-3 flex-wrap">
+                                            {currentSuggestion.words.map((word, i) => (
+                                                <>
+                                                    <div key={word.id} className="flex flex-col items-center bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 min-w-[100px]">
+                                                        <span className="text-base font-bold text-violet-900">{word.term}</span>
+                                                        <span className="text-xs text-gray-500 mt-0.5">{word.meaning}</span>
+                                                    </div>
+                                                    {i < currentSuggestion.words.length - 1 && (
+                                                        <span key={`sep-${i}`} className="text-violet-400 font-bold text-lg">↔</span>
+                                                    )}
+                                                </>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex gap-3 pt-1">
+                                            <button
+                                                onClick={() => setAiSuggestIndex(prev => prev + 1)}
+                                                disabled={approving}
+                                                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 active:bg-gray-100 transition-colors disabled:opacity-50"
+                                            >
+                                                <X size={14} />
+                                                スキップ
+                                            </button>
+                                            <button
+                                                onClick={() => handleApproveGroup(currentSuggestion)}
+                                                disabled={approving}
+                                                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 active:bg-violet-800 transition-colors disabled:opacity-50"
+                                            >
+                                                {approving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                                グループ化する
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* 全提案を処理済み */}
+                                {!aiSuggesting && !aiSuggestError && aiSuggestions.length > 0 && aiSuggestIndex >= aiSuggestions.length && (
+                                    <div className="flex flex-col items-center gap-3 py-6">
+                                        <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
+                                            <CheckCircle size={24} className="text-green-500" />
+                                        </div>
+                                        <p className="text-sm font-semibold text-gray-700">すべての提案を確認しました</p>
+                                        {approvedCount > 0 ? (
+                                            <p className="text-xs text-green-600">{approvedCount}件のグループを追加しました！</p>
+                                        ) : (
+                                            <p className="text-xs text-gray-400">承認された提案はありませんでした</p>
+                                        )}
+                                        <button
+                                            onClick={() => setShowAISuggestModal(false)}
+                                            className="mt-2 inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 active:bg-violet-800 transition-colors"
+                                        >
+                                            閉じる
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
         </div>
     );
 }
