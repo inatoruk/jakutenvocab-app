@@ -280,7 +280,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-20 min-h-[50vh]">
+            <div className="flex-1 flex items-center justify-center min-h-[50vh]">
                 <div className="flex flex-col items-center gap-3">
                     <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     <p className="text-gray-400 text-sm">読み込み中...</p>

@@ -103,12 +103,18 @@ export default function Home() {
       {/* メインコンテンツ */}
       <main className="flex-1 min-h-0 overflow-y-auto flex flex-col">
         {/* 登録/一覧タブのコンテンツ (非表示時は完全に計算から除外) */}
-        <div style={{ display: tab !== "review" ? "block" : "none" }}>
-          <div className="mx-auto w-full max-w-2xl px-4 py-5">
+        <div 
+          style={{ display: tab !== "review" ? "flex" : "none" }}
+          className="flex-1 flex-col"
+        >
+          <div className="mx-auto w-full max-w-2xl px-4 py-5 flex-1 flex flex-col">
             <div style={{ display: tab === "input" ? "block" : "none" }}>
               <InputView onAdded={handleVocabMutated} />
             </div>
-            <div style={{ display: tab === "list" ? "block" : "none" }}>
+            <div 
+              style={{ display: tab === "list" ? "flex" : "none" }}
+              className="flex-1 flex-col"
+            >
               <WordListView active={tab === "list"} onMutated={handleVocabMutated} />
             </div>
           </div>
