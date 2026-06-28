@@ -14,9 +14,9 @@ const STATUS_LABELS: Record<0 | 1 | 2, string> = {
     2: "習得済み",
 };
 const STATUS_STYLES: Record<0 | 1 | 2, string> = {
-    0: "bg-red-50 text-red-600 border-red-200",
-    1: "bg-orange-50 text-orange-600 border-orange-200",
-    2: "bg-green-50 text-green-600 border-green-200",
+    0: "bg-red-50 text-red-600 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/60",
+    1: "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-900/60",
+    2: "bg-green-50 text-green-600 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900/60",
 };
 
 /** 内部ステータス（0、5）を表面上の3段階（0/1/2）にマッピング */
@@ -26,10 +26,10 @@ function toDisplayStatus(status: Status): 0 | 1 | 2 {
     return 2;
 }
 const CATEGORY_STYLES: Record<Category, string> = {
-    Vocab: "bg-blue-50 text-blue-600 border-blue-200",
-    Paraphrase: "bg-purple-50 text-purple-600 border-purple-200",
-    Listening: "bg-teal-50 text-teal-600 border-teal-200",
-    Writing: "bg-pink-50 text-pink-600 border-pink-200",
+    Vocab: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/60",
+    Paraphrase: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900/60",
+    Listening: "bg-teal-50 text-teal-600 border-teal-200 dark:bg-teal-950/40 dark:text-teal-400 dark:border-teal-900/60",
+    Writing: "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-950/40 dark:text-pink-400 dark:border-pink-900/60",
 };
 
 type FilterCategory = Category | "all";
@@ -431,12 +431,12 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="単語・意味を検索..."
-                    className="w-full rounded-lg border border-gray-300 pl-9 pr-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 pl-9 pr-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
                 {searchQuery && (
                     <button
                         onClick={() => setSearchQuery("")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
                         <X size={14} />
                     </button>
@@ -488,7 +488,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         }}
                         className={`flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium border transition-colors shrink-0 ${
                             isGroupMode
-                                ? "border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100"
+                                ? "border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-400 dark:hover:bg-purple-900/40"
                                 : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                         }`}
                     >
@@ -531,9 +531,9 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
 
             {/* グループ化モード：ヒント */}
             {isGroupMode && (
-                <div className="flex items-center gap-2 rounded-lg bg-purple-50 border border-purple-200 px-3 py-2">
-                    <Link2 size={14} className="text-purple-600 shrink-0" />
-                    <p className="text-xs text-purple-700 font-medium">
+                <div className="flex items-center gap-2 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40 px-3 py-2">
+                    <Link2 size={14} className="text-purple-600 dark:text-purple-400 shrink-0" />
+                    <p className="text-xs text-purple-700 dark:text-purple-300 font-medium">
                         グループ化したいカードを2つ以上タップして選んでください
                     </p>
                 </div>
@@ -571,8 +571,8 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     }
                                 }}
                                 className={`rounded-lg border bg-white px-4 py-3 cursor-pointer transition-all ${isGroupMode && isSelected
-                                    ? "border-purple-400 bg-purple-50 ring-1 ring-purple-300"
-                                    : "border-gray-200 active:bg-gray-50"
+                                    ? "border-purple-400 bg-purple-50 ring-1 ring-purple-300 dark:border-purple-800 dark:bg-purple-950/20 dark:ring-purple-900/50"
+                                    : "border-gray-200 active:bg-gray-50 dark:border-gray-800 dark:active:bg-gray-800"
                                     }`}
                             >
                                 <div className="flex items-start gap-3">
@@ -580,7 +580,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     {isGroupMode && (
                                         <div className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected
                                             ? "bg-purple-600 border-purple-600"
-                                            : "border-gray-300 bg-white"
+                                            : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800"
                                             }`}>
                                             {isSelected && <Check size={11} className="text-white" />}
                                         </div>
@@ -651,16 +651,16 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     ? `${selectedWordIds.size}件選択中`
                                     : "カードを選択してください"}
                             </p>
-                            <div className="flex items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
+                            <div className="flex items-center justify-center sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto">
                                 <button
                                     onClick={exitGroupMode}
-                                    className="flex-1 sm:flex-initial text-center rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200"
+                                    className="flex-1 sm:flex-initial text-center rounded-lg border border-gray-200 dark:border-gray-700 px-2 py-2 sm:px-3 text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200 whitespace-nowrap"
                                 >
                                     キャンセル
                                 </button>
                                 <button
                                     onClick={handleAISuggest}
-                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-3 py-2 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors"
+                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-2 py-2 sm:px-3 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors whitespace-nowrap"
                                 >
                                     <Wand2 size={14} />
                                     AI提案
@@ -668,7 +668,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 <button
                                     onClick={handleGroup}
                                     disabled={selectedWordIds.size < 2 || grouping}
-                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg bg-purple-600 px-2.5 py-2 sm:px-4 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                                 >
                                     {grouping
                                         ? <Loader2 size={14} className="animate-spin" />
@@ -691,17 +691,17 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         onClick={closeEdit}
                     />
                     <div
-                        className={`relative z-10 w-full max-w-2xl max-h-full overflow-y-auto bg-white rounded-2xl shadow-xl p-5 pb-8 space-y-4 ${isClosing ? "animate-slide-down" : "animate-slide-up"
+                        className={`relative z-10 w-full max-w-2xl max-h-full overflow-y-auto bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl p-5 pb-8 space-y-4 ${isClosing ? "animate-slide-down" : "animate-slide-up"
                             }`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between">
-                            <h3 className="text-base font-bold text-gray-800">
+                            <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">
                                 単語を編集
                             </h3>
                             <button
                                 onClick={closeEdit}
-                                className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                                className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
                             >
                                 <X size={18} />
                             </button>
@@ -709,21 +709,21 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
 
                         {/* 単語 */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 単語・熟語
                             </label>
                             <input
                                 type="text"
                                 value={editTerm}
                                 onChange={(e) => setEditTerm(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                         </div>
 
                         {/* 意味 */}
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     意味
                                 </label>
                                 <button
@@ -741,7 +741,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     type="text"
                                     value={editMeaning}
                                     onChange={(e) => setEditMeaning(e.target.value)}
-                                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 />
                                 <div
                                     className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 bg-white dark:bg-gray-800 flex items-center h-full animate-shimmer-input transition-opacity duration-500 ${
@@ -756,7 +756,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         {/* 例文 */}
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     例文
                                 </label>
                                 <div className="flex items-center gap-1.5">
@@ -787,7 +787,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     value={editContext}
                                     onChange={(e) => setEditContext(e.target.value)}
                                     rows={2}
-                                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-3 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                                 />
                                 <div
                                     className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input transition-opacity duration-500 ${
@@ -811,7 +811,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         {/* カテゴリ & ステータス */}
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     カテゴリ
                                 </label>
                                 <select
@@ -819,7 +819,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     onChange={(e) =>
                                         setEditCategory(e.target.value as Category)
                                     }
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                                 >
                                     {CATEGORIES.map((c) => (
                                         <option key={c} value={c}>
@@ -829,7 +829,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     ステータス
                                 </label>
                                 <select
@@ -837,7 +837,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     onChange={(e) =>
                                         setEditStatus(Number(e.target.value) as Status)
                                     }
-                                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                                 >
                                     {([0, 1, 2] as (0 | 1 | 2)[]).map((s) => (
                                         <option key={s} value={s}>
@@ -849,7 +849,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         </div>
 
                         {aiError && (
-                            <div className="flex items-center gap-1.5 text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg p-2.5">
+                            <div className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 rounded-lg p-2.5">
                                 <AlertCircle size={14} className="shrink-0" />
                                 <span>{aiError}</span>
                             </div>
@@ -860,7 +860,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                             <button
                                 onClick={handleDelete}
                                 disabled={saving}
-                                className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-100 active:bg-red-200 disabled:opacity-50"
+                                className="rounded-lg border border-red-300 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 active:bg-red-200 dark:active:bg-red-900/50"
                             >
                                 削除
                             </button>
@@ -990,7 +990,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 {/* 全提案を処理済み */}
                                 {!aiSuggesting && !aiSuggestError && aiSuggestions.length > 0 && aiSuggestIndex >= aiSuggestions.length && (
                                     <div className="flex flex-col items-center gap-3 py-6">
-                                        <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
+                                        <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-950/30 flex items-center justify-center">
                                             <CheckCircle size={24} className="text-green-500" />
                                         </div>
                                         <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">すべての提案を確認しました</p>
