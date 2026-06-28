@@ -14,9 +14,9 @@ const STATUS_LABELS: Record<0 | 1 | 2, string> = {
     2: "習得済み",
 };
 const STATUS_STYLES: Record<0 | 1 | 2, string> = {
-    0: "bg-red-50 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
-    1: "bg-orange-50 text-orange-600 border-orange-300 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
-    2: "bg-green-50 text-green-600 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
+    0: "bg-red-50 text-red-600 border-red-300 dark:bg-red-500/20 dark:text-red-300 dark:border-red-800",
+    1: "bg-orange-50 text-orange-600 border-orange-300 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-800",
+    2: "bg-green-50 text-green-600 border-green-300 dark:bg-green-500/20 dark:text-green-300 dark:border-green-800",
 };
 
 /** 内部ステータス（0、5）を表面上の3段階（0/1/2）にマッピング */
@@ -26,10 +26,10 @@ function toDisplayStatus(status: Status): 0 | 1 | 2 {
     return 2;
 }
 const CATEGORY_STYLES: Record<Category, string> = {
-    Vocab: "bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
-    Paraphrase: "bg-purple-50 text-purple-600 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
-    Listening: "bg-teal-50 text-teal-600 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
-    Writing: "bg-pink-50 text-pink-600 border-pink-300 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
+    Vocab: "bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-800",
+    Paraphrase: "bg-purple-50 text-purple-600 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-800",
+    Listening: "bg-teal-50 text-teal-600 border-teal-300 dark:bg-teal-500/20 dark:text-teal-300 dark:border-teal-800",
+    Writing: "bg-pink-50 text-pink-600 border-pink-300 dark:bg-pink-500/20 dark:text-pink-300 dark:border-pink-800",
 };
 
 type FilterCategory = Category | "all";
@@ -488,7 +488,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         }}
                         className={`flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium border transition-colors shrink-0 ${
                             isGroupMode
-                                ? "border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-800/40"
+                                ? "border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-500/20 dark:text-purple-300 dark:hover:bg-purple-800/40"
                                 : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-600 dark:active:bg-gray-900"
                         }`}
                     >
@@ -531,7 +531,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
 
             {/* グループ化モード：ヒント */}
             {isGroupMode && (
-                <div className="flex items-center gap-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/40 px-3 py-2">
+                <div className="flex items-center gap-2 rounded-lg bg-purple-50 dark:bg-purple-500/15 border border-purple-200 dark:border-purple-800/40 px-3 py-2">
                     <Link2 size={14} className="text-purple-600 dark:text-purple-300 shrink-0" />
                     <p className="text-xs text-purple-700 dark:text-purple-200 font-medium">
                         グループ化したいカードを2つ以上タップして選んでください
@@ -571,7 +571,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     }
                                 }}
                                 className={`rounded-lg border bg-white px-4 py-3 cursor-pointer transition-all ${isGroupMode && isSelected
-                                    ? "border-purple-400 bg-purple-50 ring-1 ring-purple-300 dark:border-purple-700 dark:bg-purple-900/20 dark:ring-purple-800/50"
+                                    ? "border-purple-400 bg-purple-50 ring-1 ring-purple-300 dark:border-purple-700 dark:bg-purple-500/10 dark:ring-purple-700/40"
                                     : "border-gray-200 active:bg-gray-50 dark:border-gray-800 dark:active:bg-gray-800"
                                     }`}
                             >
@@ -600,7 +600,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                                 {/* グループバッジ */}
                                                 {groupLabel && (
                                                     isGroupMode ? (
-                                                        <span className="inline-flex items-center gap-1 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 pl-2 pr-1 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
+                                                        <span className="inline-flex items-center gap-1 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-500/20 pl-2 pr-1 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
                                                             <Link2 size={9} />
                                                             {groupLabel}
                                                             <button
@@ -615,7 +615,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                                             </button>
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center gap-0.5 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
+                                                        <span className="inline-flex items-center gap-0.5 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-500/20 px-2 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
                                                             <Link2 size={9} />
                                                             {groupLabel}
                                                         </span>

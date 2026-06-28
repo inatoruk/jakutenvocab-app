@@ -24,10 +24,10 @@ const animationStyles = `
 type ReviewMode = "unlearned" | "all" | "writing" | "paraphrase";
 
 const CATEGORY_STYLES: Record<Category, string> = {
-    Vocab: "bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
-    Paraphrase: "bg-purple-50 text-purple-600 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
-    Listening: "bg-teal-50 text-teal-600 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
-    Writing: "bg-pink-50 text-pink-600 border-pink-300 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
+    Vocab: "bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-800",
+    Paraphrase: "bg-purple-50 text-purple-600 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-800",
+    Listening: "bg-teal-50 text-teal-600 border-teal-300 dark:bg-teal-500/20 dark:text-teal-300 dark:border-teal-800",
+    Writing: "bg-pink-50 text-pink-600 border-pink-300 dark:bg-pink-500/20 dark:text-pink-300 dark:border-pink-800",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
