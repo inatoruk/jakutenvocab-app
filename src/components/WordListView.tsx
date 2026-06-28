@@ -509,7 +509,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                             </p>
                             <button
                                 onClick={exitGroupMode}
-                                className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 active:bg-gray-100"
+                                className="rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200"
                             >
                                 キャンセル
                             </button>
