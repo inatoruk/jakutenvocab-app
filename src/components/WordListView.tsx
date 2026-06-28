@@ -599,20 +599,27 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                             <div className="flex items-center gap-1">
                                                 {/* グループバッジ */}
                                                 {groupLabel && (
-                                                    <span className="inline-flex items-center gap-1 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 pl-2 pr-1 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
-                                                        <Link2 size={9} />
-                                                        {groupLabel}
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleRemoveFromGroup(word.id);
-                                                            }}
-                                                            className="hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5 transition-colors"
-                                                            title="グループから外す"
-                                                        >
-                                                            <X size={10} />
-                                                        </button>
-                                                    </span>
+                                                    isGroupMode ? (
+                                                        <span className="inline-flex items-center gap-1 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 pl-2 pr-1 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
+                                                            <Link2 size={9} />
+                                                            {groupLabel}
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleRemoveFromGroup(word.id);
+                                                                }}
+                                                                className="hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5 transition-colors"
+                                                                title="グループから外す"
+                                                            >
+                                                                <X size={10} />
+                                                            </button>
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-0.5 rounded-full border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 text-[10px] font-medium text-purple-600 dark:text-purple-300">
+                                                            <Link2 size={9} />
+                                                            {groupLabel}
+                                                        </span>
+                                                    )
                                                 )}
                                                 <span
                                                     className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${CATEGORY_STYLES[word.category]}`}
@@ -638,36 +645,38 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             {isGroupMode && (
                 <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none">
                     <div className="mx-auto max-w-2xl pointer-events-auto">
-                        <div className="flex items-center gap-2 rounded-2xl border border-purple-200 dark:border-purple-900/60 bg-white dark:bg-gray-900 selection-action-bar px-4 py-3">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 flex-1">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-purple-200 dark:border-purple-900/60 bg-white dark:bg-gray-900 selection-action-bar px-4 py-3">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center sm:text-left flex-1 min-w-0">
                                 {selectedWordIds.size > 0
                                     ? `${selectedWordIds.size}件選択中`
                                     : "カードを選択してください"}
                             </p>
-                            <button
-                                onClick={exitGroupMode}
-                                className="rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200"
-                            >
-                                キャンセル
-                            </button>
-                            <button
-                                onClick={handleAISuggest}
-                                className="flex items-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-3 py-2 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors"
-                            >
-                                <Wand2 size={14} />
-                                AI提案
-                            </button>
-                            <button
-                                onClick={handleGroup}
-                                disabled={selectedWordIds.size < 2 || grouping}
-                                className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                            >
-                                {grouping
-                                    ? <Loader2 size={14} className="animate-spin" />
-                                    : <Link2 size={14} />
-                                }
-                                グループ化
-                            </button>
+                            <div className="flex items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
+                                <button
+                                    onClick={exitGroupMode}
+                                    className="flex-1 sm:flex-initial text-center rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200"
+                                >
+                                    キャンセル
+                                </button>
+                                <button
+                                    onClick={handleAISuggest}
+                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-3 py-2 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors"
+                                >
+                                    <Wand2 size={14} />
+                                    AI提案
+                                </button>
+                                <button
+                                    onClick={handleGroup}
+                                    disabled={selectedWordIds.size < 2 || grouping}
+                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    {grouping
+                                        ? <Loader2 size={14} className="animate-spin" />
+                                        : <Link2 size={14} />
+                                    }
+                                    グループ化
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
