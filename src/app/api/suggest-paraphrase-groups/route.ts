@@ -53,18 +53,18 @@ export async function POST(request: Request) {
             is_grouped: !!existingGroupMap[v.id]
         }));
 
-        const prompt = `You are a TOEIC/IELTS vocabulary expert. 
+        const prompt = `You are a TOEIC/IELTS vocabulary expert.
 Below is a JSON array of English vocabulary words with their IDs, Japanese meanings, and a boolean flag "is_grouped" indicating whether they are already in a paraphrase group.
 
-Your task: Find groups of words (2 or more) that are paraphrases of each other — words that can be used interchangeably or have very similar meanings in a TOEIC/IELTS context.
+Your task: Find groups of words (2 or more) that are paraphrases of each other — words with similar or overlapping meanings that could serve as paraphrases in a TOEIC/IELTS context.
 
 Rules:
-- Only group words that are genuinely interchangeable in meaning (synonyms or near-synonyms).
+- Group words that share similar meanings, even if they are not perfectly interchangeable (near-synonyms, related expressions, and words that often appear as paraphrases in TOEIC/IELTS reading passages are all valid).
+- Be generous in your grouping — if in doubt, suggest the pair rather than skipping it.
 - Each group must have at least 2 words.
-- Prioritize suggestions that involve ungrouped words (where "is_grouped" is false) so they can be grouped together or merged into existing groups.
-- You can also suggest grouping/merging words that are already in different groups (where "is_grouped" is true) if their meanings align perfectly.
+- Prioritize suggestions that involve ungrouped words (where "is_grouped" is false).
+- You can also suggest grouping/merging words that are already in different groups (where "is_grouped" is true) if their meanings are related.
 - Do NOT suggest grouping pairs of words that are ALREADY in the same group (see "already_grouped" below).
-- Prioritize word pairs that are commonly tested as paraphrases in TOEIC/IELTS.
 - Return ONLY the JSON array. No explanation, no markdown fences.
 
 Already grouped (skip these combinations):
@@ -86,7 +86,7 @@ If no new paraphrase groups are found, return an empty array: []`;
         const response = await ai.models.generateContent({
             model: 'gemini-3.5-flash',
             contents: prompt,
-            config: { temperature: 0.2 }
+            config: { temperature: 0.6 }
         });
 
         const raw = response.text?.trim() || '[]';
