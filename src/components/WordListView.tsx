@@ -14,9 +14,9 @@ const STATUS_LABELS: Record<0 | 1 | 2, string> = {
     2: "習得済み",
 };
 const STATUS_STYLES: Record<0 | 1 | 2, string> = {
-    0: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50",
-    1: "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800/50",
-    2: "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50",
+    0: "bg-red-50 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+    1: "bg-orange-50 text-orange-600 border-orange-300 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
+    2: "bg-green-50 text-green-600 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
 };
 
 /** 内部ステータス（0、5）を表面上の3段階（0/1/2）にマッピング */
@@ -26,10 +26,10 @@ function toDisplayStatus(status: Status): 0 | 1 | 2 {
     return 2;
 }
 const CATEGORY_STYLES: Record<Category, string> = {
-    Vocab: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50",
-    Paraphrase: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50",
-    Listening: "bg-teal-50 text-teal-600 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800/50",
-    Writing: "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800/50",
+    Vocab: "bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+    Paraphrase: "bg-purple-50 text-purple-600 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+    Listening: "bg-teal-50 text-teal-600 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
+    Writing: "bg-pink-50 text-pink-600 border-pink-300 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
 };
 
 type FilterCategory = Category | "all";
@@ -554,7 +554,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     </p>
                 </div>
             ) : (
-                <ul className={`space-y-2 ${isGroupMode ? "pb-15" : ""}`}>
+                <ul className={`space-y-2 ${isGroupMode ? "pb-44 sm:pb-28" : ""}`}>
                     {filteredWords.map((word) => {
                         const groupId = paraphraseGroups[word.id];
                         const groupLabel = groupId ? groupLabels[groupId] : null;
@@ -651,16 +651,16 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     ? `${selectedWordIds.size}件選択中`
                                     : "カードを選択してください"}
                             </p>
-                            <div className="flex items-center justify-center sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto">
+                            <div className="flex items-center justify-center sm:justify-end gap-2.5 sm:gap-3 w-full sm:w-auto">
                                 <button
                                     onClick={exitGroupMode}
-                                    className="flex-1 sm:flex-initial text-center rounded-lg border border-gray-200 dark:border-gray-700 px-2 py-2 sm:px-3 text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200 whitespace-nowrap"
+                                    className="flex-[0.9] sm:flex-initial text-center rounded-lg border border-gray-200 dark:border-gray-700 px-2 py-2 sm:px-3 text-sm font-medium text-gray-600 dark:text-gray-300 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors duration-200 whitespace-nowrap"
                                 >
                                     キャンセル
                                 </button>
                                 <button
                                     onClick={handleAISuggest}
-                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-2 py-2 sm:px-3 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors whitespace-nowrap"
+                                    className="flex-[0.9] sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-2 py-2 sm:px-3 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors whitespace-nowrap"
                                 >
                                     <Wand2 size={14} />
                                     AI提案
@@ -668,7 +668,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 <button
                                     onClick={handleGroup}
                                     disabled={selectedWordIds.size < 2 || grouping}
-                                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg bg-purple-600 px-2.5 py-2 sm:px-4 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                                    className="flex-[1.2] sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg bg-purple-600 px-2.5 py-2 sm:px-4 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                                 >
                                     {grouping
                                         ? <Loader2 size={14} className="animate-spin" />
