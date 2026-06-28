@@ -937,10 +937,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {paraphraseResult !== null && (
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                                 paraphraseResult === "correct"
-                                                    ? "bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700/50"
+                                                    ? "bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-200 border border-green-200 dark:border-green-700/50"
                                                     : paraphraseResult === "synonym"
-                                                        ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50"
-                                                        : "bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700/50"
+                                                        ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200 border border-blue-200 dark:border-blue-700/50"
+                                                        : "bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-700/50"
                                             }`}>
                                                 <span>
                                                     {paraphraseResult === "correct" && "✅ 正解！"}
@@ -991,7 +991,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <div className="flex flex-wrap items-center justify-center gap-2">
                                                     {siblings.map((s) => (
                                                         <div key={s.id} className="rounded-lg bg-violet-50 dark:bg-violet-900/40 border border-violet-100 dark:border-violet-700/50 px-3 py-1.5">
-                                                            <span className="text-sm font-medium text-violet-900 dark:text-violet-300">{s.term}</span>
+                                                            <span className="text-sm font-medium text-violet-900 dark:text-violet-200">{s.term}</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -1002,13 +1002,13 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {aiChecking && (
                                             <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/40 border border-amber-100 dark:border-amber-700/50 px-3 py-2">
                                                 <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
-                                                <p className="text-xs text-amber-700 dark:text-amber-300">IELTSアドバイスを生成中...</p>
+                                                <p className="text-xs text-amber-700 dark:text-amber-200">IELTSアドバイスを生成中...</p>
                                             </div>
                                         )}
                                         {aiHint && !aiChecking && (
                                             <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/40 border border-amber-100 dark:border-amber-700/50 px-3 py-2">
                                                 <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                                <p className="text-xs text-amber-800 dark:text-amber-300 whitespace-pre-wrap">{aiHint}</p>
+                                                <p className="text-xs text-amber-800 dark:text-amber-200 whitespace-pre-wrap">{aiHint}</p>
                                             </div>
                                         )}
 
@@ -1018,7 +1018,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 <button
                                                     onClick={handleRegisterParaphrase}
                                                     disabled={registering}
-                                                    className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/40 px-4 py-2 text-xs font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/60 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors disabled:opacity-50"
+                                                    className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/40 px-4 py-2 text-xs font-medium text-violet-700 dark:text-violet-200 hover:bg-violet-100 dark:hover:bg-violet-900/60 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors disabled:opacity-50"
                                                 >
                                                     {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                                     別解として登録
@@ -1051,7 +1051,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         </button>
                                         <button
                                             onClick={goNext}
-                                            className="flex-1 max-w-[200px] inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/40 px-4 py-2.5 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/60 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors duration-200"
+                                            className="flex-1 max-w-[200px] inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/40 px-4 py-2.5 text-sm font-medium text-violet-700 dark:text-violet-200 hover:bg-violet-100 dark:hover:bg-violet-900/60 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors duration-200"
                                         >
                                             次へ
                                             <ChevronRight size={16} />
@@ -1209,10 +1209,10 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             {/* 正誤バッジ */}
                                             <div className={`text-center rounded-lg px-4 py-2 text-sm font-semibold flex flex-col gap-1 ${
                                                 paraphraseResult === "correct"
-                                                    ? "bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700/50"
+                                                    ? "bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-200 border border-green-200 dark:border-green-700/50"
                                                     : paraphraseResult === "synonym"
-                                                        ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50"
-                                                        : "bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700/50"
+                                                        ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200 border border-blue-200 dark:border-blue-700/50"
+                                                        : "bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-700/50"
                                             }`}>
                                                 <span>
                                                     {paraphraseResult === "correct" && "✅ 正解！"}
@@ -1251,13 +1251,13 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     {isWritingCard && aiChecking && (
                                         <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/40 border border-amber-100 dark:border-amber-700/50 px-3 py-2">
                                             <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
-                                            <p className="text-xs text-amber-700 dark:text-amber-300">AIアドバイスを生成中...</p>
+                                            <p className="text-xs text-amber-700 dark:text-amber-200">AIアドバイスを生成中...</p>
                                         </div>
                                     )}
                                     {isWritingCard && aiHint && !aiChecking && (
                                         <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/40 border border-amber-100 dark:border-amber-700/50 px-3 py-2">
                                             <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                            <p className="text-xs text-amber-800 dark:text-amber-300 whitespace-pre-wrap">{aiHint}</p>
+                                            <p className="text-xs text-amber-800 dark:text-amber-200 whitespace-pre-wrap">{aiHint}</p>
                                         </div>
                                     )}
 
@@ -1267,7 +1267,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             <button
                                                 onClick={handleRegisterParaphrase}
                                                 disabled={registering}
-                                                className="inline-flex items-center gap-1.5 rounded-lg border border-pink-300 dark:border-pink-700/60 bg-pink-50 dark:bg-pink-900/40 px-4 py-2 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-900/60 active:bg-pink-200 dark:active:bg-pink-900/70 transition-colors disabled:opacity-50"
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-pink-300 dark:border-pink-700/60 bg-pink-50 dark:bg-pink-900/40 px-4 py-2 text-xs font-medium text-pink-700 dark:text-pink-200 hover:bg-pink-100 dark:hover:bg-pink-900/60 active:bg-pink-200 dark:active:bg-pink-900/70 transition-colors disabled:opacity-50"
                                             >
                                                 {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                                 別解として登録
@@ -1285,21 +1285,21 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     </button>
                                     <button
                                         onClick={handleKeep}
-                                        className="flex-1 max-w-[140px] rounded-lg border border-orange-300 dark:border-orange-700/60 bg-orange-50 dark:bg-orange-900/40 px-4 py-3 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/60 active:bg-orange-200 dark:active:bg-orange-900/70"
+                                        className="flex-1 max-w-[140px] rounded-lg border border-orange-300 dark:border-orange-700/60 bg-orange-50 dark:bg-orange-900/40 px-4 py-3 text-sm font-medium text-orange-700 dark:text-orange-200 hover:bg-orange-100 dark:hover:bg-orange-900/60 active:bg-orange-200 dark:active:bg-orange-900/70"
                                     >
                                         まだ（Keep）
                                     </button>
                                     {(reviewMode === "unlearned" || reviewMode === "writing") ? (
                                         <button
                                             onClick={handleMastered}
-                                            className="flex-1 max-w-[140px] rounded-lg border border-green-300 dark:border-green-700/60 bg-green-50 dark:bg-green-900/40 px-4 py-3 text-sm font-medium text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/60 active:bg-green-200 dark:active:bg-green-900/70"
+                                            className="flex-1 max-w-[140px] rounded-lg border border-green-300 dark:border-green-700/60 bg-green-50 dark:bg-green-900/40 px-4 py-3 text-sm font-medium text-green-700 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900/60 active:bg-green-200 dark:active:bg-green-900/70"
                                         >
                                             覚えた（Mastered）
                                         </button>
                                     ) : (
                                         <button
                                             onClick={goNext}
-                                            className="flex-1 max-w-[140px] inline-flex items-center justify-center gap-1 rounded-lg border border-blue-300 dark:border-blue-700/60 bg-blue-50 dark:bg-blue-900/40 px-4 py-3 text-sm font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 active:bg-blue-200 dark:active:bg-blue-900/70"
+                                            className="flex-1 max-w-[140px] inline-flex items-center justify-center gap-1 rounded-lg border border-blue-300 dark:border-blue-700/60 bg-blue-50 dark:bg-blue-900/40 px-4 py-3 text-sm font-medium text-blue-700 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-900/60 active:bg-blue-200 dark:active:bg-blue-900/70"
                                         >
                                             次へ
                                             <ChevronRight size={16} />
