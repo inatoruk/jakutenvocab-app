@@ -93,11 +93,26 @@ Output format (strict JSON array of suggestion objects):
 
 If no new paraphrase groups are found, return an empty array: []`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
-            contents: prompt,
-            config: { temperature: 0.6 }
-        });
+        let response;
+        try {
+            response = await ai.models.generateContent({
+                model: 'gemini-3.5-flash',
+                contents: prompt,
+                config: { temperature: 0.6 }
+            });
+        } catch (error: any) {
+            console.warn('gemini-3.5-flash failed, attempting fallback to gemini-2.5-flash. Error:', error);
+            try {
+                response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: prompt,
+                    config: { temperature: 0.6 }
+                });
+            } catch (fallbackError: any) {
+                console.error('Fallback model gemini-2.5-flash also failed:', fallbackError);
+                throw fallbackError;
+            }
+        }
 
         const raw = response.text?.trim() || '[]';
 
