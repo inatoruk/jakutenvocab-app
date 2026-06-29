@@ -96,20 +96,20 @@ If no new paraphrase groups are found, return an empty array: []`;
         let response;
         try {
             response = await ai.models.generateContent({
-                model: 'gemini-3.5-flash',
+                model: 'gemini-3-flash-preview',
                 contents: prompt,
                 config: { temperature: 0.6 }
             });
         } catch (error: any) {
-            console.warn('gemini-3.5-flash failed, attempting fallback to gemini-2.5-flash. Error:', error);
+            console.warn('gemini-3-flash-preview failed, attempting fallback to gemini-3.1-flash-lite. Error:', error);
             try {
                 response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-3.1-flash-lite',
                     contents: prompt,
                     config: { temperature: 0.6 }
                 });
             } catch (fallbackError: any) {
-                console.error('Fallback model gemini-2.5-flash also failed:', fallbackError);
+                console.error('Fallback model gemini-3.1-flash-lite also failed:', fallbackError);
                 throw fallbackError;
             }
         }
