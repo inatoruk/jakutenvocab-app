@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Vocab, Category, CATEGORIES, Status } from "@/types/vocab";
 import { processDecay } from "@/lib/vocab";
-import { Search, X, Check, Loader2, Link2, Sparkles, Info, AlertCircle, Wand2, CheckCircle } from "lucide-react";
+import { Search, X, Check, Loader2, Link2, Sparkles, Info, AlertCircle, Wand2, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
 // 表面上の3段階（内部ステータス 2〜5 はまとめて「習得済み」）
 // フィルター・バッジを 0 / 1 / 2 の 3段階で分類
@@ -77,6 +77,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
     const [aiSuggestError, setAiSuggestError] = useState<string | null>(null);
     const [approving, setApproving] = useState(false);
     const [approvedCount, setApprovedCount] = useState(0);
+    const [approvedIndices, setApprovedIndices] = useState<Set<number>>(new Set());
 
     const fetchParaphraseGroups = useCallback(async () => {
         // 全ての vocab と paraphrase_groups を取得
@@ -354,6 +355,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
         setAiSuggestions([]);
         setAiSuggestIndex(0);
         setApprovedCount(0);
+        setApprovedIndices(new Set());
         setShowAISuggestModal(true);
         try {
             const { data: { session } } = await supabase.auth.getSession();
@@ -398,6 +400,11 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
 
             await fetchParaphraseGroups();
             setApprovedCount(prev => prev + 1);
+            setApprovedIndices(prev => {
+                const next = new Set(prev);
+                next.add(aiSuggestIndex);
+                return next;
+            });
         } catch (e) {
             console.error("Approve group failed:", e);
             alert("グループ化に失敗しました");
@@ -940,7 +947,27 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 {!aiSuggesting && !aiSuggestError && currentSuggestion && (
                                     <>
                                         <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-                                            <span>提案 {aiSuggestIndex + 1} / {aiSuggestions.length}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span>提案 {aiSuggestIndex + 1} / {aiSuggestions.length}</span>
+                                                {aiSuggestions.length > 1 && (
+                                                    <div className="flex items-center gap-0.5 ml-1">
+                                                        <button
+                                                            onClick={() => setAiSuggestIndex(prev => Math.max(0, prev - 1))}
+                                                            disabled={aiSuggestIndex === 0 || approving}
+                                                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md text-gray-500 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                                        >
+                                                            <ChevronLeft size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setAiSuggestIndex(prev => Math.min(aiSuggestions.length - 1, prev + 1))}
+                                                            disabled={aiSuggestIndex === aiSuggestions.length - 1 || approving}
+                                                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md text-gray-500 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                                        >
+                                                            <ChevronRight size={14} />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
                                             {approvedCount > 0 && (
                                                 <span className="text-green-600 dark:text-green-400 font-medium">✓ {approvedCount}件 承認済み</span>
                                             )}
@@ -974,17 +1001,36 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                                 disabled={approving}
                                                 className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700 transition-colors disabled:opacity-50"
                                             >
-                                                <X size={14} />
-                                                スキップ
+                                                {aiSuggestIndex === aiSuggestions.length - 1 ? (
+                                                    <>
+                                                        <Check size={14} />
+                                                        完了する
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <X size={14} />
+                                                        スキップ
+                                                    </>
+                                                )}
                                             </button>
-                                            <button
-                                                onClick={() => handleApproveGroup(currentSuggestion)}
-                                                disabled={approving}
-                                                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 active:bg-violet-800 transition-colors disabled:opacity-50"
-                                            >
-                                                {approving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                                                グループ化する
-                                            </button>
+                                            {approvedIndices.has(aiSuggestIndex) ? (
+                                                <button
+                                                    disabled={true}
+                                                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/50 px-4 py-2.5 text-sm font-semibold text-green-600 dark:text-green-400"
+                                                >
+                                                    <Check size={14} />
+                                                    グループ化済み
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleApproveGroup(currentSuggestion)}
+                                                    disabled={approving}
+                                                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 active:bg-violet-800 transition-colors disabled:opacity-50"
+                                                >
+                                                    {approving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                                    グループ化する
+                                                </button>
+                                            )}
                                         </div>
                                     </>
                                 )}
