@@ -368,7 +368,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             if (!res.ok) throw new Error(json.error || "エラーが発生しました");
             setAiSuggestions(json.suggestions || []);
             if ((json.suggestions || []).length === 0) {
-                setAiSuggestError("新しいグループ化自動提案の候補が見つかりませんでした。");
+                setAiSuggestError("新しいグループ化の候補が見つかりませんでした。");
             }
         } catch (e: unknown) {
             setAiSuggestError(e instanceof Error ? e.message : "エラーが発生しました");
