@@ -670,7 +670,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     className="flex-[0.9] sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-2 py-2 sm:px-3 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors whitespace-nowrap"
                                 >
                                     <Wand2 size={14} />
-                                    AIグループ化自動提案
+                                    AI提案
                                 </button>
                                 <button
                                     onClick={handleGroup}
