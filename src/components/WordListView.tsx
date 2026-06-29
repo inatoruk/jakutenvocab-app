@@ -347,7 +347,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
         }
     }
 
-    /** AIによるパラフレーズ自動提案を呼び出す */
+    /** AIによるグループ化提案を呼び出す */
     async function handleAISuggest() {
         setAiSuggesting(true);
         setAiSuggestError(null);
@@ -368,7 +368,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             if (!res.ok) throw new Error(json.error || "エラーが発生しました");
             setAiSuggestions(json.suggestions || []);
             if ((json.suggestions || []).length === 0) {
-                setAiSuggestError("新しいパラフレーズの候補が見つかりませんでした。");
+                setAiSuggestError("新しいグループ化提案の候補が見つかりませんでした。");
             }
         } catch (e: unknown) {
             setAiSuggestError(e instanceof Error ? e.message : "エラーが発生しました");
@@ -670,7 +670,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     className="flex-[0.9] sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-900/30 px-2 py-2 sm:px-3 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors whitespace-nowrap"
                                 >
                                     <Wand2 size={14} />
-                                    AI提案
+                                    AIグループ化提案
                                 </button>
                                 <button
                                     onClick={handleGroup}
@@ -905,7 +905,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                             <div className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Wand2 size={18} className="text-white" />
-                                    <span className="text-white font-semibold text-sm">AIパラフレーズ自動提案</span>
+                                    <span className="text-white font-semibold text-sm">AIグループ化提案</span>
                                 </div>
                                 <button onClick={() => setShowAISuggestModal(false)} className="text-white/70 hover:text-white transition-colors">
                                     <X size={18} />
@@ -960,16 +960,11 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                         </div>
 
                                         <div className="flex items-center justify-center gap-3 flex-wrap">
-                                            {currentSuggestion.words.map((word, i) => (
-                                                <>
-                                                    <div key={word.id} className="flex flex-col items-center bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-700/50 rounded-xl px-4 py-3 min-w-[100px]">
-                                                        <span className="text-base font-bold text-violet-900 dark:text-violet-200">{word.term}</span>
-                                                        <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{word.meaning}</span>
-                                                    </div>
-                                                    {i < currentSuggestion.words.length - 1 && (
-                                                        <span key={`sep-${i}`} className="text-violet-400 font-bold text-lg">↔</span>
-                                                    )}
-                                                </>
+                                            {currentSuggestion.words.map((word) => (
+                                                <div key={word.id} className="flex flex-col items-center bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-700/50 rounded-xl px-4 py-3 min-w-[100px]">
+                                                    <span className="text-base font-bold text-violet-900 dark:text-violet-200">{word.term}</span>
+                                                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{word.meaning}</span>
+                                                </div>
                                             ))}
                                         </div>
 
