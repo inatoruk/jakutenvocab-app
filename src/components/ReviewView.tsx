@@ -748,8 +748,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 };
                 const activeColors: Record<ReviewMode, string> = {
                     unlearned: "bg-blue-600 shadow-sm",
-                    all: "bg-emerald-550 shadow-sm",
-                    writing: "bg-pink-550 shadow-sm",
+                    all: "bg-emerald-500 shadow-sm",
+                    writing: "bg-pink-500 shadow-sm",
                     paraphrase: "bg-violet-600 shadow-sm",
                 };
                 return (
@@ -1286,7 +1286,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                         <p className="text-base text-slate-600 dark:text-gray-400">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
-                                            <p className="text-sm text-slate-700 dark:text-gray-200 leading-relaxed bg-pink-50 dark:bg-pink-300/[0.06] border border-transparent dark:border-pink-300/15 rounded-lg px-2.5 py-1">
+                                            <p className="text-sm text-slate-700 dark:text-gray-200 leading-relaxed bg-pink-50 dark:bg-pink-300/[0.06] border border-transparent dark:border-pink-300/15 rounded-lg px-2.5 py-1 mt-2">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
