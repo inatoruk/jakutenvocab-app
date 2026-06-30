@@ -893,34 +893,35 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         )}
 
                                         {/* 入力フォーム */}
-                                        <div className="space-y-2">
-                                            {!currentCard.context && (
-                                                <div className="text-center">
-                                                    <input
-                                                        ref={inputRef}
-                                                        type="text"
-                                                        value={paraphraseInput}
-                                                        onChange={(e) => {
-                                                            setParaphraseInput(e.target.value);
-                                                            setSameWordWarning(false);
-                                                        }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
-                                                        }}
-                                                        className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-slate-900 dark:text-white text-lg border-violet-400 focus:border-violet-600"
-                                                        style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
-                                                        autoComplete="off"
-                                                        autoCapitalize="none"
-                                                    />
-                                                </div>
-                                            )}
-                                            {/* 同じ単語の警告 */}
-                                            {sameWordWarning && (
-                                                <p className="text-xs text-red-500 px-1">
-                                                    出題された単語と同じです。別のパラフレーズを入力してください。
-                                                </p>
-                                            )}
-                                        </div>
+                                        {(!currentCard.context || sameWordWarning) && (
+                                            <div className="space-y-2">
+                                                {!currentCard.context && (
+                                                    <div className="text-center">
+                                                        <input
+                                                            ref={inputRef}
+                                                            type="text"
+                                                            value={paraphraseInput}
+                                                            onChange={(e) => {
+                                                                setParaphraseInput(e.target.value);
+                                                                setSameWordWarning(false);
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter" && paraphraseInput.trim()) handleSubmitAnswer();
+                                                            }}
+                                                            className="inline-block border-b-2 bg-transparent text-center focus:ring-0 focus:outline-none font-semibold px-2 py-1 text-slate-900 dark:text-white text-lg border-violet-400 focus:border-violet-600"
+                                                            style={{ width: `${Math.max(currentCard.term.length + 2, paraphraseInput.length + 1)}ch` }}
+                                                            autoComplete="off"
+                                                            autoCapitalize="none"
+                                                        />
+                                                    </div>
+                                                )}
+                                                {sameWordWarning && (
+                                                    <p className="text-xs text-red-500 px-1">
+                                                        出題された単語と同じです。別のパラフレーズを入力してください。
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
                                         {/* グループ未登録の警告 */}
                                         {!isGrouped && (
                                             <p className="text-xs text-amber-600 text-center bg-amber-50 rounded-lg px-3 py-2">
