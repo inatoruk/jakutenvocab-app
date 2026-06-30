@@ -755,7 +755,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 return (
                     <div key={mode} className={`flex flex-1 items-center relative ${reviewMode === mode ? 'z-10' : 'z-0'}`}>
                         {i > 0 && (
-                            <div className="border-l border-gray-200 h-6 mx-1 relative z-0" />
+                            <div className="border-l border-gray-200 dark:border-gray-700/50 h-5 relative z-0" />
                         )}
                         <button
                             onClick={() => handleModeChange(mode)}
