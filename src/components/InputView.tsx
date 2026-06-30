@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Category, CATEGORIES } from "@/types/vocab";
 import { filterDuplicates } from "@/lib/vocab";
-import { Plus, Volume2, Upload, CheckCircle, AlertCircle, Info, Copy, Check, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Volume2, Upload, CheckCircle, AlertCircle, Info, Copy, Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 type InputMode = "single" | "bulk";
@@ -390,7 +390,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 disabled={isGeneratingMeaning || !term.trim()}
                                 className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
                             >
-                                {isGeneratingMeaning ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                {isGeneratingMeaning ? <div className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /> : <Sparkles size={12} />}
                                 AI生成
                             </button>
                         </div>
@@ -472,7 +472,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                     disabled={isGeneratingExample || !term.trim()}
                                     className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
                                 >
-                                    {isGeneratingExample ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                    {isGeneratingExample ? <div className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /> : <Sparkles size={12} />}
                                     AI生成
                                 </button>
                                 <select

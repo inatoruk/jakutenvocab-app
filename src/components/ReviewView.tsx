@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Vocab, Category, Status } from "@/types/vocab";
 import { processDecay, calcReviewDueAt } from "@/lib/vocab";
-import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Loader2, Sparkles, SendHorizontal, Plus, Check, X, Circle } from "lucide-react";
+import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Sparkles, SendHorizontal, Plus, Check, X, Circle } from "lucide-react";
 import { AppSettings } from "@/lib/settings";
 import nlp from "compromise";
 import { motion } from "framer-motion";
@@ -976,7 +976,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                     )}
                                                     {paraphraseResult === "incorrect" && (
                                                         aiChecking
-                                                            ? <><Loader2 size={14} className="animate-spin" /><span>AI判定中...</span></>
+                                                            ? <><div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /><span>AI判定中...</span></>
                                                             : <><X size={16} className="stroke-[3]" /><span>不正解</span></>
                                                     )}
                                                 </span>
@@ -1030,7 +1030,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         {/* AI IELTS ヒント */}
                                         {aiChecking && (
                                             <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-800/40 border border-amber-100 dark:border-amber-700/50 px-3 py-2">
-                                                <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
+                                                <div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin text-amber-500 shrink-0" />
                                                 <p className="text-xs text-amber-700 dark:text-amber-200">IELTSアドバイスを生成中...</p>
                                             </div>
                                         )}
@@ -1049,7 +1049,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                     disabled={registering}
                                                     className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300 dark:border-violet-700/60 bg-violet-50 dark:bg-violet-800/40 px-4 py-2 text-xs font-medium text-violet-700 dark:text-violet-200 hover:bg-violet-100 dark:hover:bg-violet-900/60 active:bg-violet-200 dark:active:bg-violet-900/70 transition-colors disabled:opacity-50"
                                                 >
-                                                    {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                                    {registering ? <div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /> : <Plus size={14} />}
                                                     別解として登録
                                                 </button>
                                             </div>
@@ -1264,7 +1264,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                     )}
                                                     {paraphraseResult === "incorrect" && (
                                                         aiChecking
-                                                            ? <><Loader2 size={14} className="animate-spin" /><span>AI判定中...</span></>
+                                                            ? <><div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /><span>AI判定中...</span></>
                                                             : <><X size={16} className="stroke-[3]" /><span>不正解</span></>
                                                     )}
                                                 </span>
@@ -1295,7 +1295,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     {/* AIヒント */}
                                     {isWritingCard && aiChecking && (
                                         <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-800/40 border border-amber-100 dark:border-amber-700/50 px-3 py-2">
-                                            <Loader2 size={14} className="animate-spin text-amber-500 shrink-0" />
+                                            <div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin text-amber-500 shrink-0" />
                                             <p className="text-xs text-amber-700 dark:text-amber-200">AIアドバイスを生成中...</p>
                                         </div>
                                     )}
@@ -1314,7 +1314,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                                 disabled={registering}
                                                 className="inline-flex items-center gap-1.5 rounded-lg border border-pink-300 dark:border-pink-700/60 bg-pink-50 dark:bg-pink-800/40 px-4 py-2 text-xs font-medium text-pink-700 dark:text-pink-200 hover:bg-pink-100 dark:hover:bg-pink-900/60 active:bg-pink-200 dark:active:bg-pink-900/70 transition-colors disabled:opacity-50"
                                             >
-                                                {registering ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                                {registering ? <div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /> : <Plus size={14} />}
                                                 別解として登録
                                             </button>
                                         </div>
