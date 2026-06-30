@@ -748,8 +748,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 };
                 const activeColors: Record<ReviewMode, string> = {
                     unlearned: "bg-blue-600 shadow-sm",
-                    all: "bg-emerald-500 shadow-sm",
-                    writing: "bg-pink-500 shadow-sm",
+                    all: "bg-emerald-550 shadow-sm",
+                    writing: "bg-pink-550 shadow-sm",
                     paraphrase: "bg-violet-600 shadow-sm",
                 };
                 return (
@@ -1005,7 +1005,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* 例文（完成形） */}
                                         {currentCard.context && (
-                                            <p className="text-sm leading-relaxed text-slate-500 dark:text-gray-200 text-center mt-1">
+                                            <p className="text-sm leading-relaxed text-slate-500 dark:text-gray-200 text-center">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1286,7 +1286,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                         <p className="text-base text-slate-600 dark:text-gray-400">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
-                                            <p className="text-sm text-slate-500 dark:text-gray-200 mt-1 leading-relaxed">
+                                            <p className="text-sm text-slate-500 dark:text-gray-200 leading-relaxed">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
