@@ -748,7 +748,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 };
                 const activeColors: Record<ReviewMode, string> = {
                     unlearned: "bg-blue-600 shadow-sm",
-                    all: "bg-emerald-600 shadow-sm",
+                    all: "bg-emerald-500 shadow-sm",
                     writing: "bg-pink-500 shadow-sm",
                     paraphrase: "bg-violet-600 shadow-sm",
                 };
@@ -842,7 +842,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         return (
             <div className="flex-1 flex flex-col">
                 {/* モード切替 */}
-                <div key="mode-toggle-container" className={`shrink-0 relative z-20 ${showAnswer ? "mb-3 md:mb-2" : "mb-5 md:mb-3"}`}>
+                <div key="mode-toggle-container" className={`shrink-0 relative z-20 ${showAnswer ? "mb-3 md:mb-2" : "mb-5"}`}>
                     {modeToggle}
                 </div>
 
@@ -864,7 +864,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 <div className={`flex-1 flex flex-col justify-center items-center ${showAnswer ? "py-3 md:py-2" : "py-4 md:py-3"}`}>
                     {/* カードとカテゴリをまとめるラッパー */}
                     <div className="w-full flex flex-col items-center shrink-0 gap-4">
-                        <div className={`w-full rounded-2xl border border-violet-200 dark:border-violet-800 bg-white dark:bg-gray-800 shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
+                        <div className={`w-full rounded-2xl border border-violet-200 dark:border-violet-800 bg-white dark:bg-gray-800 shadow-sm min-h-[240px] flex flex-col p-6 relative z-50 ${
+                            showAnswer ? "justify-between" : "justify-start"
+                        }
                             ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                             ${animationState === "flipping-in" ? "animate-flip-in" : ""}
                             ${animationState === "swiping-out" ? "animate-swipe-out" : ""}
@@ -874,7 +876,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                             {!showAnswer ? (
                                 /* ── 出題面 ── */
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-3">
+                                    <div className="flex flex-col space-y-3">
                                         <p className="text-xs font-semibold text-violet-400 text-center uppercase tracking-widest">
                                             Paraphrase — 言い換えを答えよ
                                         </p>
@@ -927,7 +929,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         )}
                                     </div>
                                     {/* アクションボタン */}
-                                    <div className="flex justify-center gap-3 pt-3 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-5 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
@@ -1135,7 +1137,9 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
 
                     {/* カード */}
-                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
+                    <div className={`w-full rounded-2xl border bg-white shadow-sm min-h-[240px] flex flex-col p-6 relative z-50 ${
+                        (isWritingCard && !showAnswer) ? "justify-start" : "justify-between"
+                    }
                         ${isWritingCard ? "border-pink-200" : "border-gray-200"}
                         ${animationState === "flipping-out" ? "animate-flip-out" : ""}
                         ${animationState === "flipping-in" ? "animate-flip-in" : ""}
@@ -1146,7 +1150,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                         {!showAnswer ? (
                             isWritingCard ? (
                                 <>
-                                    <div className="flex-1 flex flex-col justify-center space-y-3">
+                                    <div className="flex flex-col space-y-3">
                                         <p className="text-xs font-semibold text-pink-400 text-center uppercase tracking-widest">
                                             Writing — 単語を答えよ
                                         </p>
@@ -1184,7 +1188,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex justify-center gap-3 pt-3 shrink-0">
+                                    <div className="flex justify-center gap-3 pt-5 shrink-0">
                                         <button
                                             onClick={() => { setShowAnswer(true); setParaphraseResult(null); }}
                                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm border text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:hover:text-white dark:active:bg-gray-900"
