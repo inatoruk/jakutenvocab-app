@@ -138,9 +138,9 @@ export default function Home() {
         <div className="mx-auto max-w-lg flex">
           <button
             onClick={() => handleTabChange("input")}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${tab === "input"
+            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium ${tab === "input"
               ? "text-blue-600"
-              : "text-gray-400 hover:text-gray-600"
+              : "text-gray-400 hover:text-gray-600 transition-colors duration-150"
               }`}
           >
             <PenLine size={20} />
@@ -148,9 +148,9 @@ export default function Home() {
           </button>
           <button
             onClick={() => handleTabChange("list")}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${tab === "list"
+            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium ${tab === "list"
               ? "text-blue-600"
-              : "text-gray-400 hover:text-gray-600"
+              : "text-gray-400 hover:text-gray-600 transition-colors duration-150"
               }`}
           >
             <List size={20} />
@@ -158,9 +158,9 @@ export default function Home() {
           </button>
           <button
             onClick={() => handleTabChange("review")}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${tab === "review"
+            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium ${tab === "review"
               ? "text-blue-600"
-              : "text-gray-400 hover:text-gray-600"
+              : "text-gray-400 hover:text-gray-600 transition-colors duration-150"
               }`}
           >
             <BookOpen size={20} />
