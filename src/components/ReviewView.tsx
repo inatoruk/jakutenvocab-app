@@ -748,7 +748,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 };
                 const activeColors: Record<ReviewMode, string> = {
                     unlearned: "bg-blue-600 shadow-sm",
-                    all: "bg-emerald-500 shadow-sm",
+                    all: "bg-orange-500 shadow-sm",
                     writing: "bg-pink-500 shadow-sm",
                     paraphrase: "bg-violet-600 shadow-sm",
                 };
