@@ -842,7 +842,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         return (
             <div className="flex-1 flex flex-col">
                 {/* モード切替 */}
-                <div key="mode-toggle-container" className="shrink-0 mb-4 md:mb-3 relative z-20">
+                <div key="mode-toggle-container" className={`shrink-0 relative z-20 ${showAnswer ? "mb-3 md:mb-2" : "mb-5 md:mb-3"}`}>
                     {modeToggle}
                 </div>
 
@@ -861,7 +861,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                 </div>
 
                 {/* カード & カテゴリ表示 (残りの領域で中央寄せ) */}
-                <div className="flex-1 flex flex-col justify-center items-center py-4 md:py-3">
+                <div className={`flex-1 flex flex-col justify-center items-center ${showAnswer ? "py-3 md:py-2" : "py-4 md:py-3"}`}>
                     {/* カードとカテゴリをまとめるラッパー */}
                     <div className="w-full flex flex-col items-center shrink-0 gap-4">
                         <div className={`w-full rounded-2xl border border-violet-200 dark:border-violet-800 bg-white dark:bg-gray-800 shadow-sm min-h-[240px] flex flex-col justify-between p-6 relative z-50
@@ -1105,7 +1105,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             {/* モード切替 */}
             <div key="mode-toggle-container" className={`shrink-0 relative z-20 ${
                 reviewMode === "writing"
-                    ? (showAnswer ? "mb-3" : "mb-5")
+                    ? (showAnswer ? "mb-3 md:mb-2" : "mb-5")
                     : "mb-5"
             }`}>
                 {modeToggle}
@@ -1126,7 +1126,11 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
             </div>
 
             {/* コンテンツエリア (残りの領域で中央寄せ) */}
-            <div className={`flex-1 flex flex-col justify-center items-center ${reviewMode === "writing" ? "py-4 md:py-3" : "py-4"}`}>
+            <div className={`flex-1 flex flex-col justify-center items-center ${
+                reviewMode === "writing"
+                    ? (showAnswer ? "py-3 md:py-2" : "py-4 md:py-3")
+                    : "py-4"
+            }`}>
                 {/* カード & カテゴリ表示 */}
                 <div className="w-full flex flex-col items-center shrink-0 gap-4 px-2">
 
