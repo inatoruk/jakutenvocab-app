@@ -1005,7 +1005,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
 
                                         {/* 例文（完成形） */}
                                         {currentCard.context && (
-                                            <p className="text-sm leading-relaxed text-slate-500 dark:text-gray-200 text-center">
+                                            <p className="text-sm leading-relaxed text-slate-700 dark:text-gray-200 text-center bg-violet-50 dark:bg-violet-300/[0.06] border border-transparent dark:border-violet-300/15 rounded-lg px-2.5 py-1">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
@@ -1286,7 +1286,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">{currentCard.term}</p>
                                         <p className="text-base text-slate-600 dark:text-gray-400">{currentCard.meaning}</p>
                                         {isWritingCard && currentCard.context && (
-                                            <p className="text-sm text-slate-500 dark:text-gray-200 leading-relaxed">
+                                            <p className="text-sm text-slate-700 dark:text-gray-200 leading-relaxed bg-pink-50 dark:bg-pink-300/[0.06] border border-transparent dark:border-pink-300/15 rounded-lg px-2.5 py-1">
                                                 {highlightTerm(currentCard.context, currentCard.term)}
                                             </p>
                                         )}
