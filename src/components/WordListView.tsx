@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Vocab, Category, CATEGORIES, Status } from "@/types/vocab";
 import { processDecay } from "@/lib/vocab";
-import { Search, X, Check, Loader2, Link2, Sparkles, Info, AlertCircle, Wand2, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, X, Check, Link2, Sparkles, Info, AlertCircle, Wand2, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
 // 表面上の3段階（内部ステータス 2〜5 はまとめて「習得済み」）
 // フィルター・バッジを 0 / 1 / 2 の 3段階で分類
@@ -685,7 +685,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     className="flex-[1.2] sm:flex-initial inline-flex items-center justify-center gap-1 rounded-lg bg-purple-600 px-2.5 py-2 sm:px-4 text-sm font-medium text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                                 >
                                     {grouping
-                                        ? <Loader2 size={14} className="animate-spin" />
+                                        ? <div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
                                         : <Link2 size={14} />
                                     }
                                     グループ化
@@ -746,7 +746,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                     disabled={isGeneratingMeaning || !editTerm.trim()}
                                     className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
                                 >
-                                    {isGeneratingMeaning ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                    {isGeneratingMeaning ? <div className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /> : <Sparkles size={12} />}
                                     AI生成
                                 </button>
                             </div>
@@ -780,7 +780,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                         disabled={isGeneratingExample || !editTerm.trim()}
                                         className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/80 dark:hover:bg-blue-900/30"
                                     >
-                                        {isGeneratingExample ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                        {isGeneratingExample ? <div className="w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /> : <Sparkles size={12} />}
                                         AI生成
                                     </button>
                                     <select
@@ -888,7 +888,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                 className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {saving ? (
-                                    <Loader2 size={16} className="animate-spin" />
+                                    <div className="w-4 h-4 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
                                 ) : (
                                     <Check size={16} />
                                 )}
@@ -1027,7 +1027,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                                                     disabled={approving}
                                                     className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 active:bg-violet-800 transition-colors disabled:opacity-50"
                                                 >
-                                                    {approving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                                    {approving ? <div className="w-3.5 h-3.5 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" /> : <Check size={14} />}
                                                     グループ化する
                                                 </button>
                                             )}
