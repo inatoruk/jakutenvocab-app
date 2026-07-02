@@ -146,10 +146,8 @@ export default function InputView({ onAdded }: InputViewProps) {
     }, []);
 
     useEffect(() => {
-        if (mode === "bulk") {
-            fetchExistingTerms();
-        }
-    }, [mode, fetchExistingTerms]);
+        fetchExistingTerms();
+    }, [fetchExistingTerms]);
 
     const parsedRows = parseRows(bulkText, delimiter);
     const duplicateRows = parsedRows.filter((row) =>
@@ -158,12 +156,21 @@ export default function InputView({ onAdded }: InputViewProps) {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (!term.trim() || !meaning.trim()) return;
+        const trimmedTerm = term.trim();
+        const trimmedMeaning = meaning.trim();
+        if (!trimmedTerm || !trimmedMeaning) return;
+
+        // 重複チェック (Writing 以外の場合)
+        if (category !== "Writing" && existingTerms.has(trimmedTerm.toLowerCase())) {
+            setSingleResult({ type: "error", message: "既に登録されている単語です" });
+            return;
+        }
+
         setLoading(true);
         setSingleResult(null);
         const { error } = await supabase.from("vocab").insert({
-            term: term.trim(),
-            meaning: meaning.trim(),
+            term: trimmedTerm,
+            meaning: trimmedMeaning,
             context: context.trim(),
             category,
             status: 0,
