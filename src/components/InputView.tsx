@@ -163,6 +163,7 @@ export default function InputView({ onAdded }: InputViewProps) {
         // 重複チェック (Writing 以外の場合)
         if (category !== "Writing" && existingTerms.has(trimmedTerm.toLowerCase())) {
             setSingleResult({ type: "error", message: "既に登録されている単語です" });
+            setTimeout(() => setSingleResult(null), 5000);
             return;
         }
 
@@ -371,7 +372,7 @@ export default function InputView({ onAdded }: InputViewProps) {
 
             {mode === "single" ? (
                 /* ── 1件ずつモード（既存） ── */
-                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-2.5">
+                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-2">
                     {/* 単語 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
