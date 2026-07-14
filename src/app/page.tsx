@@ -107,7 +107,7 @@ export default function Home() {
           style={{ display: tab !== "review" ? "flex" : "none" }}
           className="flex-1 flex-col"
         >
-          <div className="mx-auto w-full max-w-2xl px-4 py-5 flex-1 flex flex-col">
+          <div className="mx-auto w-full max-w-2xl px-4 py-4 flex-1 flex flex-col">
             <div style={{ display: tab === "input" ? "block" : "none" }}>
               <InputView onAdded={handleVocabMutated} />
             </div>
@@ -123,7 +123,7 @@ export default function Home() {
         {/* 復習タブのコンテンツ (表示時のみ flex になり、高さを確保) */}
         <div 
           style={{ display: tab === "review" ? "flex" : "none" }} 
-          className="flex-1 flex-col mx-auto w-full max-w-2xl px-4 py-5"
+          className="flex-1 flex-col mx-auto w-full max-w-2xl px-4 py-4"
         >
           <ReviewView
             active={tab === "review"}
