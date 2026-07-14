@@ -573,7 +573,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                     <button
                         type="submit"
                         disabled={loading || !term.trim() || !meaning.trim()}
-                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base md:text-sm font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={18} />
                         {loading ? "登録中..." : "登録"}
@@ -717,7 +717,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             type="button"
                             onClick={handleBulkSubmit}
                             disabled={bulkLoading || parsedRows.length === 0}
-                            className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base md:text-sm font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Upload size={18} />
                             {bulkLoading
