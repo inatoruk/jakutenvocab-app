@@ -372,7 +372,7 @@ export default function InputView({ onAdded }: InputViewProps) {
 
             {mode === "single" ? (
                 /* ── 1件ずつモード（既存） ── */
-                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-2">
+                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-2.5">
                     {/* 単語 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
