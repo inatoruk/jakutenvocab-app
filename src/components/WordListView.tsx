@@ -705,7 +705,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                         onClick={closeEdit}
                     />
                     <div
-                        className={`relative z-10 w-full max-w-2xl max-h-full overflow-y-auto bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl p-5 pb-8 space-y-4 ${isClosing ? "animate-slide-down" : "animate-slide-up"
+                        className={`relative z-10 w-full max-w-2xl max-h-full overflow-y-auto bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl p-5 pb-8 space-y-4 ${isClosing ? "animate-zoom-out" : "animate-zoom-in"
                             }`}
                         onClick={(e) => e.stopPropagation()}
                     >
@@ -905,7 +905,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={() => setShowAISuggestModal(false)}>
                         <div className="absolute inset-0 bg-black/50 animate-fade-in" />
                         <div
-                            className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-violet-100 dark:border-violet-900/60 overflow-hidden animate-slide-up"
+                            className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-violet-100 dark:border-violet-900/60 overflow-hidden animate-zoom-in"
                             onClick={e => e.stopPropagation()}
                         >
                             {/* ヘッダー */}

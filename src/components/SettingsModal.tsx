@@ -251,7 +251,7 @@ export default function SettingsModal({ settings, onChange, onClose, user }: Pro
       />
       <div
         className={`relative z-10 settings-modal w-full max-w-2xl max-h-full flex flex-col rounded-2xl shadow-2xl ${
-          isClosing ? "animate-slide-down" : "animate-slide-up"
+          isClosing ? "animate-zoom-out" : "animate-zoom-in"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -449,7 +449,7 @@ export default function SettingsModal({ settings, onChange, onClose, user }: Pro
                 />
                 <div
                   className={`relative z-10 w-full max-w-xs bg-white rounded-2xl shadow-2xl p-5 space-y-4 ${
-                    isExportClosing ? "animate-slide-down" : "animate-slide-up"
+                    isExportClosing ? "animate-zoom-out" : "animate-zoom-in"
                   }`}
                   onClick={e => e.stopPropagation()}
                 >

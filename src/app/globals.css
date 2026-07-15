@@ -14,35 +14,35 @@ body {
 
 
 
-/* モーダル用アニメーション */
-@keyframes slide-up {
+/* モーダル用アニメーション（中心からのズーム） */
+@keyframes zoom-in {
     from {
-        transform: translateY(16px) scale(0.97);
+        transform: scale(0.95);
         opacity: 0;
     }
     to {
-        transform: translateY(0) scale(1);
+        transform: scale(1);
         opacity: 1;
     }
 }
 
-.animate-slide-up {
-    animation: slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-zoom-in {
+    animation: zoom-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes slide-down {
+@keyframes zoom-out {
     from {
-        transform: translateY(0) scale(1);
+        transform: scale(1);
         opacity: 1;
     }
     to {
-        transform: translateY(16px) scale(0.97);
+        transform: scale(0.95);
         opacity: 0;
     }
 }
 
-.animate-slide-down {
-    animation: slide-down 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-zoom-out {
+    animation: zoom-out 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* 背景（オーバーレイ）用アニメーション */

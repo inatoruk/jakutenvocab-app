@@ -27,7 +27,7 @@ export default function LoginView() {
 
   return (
     <div className="min-h-dvh w-full flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 rounded-3xl shadow-xl p-8 space-y-8 animate-slide-up">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 rounded-3xl shadow-xl p-8 space-y-8 animate-zoom-in">
         {/* ロゴ・アプリ情報 */}
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="relative w-24 h-24 overflow-hidden rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800/80">
