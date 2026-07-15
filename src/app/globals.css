@@ -102,39 +102,7 @@ html[data-theme="dark"] body {
     color: var(--text-primary);
 }
 
-/* ダークモード: システム設定に従う (data-theme="system" かつ OS がダーク) */
-html[data-theme="system"] {
-    color-scheme: light dark;
-}
 
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] {
-        --bg-primary: #111827;
-        --bg-secondary: #1f2937;
-        --text-primary: #f9fafb;
-        --text-secondary: #d1d5db;
-        --text-muted: #6b7280;
-        --border-color: #374151;
-    }
-
-    html[data-theme="system"] body {
-        background-color: var(--bg-primary);
-        color: var(--text-primary);
-    }
-
-    /* ダークモード時のTailwindクラス上書き */
-    html[data-theme="system"] .bg-white { background-color: #1f2937 !important; }
-    html[data-theme="system"] .bg-gray-50 { background-color: #111827 !important; }
-    html[data-theme="system"] .bg-gray-100 { background-color: #1f2937 !important; }
-    html[data-theme="system"] .text-gray-800,
-    html[data-theme="system"] .text-gray-900 { color: #f9fafb !important; }
-    html[data-theme="system"] .text-gray-600,
-    html[data-theme="system"] .text-gray-700 { color: #d1d5db !important; }
-    html[data-theme="system"] .text-gray-400,
-    html[data-theme="system"] .text-gray-500 { color: #6b7280 !important; }
-    html[data-theme="system"] .border-gray-200 { border-color: #374151 !important; }
-    html[data-theme="system"] .border-gray-300 { border-color: #4b5563 !important; }
-}
 
 html[data-theme="dark"] .bg-white { background-color: #1f2937 !important; }
 html[data-theme="dark"] .bg-gray-50 { background-color: #111827 !important; }
@@ -157,17 +125,9 @@ html[data-theme="dark"] .border-gray-300 { border-color: #4b5563 !important; }
     color: #111827;
 }
 
-html[data-theme="dark"] .settings-modal,
-html[data-theme="system"] .settings-modal {
+html[data-theme="dark"] .settings-modal {
     background-color: #1f2937;
     color: #f9fafb;
-}
-
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .settings-modal {
-        background-color: #1f2937;
-        color: #f9fafb;
-    }
 }
 
 .settings-text-primary { color: #111827; }
@@ -228,27 +188,7 @@ html[data-theme="dark"] .settings-btn-secondary {
 html[data-theme="dark"] .settings-btn-secondary:hover { background-color: #4b5563; }
 html[data-theme="dark"] .settings-toggle-off { background-color: #4b5563; }
 
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .settings-text-primary { color: #f9fafb; }
-    html[data-theme="system"] .settings-text-secondary { color: #d1d5db; }
-    html[data-theme="system"] .settings-text-muted { color: #6b7280; }
-    html[data-theme="system"] .settings-section-label { color: #9ca3af; }
-    html[data-theme="system"] .settings-divider { border-color: #374151; }
-    html[data-theme="system"] .settings-btn-inactive {
-        background-color: #374151;
-        color: #d1d5db;
-        border-color: #4b5563;
-    }
-    html[data-theme="system"] .settings-btn-inactive:hover { background-color: #4b5563; }
-    html[data-theme="system"] .settings-btn-ghost:hover { background-color: #374151; color: #d1d5db; }
-    html[data-theme="system"] .settings-btn-secondary {
-        background-color: #374151;
-        color: #d1d5db;
-        border-color: #4b5563;
-    }
-    html[data-theme="system"] .settings-btn-secondary:hover { background-color: #4b5563; }
-    html[data-theme="system"] .settings-toggle-off { background-color: #4b5563; }
-}
+
 
 /* フィルターボタン（アクティブ状態） */
 .filter-btn-active {
@@ -263,13 +203,7 @@ html[data-theme="dark"] .filter-btn-active {
     border-color: #e5e7eb !important;
 }
 
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .filter-btn-active {
-        background-color: #e5e7eb !important;
-        color: #000000 !important;
-        border-color: #e5e7eb !important;
-    }
-}
+
 
 /* セグメントコントロール（アクティブ状態） */
 .segmented-btn-active {
@@ -283,12 +217,7 @@ html[data-theme="dark"] .segmented-btn-active {
     color: #ffffff !important;
 }
 
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .segmented-btn-active {
-        background-color: #374151 !important;
-        color: #ffffff !important;
-    }
-}
+
 
 /* ============================================
    設定モーダルのユーザーアカウント情報カードスタイル
@@ -348,34 +277,7 @@ html[data-theme="dark"] .settings-btn-danger:hover {
     background-color: #7f1d1d !important;
 }
 
-/* システム設定（ダークモード自動切り替え時） */
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .settings-user-card {
-        background-color: #1e293b !important;
-        border-color: #334155 !important;
-    }
-    html[data-theme="system"] .settings-avatar-border {
-        border-color: #475569 !important;
-    }
-    html[data-theme="system"] .settings-avatar-fallback {
-        background-color: #1e3a8a !important;
-        color: #93c5fd !important;
-    }
-    html[data-theme="system"] .settings-user-name {
-        color: #f8fafc !important;
-    }
-    html[data-theme="system"] .settings-user-email {
-        color: #94a3b8 !important;
-    }
-    html[data-theme="system"] .settings-btn-danger {
-        background-color: #450a0a !important;
-        color: #fca5a5 !important;
-        border-color: #7f1d1d !important;
-    }
-    html[data-theme="system"] .settings-btn-danger:hover {
-        background-color: #7f1d1d !important;
-    }
-}
+
 
 /* AI生成中・ローディング用のスケルトン表示 */
 @keyframes skeleton-reveal {
@@ -497,47 +399,22 @@ html[data-theme="dark"] .animate-shimmer-input {
 }
 
 /* ダークモード */
-html[data-theme="dark"] .speak-button,
-html[data-theme="system"] .speak-button {
+html[data-theme="dark"] .speak-button {
     background-color: #1f2937; /* bg-gray-800 equivalent */
     border-color: #374151; /* border-gray-700 equivalent */
     color: #d1d5db; /* text-gray-300 equivalent */
 }
 
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .speak-button {
-        background-color: #1f2937;
-        border-color: #374151;
-        color: #d1d5db;
-    }
-}
-
 /* ダークモードホバー */
-html[data-theme="dark"] .speak-button:hover:not(:disabled),
-html[data-theme="system"] .speak-button:hover:not(:disabled) {
+html[data-theme="dark"] .speak-button:hover:not(:disabled) {
     background-color: #374151; /* bg-gray-700 equivalent */
     border-color: #4b5563; /* border-gray-600 equivalent */
     color: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .speak-button:hover:not(:disabled) {
-        background-color: #374151;
-        border-color: #4b5563;
-        color: #ffffff;
-    }
-}
-
 /* ダークモードアクティブ */
-html[data-theme="dark"] .speak-button:active:not(:disabled),
-html[data-theme="system"] .speak-button:active:not(:disabled) {
+html[data-theme="dark"] .speak-button:active:not(:disabled) {
     background-color: #111827; /* bg-gray-900 equivalent */
-}
-
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .speak-button:active:not(:disabled) {
-        background-color: #111827;
-    }
 }
 
 /* コピーアイコン用スタイル（Tailwind !important 回避） */
@@ -551,27 +428,13 @@ html[data-theme="system"] .speak-button:active:not(:disabled) {
 }
 
 /* ダークモード */
-html[data-theme="dark"] .copy-btn-icon,
-html[data-theme="system"] .copy-btn-icon {
+html[data-theme="dark"] .copy-btn-icon {
     color: #6b7280; /* text-gray-500 */
 }
 
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .copy-btn-icon {
-        color: #6b7280;
-    }
-}
-
 /* ダークモードホバー */
-html[data-theme="dark"] .copy-btn-icon:hover,
-html[data-theme="system"] .copy-btn-icon:hover {
+html[data-theme="dark"] .copy-btn-icon:hover {
     color: #d1d5db; /* text-gray-300 */
-}
-
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] .copy-btn-icon:hover {
-        color: #d1d5db;
-    }
 }
 
 /* ============================================

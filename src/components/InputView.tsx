@@ -66,6 +66,7 @@ export default function InputView({ onAdded }: InputViewProps) {
 
     // Single mode states
     const [term, setTerm] = useState("");
+    const [termError, setTermError] = useState("");
     const [meaning, setMeaning] = useState("");
     const [context, setContext] = useState("");
     const [category, setCategory] = useState<Category>("Vocab");
@@ -79,10 +80,24 @@ export default function InputView({ onAdded }: InputViewProps) {
     const [isGeneratingExample, setIsGeneratingExample] = useState(false);
     const [exampleLevel, setExampleLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
 
+    const TERM_REGEX = /^[A-Za-z\s'\-]+$/;
+
+    function validateTerm(value: string): string {
+        if (!value.trim()) return "";
+        if (value.length > 30) return "30文字以内で入力してください";
+        if (!TERM_REGEX.test(value)) return "英字・スペース・ハイフン・アポストロフィのみ使用できます";
+        return "";
+    }
+
     const generateAIContent = async (type: 'meaning' | 'example') => {
         if (!term.trim()) {
             setSingleResult({ type: "error", message: "単語を入力してください" });
             setTimeout(() => setSingleResult(null), 3000);
+            return;
+        }
+        const validationError = validateTerm(term);
+        if (validationError) {
+            setTermError(validationError);
             return;
         }
 
@@ -159,6 +174,13 @@ export default function InputView({ onAdded }: InputViewProps) {
         const trimmedTerm = term.trim();
         const trimmedMeaning = meaning.trim();
         if (!trimmedTerm || !trimmedMeaning) return;
+
+        // 単語バリデーション
+        const validationError = validateTerm(trimmedTerm);
+        if (validationError) {
+            setTermError(validationError);
+            return;
+        }
 
         // 重複チェック (Writing 以外の場合)
         if (category !== "Writing" && existingTerms.has(trimmedTerm.toLowerCase())) {
@@ -381,9 +403,21 @@ export default function InputView({ onAdded }: InputViewProps) {
                         <input
                             type="text"
                             value={term}
-                            onChange={(e) => setTerm(e.target.value)}
-                            className="block w-full rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setTerm(val);
+                                setTermError(validateTerm(val));
+                            }}
+                            maxLength={30}
+                            className={`block w-full rounded-lg border px-4 py-3 md:py-2.5 text-base md:text-sm focus:outline-none focus:ring-1 ${
+                                termError
+                                    ? "border-red-400 focus:border-red-500 focus:ring-red-500"
+                                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            }`}
                         />
+                        {termError && (
+                            <p className="mt-1 text-xs text-red-500">{termError}</p>
+                        )}
                     </div>
 
                     {/* 意味 */}

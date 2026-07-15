@@ -30,11 +30,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const item = localStorage.getItem('vocab_settings');
-                let theme = 'system';
+                const item = localStorage.getItem('toeic-app-settings');
+                let theme = 'light';
                 if (item) {
                   const parsed = JSON.parse(item);
-                  if (parsed.theme) theme = parsed.theme;
+                  if (parsed.theme === 'dark') theme = 'dark';
                 }
                 document.documentElement.setAttribute('data-theme', theme);
               } catch (e) {}

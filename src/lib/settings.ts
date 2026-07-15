@@ -1,7 +1,7 @@
 
 export type ReviewOrder = "random" | "newest" | "oldest";
 export type ReviewCount = 10 | 20 | 50 | 9999;
-export type ThemeMode = "light" | "dark" | "system";
+export type ThemeMode = "light" | "dark";
 
 export interface AppSettings {
   theme: ThemeMode;
@@ -11,7 +11,7 @@ export interface AppSettings {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  theme: "system",
+  theme: "light",
   autoSpeak: true,
   reviewCount: 20,
   reviewOrder: "random",

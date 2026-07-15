@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Moon, Volume2, Hash, Shuffle, Download, Upload, Trash2, Sun, Monitor } from "lucide-react";
+import { X, Moon, Volume2, Hash, Shuffle, Download, Upload, Trash2, Sun } from "lucide-react";
 import { User } from "@supabase/supabase-js";
 import {
   AppSettings,
@@ -24,7 +24,6 @@ interface Props {
 const THEME_OPTIONS: { value: ThemeMode; label: string; icon: React.ReactNode }[] = [
   { value: "light", label: "ライト", icon: <Sun size={14} /> },
   { value: "dark", label: "ダーク", icon: <Moon size={14} /> },
-  { value: "system", label: "自動", icon: <Monitor size={14} /> },
 ];
 
 const COUNT_OPTIONS: { value: ReviewCount; label: string }[] = [
@@ -245,7 +244,7 @@ export default function SettingsModal({ settings, onChange, onClose, user }: Pro
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className={`absolute inset-0 bg-black/50 backdrop-blur-sm ${
+        className={`absolute inset-0 bg-black/50 ${
           isClosing ? "animate-fade-out" : "animate-fade-in"
         }`}
         onClick={handleClose}
@@ -443,7 +442,7 @@ export default function SettingsModal({ settings, onChange, onClose, user }: Pro
             {showExportModal && (
               <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                 <div
-                  className={`absolute inset-0 bg-black/50 backdrop-blur-sm ${
+                  className={`absolute inset-0 bg-black/50 ${
                     isExportClosing ? "animate-fade-out" : "animate-fade-in"
                   }`}
                   onClick={handleCloseExport}

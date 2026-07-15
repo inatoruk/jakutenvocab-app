@@ -700,7 +700,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
             {editingWord && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
-                        className={`absolute inset-0 bg-black/40 backdrop-blur-sm ${isClosing ? "animate-fade-out" : "animate-fade-in"
+                        className={`absolute inset-0 bg-black/40 ${isClosing ? "animate-fade-out" : "animate-fade-in"
                             }`}
                         onClick={closeEdit}
                     />
@@ -903,9 +903,9 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
                 const currentSuggestion = aiSuggestions[aiSuggestIndex] ?? null;
                 return (
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={() => setShowAISuggestModal(false)}>
-                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+                        <div className="absolute inset-0 bg-black/50 animate-fade-in" />
                         <div
-                            className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-violet-100 dark:border-violet-900/60 overflow-hidden"
+                            className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-violet-100 dark:border-violet-900/60 overflow-hidden animate-slide-up"
                             onClick={e => e.stopPropagation()}
                         >
                             {/* ヘッダー */}

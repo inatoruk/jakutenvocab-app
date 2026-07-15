@@ -218,6 +218,21 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         fetchParaphraseGroups();
     }, [vocabVersion, fetchAndBuildSession, fetchParaphraseGroups]);
 
+    // 設定変更時（復習件数・出題順など）は即座にセッションを再構築
+    const settingsInitialized = useRef(false);
+    useEffect(() => {
+        if (!settingsInitialized.current) {
+            settingsInitialized.current = true;
+            return;
+        }
+        // allCards が空の場合（ローディング中）はスキップ
+        if (allCardsRef.current.length === 0) return;
+        setSessionCards(buildSession(allCardsRef.current, reviewModeRef.current, settings));
+        setCurrentIndex(0);
+        setShowAnswer(false);
+        setShowCompletion(false);
+    }, [settings]);
+
     // ─── 現在のカード ──────────────────────────────────────────────────────────
 
     const currentCard = sessionCards[currentIndex] ?? null;
