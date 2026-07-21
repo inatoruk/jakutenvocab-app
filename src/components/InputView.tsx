@@ -235,6 +235,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                 type: "error",
                 message: `全 ${skipped.length} 件が既に登録済みのためスキップしました`,
             });
+            setTimeout(() => setBulkResult(null), 10000);
             return;
         }
 
@@ -248,6 +249,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                 type: "success",
                 message: `${toInsert.length}件を登録しました${skipMsg}`,
             });
+            setTimeout(() => setBulkResult(null), 10000);
             setBulkText("");
             await fetchExistingTerms();
             onAdded?.();
@@ -471,7 +473,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                                         <Info size={14} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
                                     </button>
                                     <div 
-                                        className="absolute left-full ml-3 top-1/2 -translate-y-[90px] md:-translate-y-1/2 w-[310px] md:w-[580px] transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-left after:content-[''] after:absolute after:right-full after:top-0 after:w-4 after:h-full opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
+                                        className="absolute left-full ml-3 top-1/2 -translate-y-[90px] md:-translate-y-[30%] w-[310px] md:w-[580px] transition-all duration-300 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-xs rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg z-50 leading-normal text-left origin-left after:content-[''] after:absolute after:right-full after:top-0 after:w-4 after:h-full opacity-0 invisible pointer-events-none transform-gpu antialiased scale-95 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:scale-100"
                                     >
                                         <p className="mb-2">登録する単語と例文内の単語の形（時制や単複など）が異なっていても、自動的に認識されます。例文がない、または用意が難しい場合は、空欄のままでも通常の単語カードとして登録・利用できます。ただし、単語は例文とセットで覚える方が、状況や文脈のイメージと結びついて記憶に残りやすいためおすすめです。</p>
 
@@ -534,9 +536,9 @@ export default function InputView({ onAdded }: InputViewProps) {
                             <textarea
                                 value={context}
                                 onChange={(e) => setContext(e.target.value)}
-                                rows={isMobile ? 3 : 2}
+                                rows={3}
                                 suppressHydrationWarning
-                                className="block w-full h-[102px] md:h-[66px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                                className="block w-full h-[102px] md:h-[88px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                             />
                             <div
                                 className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input transition-opacity duration-500 ${
