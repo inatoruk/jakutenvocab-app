@@ -782,7 +782,7 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                                     layoutId="reviewModeIndicator"
                                     className={`absolute inset-0 rounded-md ${activeColors[mode]}`}
                                     style={{ zIndex: 0 }}
-                                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                                    transition={{ duration: 0.2, ease: "easeOut" }}
                                 />
                             )}
                             <span className="relative z-10">{labels[mode]}</span>
