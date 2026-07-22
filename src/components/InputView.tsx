@@ -366,7 +366,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                         >
                             <p className="font-semibold mb-1">複数の単語をまとめて登録できる機能です。</p>
                             <p className="mb-1.5"><strong>【入力方法】</strong><br />「単語」「意味」「例文」の間を選択した区切り文字（標準はタブ）で区切って、1行に1単語ずつ入力してください。<br />(例: compromise [タブ] 妥協する [タブ] They had to...)</p>
-                            <p className="mb-2">
+                            <p className="mb-2 text-gray-500 dark:text-gray-200">
                                 ※ 例文は省略しても大丈夫です。<br />
                                 ※ Excelやスプレッドシートの表をそのままコピー＆ペーストすると、自動的に「タブ」で区切られて綺麗に入力できます。<br />
                                 ※ すでに登録済みの単語は、重複登録を防ぐために自動でスキップされます。
