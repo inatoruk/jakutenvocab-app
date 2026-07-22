@@ -94,7 +94,7 @@ Output format (strict JSON array of suggestion objects):
 If no new paraphrase groups are found, return an empty array: []`;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-3.1-flash-lite',
+            model: 'gemini-3.5-flash-lite',
             contents: prompt,
             config: { temperature: 0.6 }
         });
