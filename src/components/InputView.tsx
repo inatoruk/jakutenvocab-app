@@ -314,7 +314,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             layoutId="inputModeIndicator"
                             className="absolute inset-0 rounded-md bg-white shadow-sm"
                             style={{ zIndex: 0 }}
-                            transition={{ type: "spring", bounce: 0 }}
+                            transition={{ type: "spring", duration: 0.15, bounce: 0 }}
                         />
                     )}
                     <span className="relative z-10 block" style={{ transform: "translateZ(0)" }}>1件ずつ</span>
@@ -344,7 +344,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                             layoutId="inputModeIndicator"
                             className="absolute inset-0 rounded-md bg-white shadow-sm"
                             style={{ zIndex: 0 }}
-                            transition={{ type: "spring", bounce: 0 }}
+                            transition={{ type: "spring", duration: 0.15, bounce: 0 }}
                         />
                     )}
                     <div className="relative z-10 flex h-full w-full items-center justify-center gap-1.5" style={{ transform: "translateZ(0)" }}>
