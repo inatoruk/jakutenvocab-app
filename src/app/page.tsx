@@ -93,7 +93,7 @@ export default function Home() {
             id="settings-button"
             onClick={() => setShowSettings(true)}
             aria-label="設定を開く"
-            className="absolute right-0 rounded-full p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+            className="absolute right-0 rounded-full p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700 dark:active:bg-gray-600 transition-colors"
           >
             <Settings size={20} />
           </button>
