@@ -657,7 +657,7 @@ export default function WordListView({ active, onMutated }: { active: boolean; o
 
             {/* グループ化モード：スティッキーアクションバー */}
             {isGroupMode && (
-                <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none">
+                <div className="fixed bottom-20 left-0 right-0 z-[45] px-4 pointer-events-none">
                     <div className="mx-auto max-w-2xl pointer-events-auto">
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-purple-200 dark:border-purple-900/60 bg-white dark:bg-gray-900 selection-action-bar px-4 py-3">
                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center sm:text-left flex-1 min-w-0">
