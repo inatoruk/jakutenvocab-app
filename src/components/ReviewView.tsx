@@ -763,13 +763,14 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         );
     }
 
+    const activeModeIndex = REVIEW_MODES.indexOf(reviewMode);
     const modeToggle = (
         <div ref={modeToggleRef} className="relative flex rounded-lg border border-gray-200 bg-gray-100 p-1">
             <JellyTabIndicator
                 id="reviewMode"
                 containerRef={modeToggleRef}
                 itemRefs={modeButtonRefs}
-                activeIndex={REVIEW_MODES.indexOf(reviewMode)}
+                activeIndex={activeModeIndex}
                 className={`z-[1] rounded-md transition-colors duration-300 ${REVIEW_MODE_ACTIVE_COLORS[reviewMode]}`}
             />
             {REVIEW_MODES.map((mode, i) => {
@@ -779,10 +780,14 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
                     writing: "Writing",
                     paraphrase: "Paraphrase",
                 };
+                // 選択中のタブの両隣（左側 = i、右側 = i + 1）の仕切りは消す
+                const hideDivider = i === activeModeIndex || i === activeModeIndex + 1;
                 return (
                     <div key={mode} className="flex flex-1 items-center">
                         {i > 0 && (
-                            <div className="border-l border-gray-200 dark:border-gray-700/50 h-5 relative z-0" />
+                            <div
+                                className={`border-l border-gray-200 dark:border-gray-700/50 h-5 relative z-0 transition-opacity duration-200 ${hideDivider ? "opacity-0" : "opacity-100"}`}
+                            />
                         )}
                         <button
                             ref={(el) => { modeButtonRefs.current[i] = el; }}
