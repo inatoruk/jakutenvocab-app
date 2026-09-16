@@ -13,7 +13,7 @@ import {
 // 進行方向側の端（先端）は硬く速いバネですぐ動き、
 // 反対側の端（後端）は一拍置いてから追いかける → 途中で大きく伸びて「ムニョン」と収まる
 const LEADING_SPRING = { type: "spring", stiffness: 1100, damping: 58 } as const;
-const TRAILING_SPRING = { type: "spring", stiffness: 700, damping: 36, mass: 0.7, delay: 0.14 } as const;
+const TRAILING_SPRING = { type: "spring", stiffness: 1300, damping: 52, mass: 0.7, delay: 0.14 } as const;
 
 // 画面の分岐でトグルが再マウントされても前の位置から動けるよう、id ごとに最後の位置を覚えておく
 const lastPositions = new Map<string, { left: number; right: number }>();
