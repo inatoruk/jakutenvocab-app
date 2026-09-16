@@ -8,7 +8,7 @@ import { processDecay, calcReviewDueAt } from "@/lib/vocab";
 import { Volume2, Eye, RotateCcw, ChevronRight, Shuffle, CheckCircle, BookOpen, Link2, Sparkles, SendHorizontal, Plus, Check, X, Circle } from "lucide-react";
 import { AppSettings } from "@/lib/settings";
 import nlp from "compromise";
-import { motion } from "framer-motion";
+import JellyTabIndicator from "./JellyTabIndicator";
 
 const animationStyles = `
 @keyframes swipe-out-tl {
@@ -22,6 +22,15 @@ const animationStyles = `
 
 
 type ReviewMode = "unlearned" | "all" | "writing" | "paraphrase";
+
+const REVIEW_MODES: ReviewMode[] = ["unlearned", "all", "writing", "paraphrase"];
+
+const REVIEW_MODE_ACTIVE_COLORS: Record<ReviewMode, string> = {
+    unlearned: "bg-blue-600 shadow-sm",
+    all: "bg-orange-500 shadow-sm",
+    writing: "bg-pink-500 shadow-sm",
+    paraphrase: "bg-violet-600 shadow-sm",
+};
 
 const CATEGORY_STYLES: Record<Category, string> = {
     Vocab: "bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-800",
@@ -135,6 +144,8 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     const [showAnswer, setShowAnswer] = useState(false);
     const [loading, setLoading] = useState(true);
     const [reviewMode, setReviewMode] = useState<ReviewMode>("unlearned");
+    const modeToggleRef = useRef<HTMLDivElement>(null);
+    const modeButtonRefs = useRef<(HTMLElement | null)[]>([]);
     const [showCompletion, setShowCompletion] = useState(false);
     const [animationState, setAnimationState] = useState<"idle" | "flipping-out" | "flipping-in" | "swiping-out" | "swiping-out-left" | "swiping-in">("idle");
 
@@ -753,38 +764,32 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
     }
 
     const modeToggle = (
-        <div className="flex rounded-lg border border-gray-200 bg-gray-100 p-1">
-            {(["unlearned", "all", "writing", "paraphrase"] as ReviewMode[]).map((mode, i, arr) => {
+        <div ref={modeToggleRef} className="relative flex rounded-lg border border-gray-200 bg-gray-100 p-1">
+            <JellyTabIndicator
+                id="reviewMode"
+                containerRef={modeToggleRef}
+                itemRefs={modeButtonRefs}
+                activeIndex={REVIEW_MODES.indexOf(reviewMode)}
+                className={`z-[1] rounded-md transition-colors duration-300 ${REVIEW_MODE_ACTIVE_COLORS[reviewMode]}`}
+            />
+            {REVIEW_MODES.map((mode, i) => {
                 const labels: Record<ReviewMode, string> = {
                     unlearned: "未習得のみ",
                     all: "すべて",
                     writing: "Writing",
                     paraphrase: "Paraphrase",
                 };
-                const activeColors: Record<ReviewMode, string> = {
-                    unlearned: "bg-blue-600 shadow-sm",
-                    all: "bg-orange-500 shadow-sm",
-                    writing: "bg-pink-500 shadow-sm",
-                    paraphrase: "bg-violet-600 shadow-sm",
-                };
                 return (
-                    <div key={mode} className={`flex flex-1 items-center relative ${reviewMode === mode ? 'z-10' : 'z-0'}`}>
+                    <div key={mode} className="flex flex-1 items-center">
                         {i > 0 && (
                             <div className="border-l border-gray-200 dark:border-gray-700/50 h-5 relative z-0" />
                         )}
                         <button
+                            ref={(el) => { modeButtonRefs.current[i] = el; }}
                             onClick={() => handleModeChange(mode)}
                             className={`relative flex-1 rounded-md px-2 py-2 text-xs font-medium transition-colors outline-none ${reviewMode === mode ? "text-white" : "text-gray-600 hover:text-gray-800"}`}
                             style={{ WebkitTapHighlightColor: "transparent" }}
                         >
-                            {reviewMode === mode && (
-                                <motion.div
-                                    layoutId="reviewModeIndicator"
-                                    className={`absolute inset-0 rounded-md ${activeColors[mode]}`}
-                                    style={{ zIndex: 0 }}
-                                    transition={{ type: "spring", duration: 0.2, bounce: 0 }}
-                                />
-                            )}
                             <span className="relative z-10">{labels[mode]}</span>
                         </button>
                     </div>

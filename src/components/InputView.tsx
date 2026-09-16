@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { speak } from "@/lib/speech";
 import { Category, CATEGORIES } from "@/types/vocab";
 import { filterDuplicates } from "@/lib/vocab";
 import { Plus, Volume2, Upload, CheckCircle, AlertCircle, Info, Copy, Check, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import JellyTabIndicator from "./JellyTabIndicator";
 
 type InputMode = "single" | "bulk";
 type Delimiter = "tab" | "comma" | "semicolon";
@@ -43,6 +43,8 @@ interface InputViewProps {
 
 export default function InputView({ onAdded }: InputViewProps) {
     const [mode, setMode] = useState<InputMode>("single");
+    const modeToggleRef = useRef<HTMLDivElement>(null);
+    const modeButtonRefs = useRef<(HTMLElement | null)[]>([]);
     const [showAllPreview, setShowAllPreview] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -296,8 +298,16 @@ export default function InputView({ onAdded }: InputViewProps) {
     return (
         <div className={mode === "single" ? "space-y-4 md:space-y-3" : "space-y-4"}>
             {/* モード切替 */}
-            <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 relative z-20">
+            <div ref={modeToggleRef} className="flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 relative z-20">
+                <JellyTabIndicator
+                    id="inputMode"
+                    containerRef={modeToggleRef}
+                    itemRefs={modeButtonRefs}
+                    activeIndex={mode === "single" ? 0 : 1}
+                    className="z-0 rounded-md bg-white shadow-sm"
+                />
                 <button
+                    ref={(el) => { modeButtonRefs.current[0] = el; }}
                     type="button"
                     onClick={() => {
                         setMode("single");
@@ -309,17 +319,10 @@ export default function InputView({ onAdded }: InputViewProps) {
                         }`}
                     style={{ WebkitTapHighlightColor: "transparent" }}
                 >
-                    {mode === "single" && (
-                        <motion.div
-                            layoutId="inputModeIndicator"
-                            className="absolute inset-0 rounded-md bg-white shadow-sm"
-                            style={{ zIndex: 0 }}
-                            transition={{ type: "spring", duration: 0.2, bounce: 0 }}
-                        />
-                    )}
                     <span className="relative z-10 block" style={{ transform: "translateZ(0)" }}>1件ずつ</span>
                 </button>
                 <div
+                    ref={(el) => { modeButtonRefs.current[1] = el; }}
                     role="button"
                     tabIndex={0}
                     onClick={() => {
@@ -339,14 +342,6 @@ export default function InputView({ onAdded }: InputViewProps) {
                         }`}
                     style={{ WebkitTapHighlightColor: "transparent" }}
                 >
-                    {mode === "bulk" && (
-                        <motion.div
-                            layoutId="inputModeIndicator"
-                            className="absolute inset-0 rounded-md bg-white shadow-sm"
-                            style={{ zIndex: 0 }}
-                            transition={{ type: "spring", duration: 0.2, bounce: 0 }}
-                        />
-                    )}
                     <div className="relative z-10 flex h-full w-full items-center justify-center gap-1.5" style={{ transform: "translateZ(0)" }}>
                         <Upload size={14} />
                         <span>一括登録</span>
