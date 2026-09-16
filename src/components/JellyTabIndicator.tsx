@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, useEffect, useLayoutEffect, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 import {
     animate,
     AnimationPlaybackControls,
@@ -72,7 +72,10 @@ export default function JellyTabIndicator({ id, containerRef, itemRefs, activeIn
         initialized.current = true;
     };
 
-    useLayoutEffect(() => {
+    // レイアウトエフェクトではなく通常のエフェクトを使う。
+    // このインジケーターはコンテナの最初の子なので、レイアウトフェーズの時点では
+    // 後ろに並ぶタブボタンの ref がまだ付け直されておらず、計測できない。
+    useEffect(() => {
         activeIndexRef.current = activeIndex;
         const previous = lastPositions.get(id);
         if (reduceMotion || (!initialized.current && !previous)) {
@@ -80,7 +83,11 @@ export default function JellyTabIndicator({ id, containerRef, itemRefs, activeIn
             return;
         }
         const m = measure();
-        if (!m) return;
+        if (!m) {
+            // まだ計測できない（非表示など）場合は次のフレームで位置だけ合わせる
+            const raf = requestAnimationFrame(() => jump());
+            return () => cancelAnimationFrame(raf);
+        }
         stop();
         if (!initialized.current && previous) {
             left.set(previous.left);
