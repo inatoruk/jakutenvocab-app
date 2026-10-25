@@ -1,0 +1,22 @@
+# Supabase の無料プランは一定期間アクセスがないとプロジェクトが一時停止されるため、
+# 定期的に軽いクエリを投げてアクティブな状態を保つ。
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "0 0 */3 * *" # 3日おき 09:00 JST
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/rest/v1/vocab?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY"
