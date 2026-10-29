@@ -434,11 +434,13 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 onChange={(e) => setMeaning(e.target.value)}
                                 className="block w-full h-[50px] md:h-[42px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
-                            {isGeneratingMeaning && !meaning && (
-                                <div className="pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-full animate-shimmer-input">
-                                    <div className="h-3 w-[35%] skeleton-bar" />
-                                </div>
-                            )}
+                            <div
+                                className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-full animate-shimmer-input transition-opacity duration-150 ${
+                                    isGeneratingMeaning && !meaning ? "opacity-100" : "opacity-0"
+                                }`}
+                            >
+                                {isGeneratingMeaning && !meaning && <div className="h-3 w-[35%] skeleton-bar" />}
+                            </div>
                         </div>
                     </div>
 
@@ -528,16 +530,22 @@ export default function InputView({ onAdded }: InputViewProps) {
                                 suppressHydrationWarning
                                 className="block w-full h-[102px] md:h-[88px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                             />
-                            {isGeneratingExample && !context && (
-                                <div className="pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input">
-                                    <div className="h-6 md:h-5 flex items-center">
-                                        <div className="h-3 w-[85%] skeleton-bar" />
-                                    </div>
-                                    <div className="h-6 md:h-5 flex items-center">
-                                        <div className="h-3 w-[55%] skeleton-bar" />
-                                    </div>
-                                </div>
-                            )}
+                            <div
+                                className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input transition-opacity duration-150 ${
+                                    isGeneratingExample && !context ? "opacity-100" : "opacity-0"
+                                }`}
+                            >
+                                {isGeneratingExample && !context && (
+                                    <>
+                                        <div className="h-6 md:h-5 flex items-center">
+                                            <div className="h-3 w-[85%] skeleton-bar" />
+                                        </div>
+                                        <div className="h-6 md:h-5 flex items-center">
+                                            <div className="h-3 w-[55%] skeleton-bar" />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <button
                             type="button"
