@@ -1,0 +1,38 @@
+{
+  "recordedAt": "2026-10-29T09:01:24.332Z",
+  "model": "gemini-3.5-flash-lite",
+  "mode": "generate",
+  "apiVersion": "v1",
+  "metric": "request start to first non-whitespace model text (not rendered paint)",
+  "targetMs": 200,
+  "samplesRequested": 2,
+  "samplesCompleted": 2,
+  "minMs": 714.331,
+  "medianMs": 2444.3385,
+  "maxMs": 4174.346,
+  "targetMetInAllSamples": false,
+  "rows": [
+    {
+      "term": "authorize",
+      "complete": true,
+      "chars": 4,
+      "finishReason": "STOP",
+      "thoughtTokens": 0,
+      "firstTextMs": 4174.346,
+      "headersMs": 4174,
+      "totalMs": 4488,
+      "region": null
+    },
+    {
+      "term": "coordinate",
+      "complete": true,
+      "chars": 2,
+      "finishReason": "STOP",
+      "thoughtTokens": 0,
+      "firstTextMs": 714.331,
+      "headersMs": 714,
+      "totalMs": 768,
+      "region": null
+    }
+  ]
+}

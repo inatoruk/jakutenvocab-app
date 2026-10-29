@@ -53,12 +53,14 @@ async function readTextEvents(response, mode, onText) {
 async function main() {
     const { values } = parseArgs({ options: {
         mode: { type: 'string', default: 'production' },
+        'api-version': { type: 'string', default: 'v1beta' },
         samples: { type: 'string', default: '3' },
         url: { type: 'string', default: 'https://jakuten-vocab.vercel.app' },
         output: { type: 'string' },
         'target-ms': { type: 'string', default: '200' },
     } });
     const mode = values.mode, samples = Number(values.samples), targetMs = Number(values['target-ms']);
+    if (!['v1', 'v1beta'].includes(values['api-version'])) throw new Error('Invalid API version');
     if (!['production', 'generate', 'interactions'].includes(mode)) throw new Error('Invalid mode');
     if (!Number.isInteger(samples) || samples < 1 || samples > 10) throw new Error('samples must be 1–10');
     if (!Number.isFinite(targetMs) || targetMs <= 0) throw new Error('Invalid target');
@@ -74,7 +76,7 @@ async function main() {
         let firstTextMs;
         const production = mode === 'production', interactions = mode === 'interactions';
         const url = production ? new URL('/api/generate', values.url) :
-            'https://generativelanguage.googleapis.com/v1beta/' + (interactions ? 'interactions?alt=sse' :
+            'https://generativelanguage.googleapis.com/' + values['api-version'] + '/' + (interactions ? 'interactions?alt=sse' :
                 'models/gemini-3.5-flash-lite:streamGenerateContent?alt=sse');
         const body = production ? { term, type: 'meaning' } : interactions ? {
             model: 'gemini-3.5-flash-lite', input: prompt, store: false, stream: true,
@@ -102,6 +104,7 @@ async function main() {
     }
     const times = rows.filter(r => r.complete).map(r => r.firstTextMs).sort((a, b) => a - b);
     const report = { recordedAt: new Date().toISOString(), model: 'gemini-3.5-flash-lite', mode,
+        apiVersion: mode === 'production' ? undefined : values['api-version'],
         metric: 'request start to first non-whitespace model text (not rendered paint)', targetMs,
         samplesRequested: samples, samplesCompleted: times.length, minMs: times[0],
         medianMs: times.length ? (times[Math.floor((times.length - 1) / 2)] + times[Math.floor(times.length / 2)]) / 2 : undefined, maxMs: times.at(-1),

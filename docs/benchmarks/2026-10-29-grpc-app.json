@@ -1,0 +1,79 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "promptSource": "src/app/api/generate/route.ts",
+  "samePromptAndTemperaturePerPair": true,
+  "targetMs": 200,
+  "targetAchieved": false,
+  "rows": [
+    {
+      "term": "authorize",
+      "type": "meaning",
+      "transport": "grpc",
+      "status": 200,
+      "grpcStatus": "0",
+      "firstMs": 2534,
+      "totalMs": 2659,
+      "chars": 11,
+      "text": "権限を与える、認可する",
+      "finish": 1
+    },
+    {
+      "term": "authorize",
+      "type": "meaning",
+      "transport": "sdk",
+      "firstMs": 807,
+      "totalMs": 905,
+      "chars": 11,
+      "text": "認可する、権限を与える",
+      "finish": "STOP"
+    },
+    {
+      "term": "coordinate",
+      "type": "example",
+      "level": "intermediate",
+      "transport": "sdk",
+      "firstMs": 4741,
+      "totalMs": 4933,
+      "chars": 122,
+      "text": "Schools need to coordinate their curricula with local employers to ensure students are prepared for the modern job market.",
+      "finish": "STOP"
+    },
+    {
+      "term": "coordinate",
+      "type": "example",
+      "level": "intermediate",
+      "transport": "grpc",
+      "status": 200,
+      "grpcStatus": "0",
+      "firstMs": 679,
+      "totalMs": 791,
+      "chars": 125,
+      "text": "Online learning allows students to coordinate their study schedules with their part-time jobs and extracurricular activities.",
+      "finish": 1
+    },
+    {
+      "term": "anticipate",
+      "type": "example",
+      "level": "advanced",
+      "transport": "grpc",
+      "status": 200,
+      "grpcStatus": "0",
+      "firstMs": 638,
+      "totalMs": 876,
+      "chars": 201,
+      "text": "Anticipating a surge in local volunteer turnout following the recent mayoral endorsement, the neighborhood association has expedited the allocation of resources for Saturday's river cleanup initiative.",
+      "finish": 1
+    },
+    {
+      "term": "anticipate",
+      "type": "example",
+      "level": "advanced",
+      "transport": "sdk",
+      "firstMs": 2359,
+      "totalMs": 2533,
+      "chars": 149,
+      "text": "Anticipating a surge in community participation, the organizing committee has expanded the venue capacity to accommodate all enthusiastic volunteers.",
+      "finish": "STOP"
+    }
+  ]
+}
