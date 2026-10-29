@@ -1,9 +1,14 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
+import { warmAIConnection } from '@/lib/ai-connection';
 
 // Initialize the SDK. It automatically uses process.env.GEMINI_API_KEY if not provided,
 // but we explicitly pass it here for clarity.
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+export async function HEAD() {
+    return warmAIConnection();
+}
 
 export async function POST(request: Request) {
     const startedAt = performance.now();

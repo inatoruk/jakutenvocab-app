@@ -10,7 +10,7 @@ function load(file, overrides = {}) {
     }).outputText;
     const context = {
         exports: {}, Response, Request, ReadableStream, TextEncoder, TextDecoder,
-        AbortController, performance, console: { info() {} },
+        AbortController, AbortSignal, performance, console: { info() {} },
         process: { env: { GEMINI_API_KEY: 'test-only' } }, ...overrides,
     };
     vm.runInNewContext(code, context);
@@ -33,6 +33,7 @@ function request(stream = true) {
 function route(models) {
     return load('src/app/api/generate/route.ts', { require: name => {
         if (name === '@google/genai') return { GoogleGenAI: class { models = models; } };
+        if (name === '@/lib/ai-connection') return { warmAIConnection: async () => new Response(null, { status: 204 }) };
         if (name === 'next/server') return { NextResponse: Response };
         throw new Error(name);
     } });
@@ -142,4 +143,36 @@ test('route retains JSON compatibility and exposes elapsed timing', async () => 
     const res = await api.POST(request(false));
     assert.deepEqual(await res.json(), { result: '確認する' });
     assert.match(res.headers.get('Server-Timing'), /gemini;dur=/);
+});
+
+
+test('warmup never sends a prompt or API key, and tolerates network failure', async () => {
+    let calls = 0;
+    const connection = load('src/lib/ai-connection.ts', { fetch: async (url, options) => {
+        calls++;
+        assert.equal(url, 'https://generativelanguage.googleapis.com/');
+        assert.equal(options.method, 'HEAD');
+        assert.equal(options.headers, undefined);
+        assert.equal(options.body, undefined);
+        throw new Error('offline');
+    } });
+    assert.equal((await connection.warmAIConnection()).status, 204);
+    assert.equal(calls, 1);
+});
+
+test('interaction warmup is throttled and does not generate content', async () => {
+    let now = 0, calls = 0;
+    const client = load('src/lib/ai-client.ts', { Date: { now: () => now }, fetch: async (url, options) => {
+        calls++;
+        assert.equal(url, '/api/generate');
+        assert.equal(options.method, 'HEAD');
+        assert.equal(options.body, undefined);
+        return new Response(null, { status: 204 });
+    } });
+    client.warmGenerationConnection();
+    client.warmGenerationConnection();
+    assert.equal(calls, 1);
+    now = 10_000;
+    client.warmGenerationConnection();
+    assert.equal(calls, 2);
 });

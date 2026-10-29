@@ -1,3 +1,13 @@
+let lastWarmupAt = -Infinity;
+
+export function warmGenerationConnection(): void {
+    const now = Date.now();
+    if (now - lastWarmupAt < 10_000) return;
+    lastWarmupAt = now;
+    // User-triggered connection preparation only; no generation or polling.
+    void fetch('/api/generate', { method: 'HEAD', cache: 'no-store' }).catch(() => {});
+}
+
 // Per-tab caches: never persist vocabulary or hints to browser storage.
 const cache = new Map<string, { value: unknown; expiresAt: number }>();
 const MAX_ENTRIES = 200;
