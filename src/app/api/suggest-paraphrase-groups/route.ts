@@ -29,11 +29,14 @@ export async function POST(request: Request) {
         });
 
         // 1. カテゴリが「Paraphrase」の単語データのみを取得
-        const { data: vocabData, error: vocabError } = await supabase
-            .from('vocab')
-            .select('id, term, meaning, category')
-            .eq('category', 'Paraphrase')
-            .order('created_at', { ascending: true });
+        const startedAt = performance.now();
+        const [vocabResult, groupResult] = await Promise.all([
+            supabase.from('vocab').select('id, term, meaning, category')
+                .eq('category', 'Paraphrase').order('created_at', { ascending: true }),
+            supabase.from('paraphrase_groups').select('vocab_id, group_id'),
+        ]);
+        const dbMs = performance.now() - startedAt;
+        const { data: vocabData, error: vocabError } = vocabResult;
 
         if (vocabError) throw vocabError;
         const allVocab = vocabData || [];
@@ -43,9 +46,8 @@ export async function POST(request: Request) {
         }
 
         // 2. 既存のparaphrase_groupsデータを取得し、グループ済みのペアを把握
-        const { data: groupData } = await supabase
-            .from('paraphrase_groups')
-            .select('vocab_id, group_id');
+        if (groupResult.error) throw groupResult.error;
+        const groupData = groupResult.data;
 
         const existingGroupMap: Record<string, string> = {};
         const existingGroupMembers: Record<string, string[]> = {};
@@ -93,12 +95,15 @@ Output format (strict JSON array of suggestion objects):
 
 If no new paraphrase groups are found, return an empty array: []`;
 
+        const aiStartedAt = performance.now();
         const response = await ai.models.generateContent({
             model: 'gemini-3.5-flash-lite',
             contents: prompt,
             config: { temperature: 0.6 }
         });
 
+        console.info('ai-timing', { route: 'suggest-paraphrase-groups', dbMs: Math.round(dbMs),
+            aiMs: Math.round(performance.now() - aiStartedAt), vocabularyCount: allVocab.length });
         const raw = response.text?.trim() || '[]';
 
         // JSONのみを抽出（マークダウンコードブロック対策）

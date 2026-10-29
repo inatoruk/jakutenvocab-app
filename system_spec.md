@@ -35,6 +35,15 @@
 | **AI (LLM)** | Google GenAI SDK (`@google/genai`) | AIモデル `gemini-3.5-flash-lite` による生成・判定処理 |
 | **データベース / Auth** | Supabase (PostgreSQL / Supabase Auth) | 認証（Google OAuth）およびデータ永続化（Row Level Security対応） |
 
+### AI応答速度の最適化
+
+- Vercel Functionsは `vercel.json` で東京（`hnd1`）を指定。
+- 意味・例文はNDJSONストリームで生成途中から表示。従来のJSONリクエストにも対応。
+- 意味と文脈を含む言い換え判定は、タブ内メモリに30分・最大200件を保存。例文は毎回新規生成し、途中終了やエラーは保存しない。
+- グループ提案の単語・グループ取得は並列実行。
+- `ai-timing` ログで生成待ち・初回テキスト・DB待ちを記録（入力本文やAPIキーは記録しない）。JSON応答には `Server-Timing` も付与。
+- 検証: `node --test tests/ai-latency.test.cjs`。
+
 ### 2.2 システム全体構成図
 
 ```mermaid

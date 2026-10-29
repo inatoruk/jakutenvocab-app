@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkParaphrase } from "@/lib/ai-client";
 import { speak } from "@/lib/speech";
 import { Vocab, Category, Status } from "@/types/vocab";
 import { processDecay, calcReviewDueAt } from "@/lib/vocab";
@@ -331,17 +332,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setAiChecking(true);
         setAiHint(null);
         try {
-            const res = await fetch("/api/check-paraphrase", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    input,
-                    displayedTerm: card.term,
-                    meaning: card.meaning,
-                    context: card.context || "",
-                }),
+            const json = await checkParaphrase({
+                input,
+                displayedTerm: card.term,
+                meaning: card.meaning,
+                context: card.context || "",
             });
-            const json = await res.json();
             if (json.isValid) {
                 setParaphraseResult("synonym"); // Nice synonym
             }
@@ -358,17 +354,12 @@ export default function ReviewView({ active, settings, vocabVersion = 0 }: { act
         setAiChecking(true);
         setAiHint(null);
         try {
-            const res = await fetch("/api/check-paraphrase", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    input,
-                    displayedTerm: card.term,
-                    meaning: card.meaning,
-                    context: card.context || "",
-                }),
+            const json = await checkParaphrase({
+                input,
+                displayedTerm: card.term,
+                meaning: card.meaning,
+                context: card.context || "",
             });
-            const json = await res.json();
             if (json.hint) setAiHint(json.hint);
         } catch {
             // 無視

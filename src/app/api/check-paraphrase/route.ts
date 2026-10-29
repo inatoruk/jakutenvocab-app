@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(request: Request) {
+    const startedAt = performance.now();
     try {
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: 'APIキーが未設定です。' }, { status: 500 });
@@ -30,6 +31,7 @@ Output format (exactly 2 lines):
 YES
 <tip in Japanese>`;
 
+        const aiStartedAt = performance.now();
         const response = await ai.models.generateContent({
             model: 'gemini-3.5-flash-lite',
             contents: prompt,
@@ -46,7 +48,13 @@ YES
         // Preserve all lines after the first line as the hint
         const hint = lines.slice(1).join('\n');
 
-        return NextResponse.json({ isValid, hint });
+        const aiMs = performance.now() - aiStartedAt;
+        console.info('ai-timing', { route: 'check-paraphrase', aiMs: Math.round(aiMs),
+            totalMs: Math.round(performance.now() - startedAt) });
+        return NextResponse.json({ isValid, hint }, { headers: {
+            'Cache-Control': 'no-store',
+            'Server-Timing': `gemini;dur=${Math.round(aiMs)}, total;dur=${Math.round(performance.now() - startedAt)}`,
+        } });
     } catch (error: unknown) {
         console.error('check-paraphrase error:', error);
         return NextResponse.json({ error: 'AI判定中にエラーが発生しました。' }, { status: 500 });

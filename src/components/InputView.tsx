@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { generateContent } from "@/lib/ai-client";
 import { speak } from "@/lib/speech";
 import { Category, CATEGORIES } from "@/types/vocab";
 import { filterDuplicates } from "@/lib/vocab";
@@ -112,24 +113,14 @@ export default function InputView({ onAdded }: InputViewProps) {
         }
 
         try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ term: term.trim(), type, ...(type === 'example' ? { level: exampleLevel } : {}) }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || '生成に失敗しました');
-            }
-
-            if (type === 'meaning') {
-                setMeaning(data.result);
-            } else {
-                setContext(data.result);
-            }
+            await generateContent(
+                { term: term.trim(), type, ...(type === 'example' ? { level: exampleLevel } : {}) },
+                type === 'meaning' ? setMeaning : setContext,
+            );
         } catch (error: any) {
+            // Do not leave an incomplete streamed answer looking like a finished result.
+            if (type === 'meaning') setMeaning('');
+            else setContext('');
             let userMessage = error.message || 'エラーが発生しました。';
             if (userMessage.includes('Failed to fetch') || userMessage.includes('NetworkError') || userMessage.includes('fetch')) {
                 userMessage = 'サーバーとの通信に失敗しました。ネットワークの接続状況を確認してください。';
@@ -173,6 +164,7 @@ export default function InputView({ onAdded }: InputViewProps) {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        if (loading || isGeneratingMeaning || isGeneratingExample) return;
         const trimmedTerm = term.trim();
         const trimmedMeaning = meaning.trim();
         if (!trimmedTerm || !trimmedMeaning) return;
@@ -400,6 +392,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                         <input
                             type="text"
                             value={term}
+                            readOnly={isGeneratingMeaning || isGeneratingExample}
                             onChange={(e) => {
                                 const val = e.target.value;
                                 setTerm(val);
@@ -437,12 +430,13 @@ export default function InputView({ onAdded }: InputViewProps) {
                             <input
                                 type="text"
                                 value={meaning}
+                                readOnly={isGeneratingMeaning}
                                 onChange={(e) => setMeaning(e.target.value)}
                                 className="block w-full h-[50px] md:h-[42px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                             <div
-                                className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-full animate-shimmer-input transition-opacity duration-500 ${
-                                    isGeneratingMeaning ? "opacity-100" : "opacity-0"
+                                className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex items-center h-full animate-shimmer-input transition-opacity duration-150 ${
+                                    isGeneratingMeaning && !meaning ? "opacity-100" : "opacity-0"
                                 }`}
                             >
                                 {isGeneratingMeaning && <div className="h-3 w-[35%] skeleton-bar"></div>}
@@ -530,14 +524,15 @@ export default function InputView({ onAdded }: InputViewProps) {
                         <div className="relative w-full">
                             <textarea
                                 value={context}
+                                readOnly={isGeneratingExample}
                                 onChange={(e) => setContext(e.target.value)}
                                 rows={3}
                                 suppressHydrationWarning
                                 className="block w-full h-[102px] md:h-[88px] rounded-lg border border-gray-300 px-4 py-3 md:py-2.5 text-base md:text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                             />
                             <div
-                                className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input transition-opacity duration-500 ${
-                                    isGeneratingExample ? "opacity-100" : "opacity-0"
+                                className={`pointer-events-none absolute inset-0 w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 md:py-2.5 bg-white dark:bg-gray-800 flex flex-col h-full animate-shimmer-input transition-opacity duration-150 ${
+                                    isGeneratingExample && !context ? "opacity-100" : "opacity-0"
                                 }`}
                             >
                                 {isGeneratingExample && (
@@ -603,7 +598,7 @@ export default function InputView({ onAdded }: InputViewProps) {
                     {/* 登録ボタン */}
                     <button
                         type="submit"
-                        disabled={loading || !term.trim() || !meaning.trim()}
+                        disabled={loading || isGeneratingMeaning || isGeneratingExample || !term.trim() || !meaning.trim()}
                         className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base md:text-sm font-medium text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={18} />

@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(request: Request) {
+    const startedAt = performance.now();
     try {
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json(
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
             temperature = 0.7;
         } else if (type === 'example') {
             // ベースプロンプト（難易度への言及は削除。レベル別制約で制御する）
-            let baseInstruction = 'あなたは優秀な英語講師です。自然な英語の例文を作成してください。文脈が分かりやすく、実用的な文章にしてください。対象の単語・熟語の形（時制、単複、品詞など）は、最も一般的で自然な使われ方に適宜変形して使用して構いません。出力は英語の例文のみとし、挨拶、日本語訳、思考プロセス、前置きなどは一切含めないでください。毎回異なる視点や状況を想定し、バリエーション豊かな例文を出力してください。';
+            const baseInstruction = 'あなたは優秀な英語講師です。自然な英語の例文を作成してください。文脈が分かりやすく、実用的な文章にしてください。対象の単語・熟語の形（時制、単複、品詞など）は、最も一般的で自然な使われ方に適宜変形して使用して構いません。出力は英語の例文のみとし、挨拶、日本語訳、思考プロセス、前置きなどは一切含めないでください。毎回異なる視点や状況を想定し、バリエーション豊かな例文を出力してください。';
 
             // レベル別制約（ユーザーが選択したレベルに応じて動的に追加）
             let levelInstruction = '';
@@ -75,27 +76,88 @@ export async function POST(request: Request) {
             temperature = 0.9; // 高めの温度とシチュエーション指定で多様性を出す
         }
 
-        const response = await ai.models.generateContent({
+        const params = {
             model: 'gemini-3.5-flash-lite',
-            contents: contents,
-            config: {
-                systemInstruction: systemInstruction,
-                temperature: temperature,
-            }
-        });
+            contents,
+            config: { systemInstruction, temperature },
+        };
 
-        const text = response.text?.trim() || '';
-
-        return NextResponse.json({ result: text });
-    } catch (error: any) {
-        console.error('Gemini API Error:', error);
-        let errorMsg = 'AI生成中にエラーが発生しました。';
-        const errorStr = String(error.message || error);
-        if (errorStr.includes('429') || errorStr.includes('quota') || errorStr.includes('Quota')) {
-            errorMsg = 'APIの利用制限（1分間15回まで）を超えました。1分ほど待ってから再度お試しください。';
-        } else if (errorStr.includes('API_KEY_INVALID') || errorStr.includes('API key') || errorStr.includes('key is invalid')) {
-            errorMsg = 'APIキーが無効です。正しいキーを設定してください。';
+        if (request.headers.get('Accept')?.includes('application/x-ndjson')) {
+            const encoder = new TextEncoder();
+            const abort = new AbortController();
+            let cancelled = false;
+            const stream = new ReadableStream<Uint8Array>({
+                async start(controller) {
+                    const aiStartedAt = performance.now();
+                    let firstTextMs: number | undefined;
+                    let text = '';
+                    const send = (event: object) => {
+                        if (!cancelled) controller.enqueue(encoder.encode(JSON.stringify(event) + '\n'));
+                    };
+                    try {
+                        const chunks = await ai.models.generateContentStream({
+                            ...params,
+                            config: { ...params.config, abortSignal: abort.signal },
+                        });
+                        for await (const chunk of chunks) {
+                            if (cancelled) break;
+                            const delta = chunk.text;
+                            if (delta) {
+                                firstTextMs ??= performance.now() - aiStartedAt;
+                                text += delta;
+                                send({ delta });
+                            }
+                        }
+                        if (!cancelled) {
+                            if (!text.trim()) throw new Error('Empty generation');
+                            send({ done: true });
+                        }
+                    } catch (error: unknown) {
+                        if (!cancelled) send({ error: generationErrorMessage(error) });
+                    } finally {
+                        console.info('ai-timing', { route: 'generate', type, streamed: true,
+                            setupMs: Math.round(aiStartedAt - startedAt),
+                            firstTextMs: firstTextMs === undefined ? null : Math.round(firstTextMs),
+                            totalMs: Math.round(performance.now() - startedAt), cancelled });
+                        if (!cancelled) controller.close();
+                    }
+                },
+                cancel() {
+                    cancelled = true;
+                    abort.abort();
+                },
+            });
+            return new Response(stream, { headers: {
+                'Content-Type': 'application/x-ndjson; charset=utf-8',
+                'Cache-Control': 'no-store',
+                'X-Accel-Buffering': 'no',
+            } });
         }
-        return NextResponse.json({ error: errorMsg }, { status: 500 });
+
+        // Keep the JSON contract for callers using the previous app version.
+        const aiStartedAt = performance.now();
+        const response = await ai.models.generateContent(params);
+        const text = response.text?.trim() || '';
+        if (!text) throw new Error('Empty generation');
+        const aiMs = performance.now() - aiStartedAt;
+        console.info('ai-timing', { route: 'generate', type, streamed: false,
+            aiMs: Math.round(aiMs), totalMs: Math.round(performance.now() - startedAt) });
+        return NextResponse.json({ result: text }, { headers: {
+            'Cache-Control': 'no-store',
+            'Server-Timing': `gemini;dur=${Math.round(aiMs)}, total;dur=${Math.round(performance.now() - startedAt)}`,
+        } });
+    } catch (error: unknown) {
+        return NextResponse.json({ error: generationErrorMessage(error) }, { status: 500 });
     }
+}
+
+function generationErrorMessage(error: unknown): string {
+    const errorStr = error instanceof Error ? error.message : String(error);
+    if (/429|quota/i.test(errorStr)) {
+        return 'APIの利用制限に達しました。しばらく待ってから再度お試しください。';
+    }
+    if (/API_KEY_INVALID|API key|key is invalid/i.test(errorStr)) {
+        return 'APIキーが無効です。正しいキーを設定してください。';
+    }
+    return 'AI生成中にエラーが発生しました。もう一度お試しください。';
 }
