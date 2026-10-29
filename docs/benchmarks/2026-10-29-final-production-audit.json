@@ -1,0 +1,24 @@
+{
+  "recordedAt": "2026-10-29T09:05:38.166Z",
+  "model": "gemini-3.5-flash-lite",
+  "mode": "production",
+  "metric": "request start to first non-whitespace model text (not rendered paint)",
+  "targetMs": 200,
+  "samplesRequested": 1,
+  "samplesCompleted": 1,
+  "minMs": 3776.802,
+  "medianMs": 3776.802,
+  "maxMs": 3776.802,
+  "targetMetInAllSamples": false,
+  "rows": [
+    {
+      "term": "authorize",
+      "complete": true,
+      "chars": 11,
+      "firstTextMs": 3776.802,
+      "headersMs": 3775,
+      "totalMs": 3868,
+      "region": "kix1::hnd1::562jf-1793264734359-17a08ad0f32a"
+    }
+  ]
+}
