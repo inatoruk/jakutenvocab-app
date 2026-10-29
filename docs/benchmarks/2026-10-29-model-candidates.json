@@ -1,0 +1,124 @@
+{
+  "modelInProductionUnchanged": true,
+  "promptSource": "src/app/api/generate/route.ts",
+  "metric": "first actual text, no cache",
+  "rows": [
+    {
+      "model": "gemini-3.5-flash-lite",
+      "term": "authorize",
+      "round": 1,
+      "status": 200,
+      "firstTextMs": 1616,
+      "headersMs": 1614,
+      "totalMs": 1712,
+      "finish": "STOP",
+      "thoughtTokens": 0,
+      "cachedTokens": 0,
+      "text": "認可する、権限を与える"
+    },
+    {
+      "model": "gemini-3.1-flash-lite",
+      "term": "authorize",
+      "round": 1,
+      "status": 200,
+      "firstTextMs": 5341,
+      "headersMs": 5341,
+      "totalMs": 5446,
+      "finish": "STOP",
+      "thoughtTokens": 0,
+      "cachedTokens": 0,
+      "text": "権限を与える、認可する"
+    },
+    {
+      "model": "gemini-2.5-flash-lite",
+      "term": "authorize",
+      "round": 1,
+      "status": 404,
+      "error": "This model models/gemini-2.5-flash-lite is no longer available to new users. Please update your code to use models/gemini-3.5-flash-lite for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs/get-started)."
+    },
+    {
+      "model": "gemma-4-26b-a4b-it",
+      "term": "authorize",
+      "round": 1,
+      "status": 500,
+      "error": "Internal error encountered."
+    },
+    {
+      "model": "gemma-4-31b-it",
+      "term": "authorize",
+      "round": 1,
+      "status": 500,
+      "error": "Internal error encountered."
+    },
+    {
+      "model": "gemini-3.1-flash-lite",
+      "term": "coordinate",
+      "round": 2,
+      "status": 200,
+      "firstTextMs": 3947,
+      "headersMs": 3947,
+      "totalMs": 4074,
+      "finish": "STOP",
+      "thoughtTokens": 0,
+      "cachedTokens": 0,
+      "text": "調整する、組織する"
+    },
+    {
+      "model": "gemini-3.5-flash-lite",
+      "term": "coordinate",
+      "round": 2,
+      "status": 200,
+      "firstTextMs": 1068,
+      "headersMs": 1067,
+      "totalMs": 1122,
+      "finish": "STOP",
+      "thoughtTokens": 0,
+      "cachedTokens": 0,
+      "text": "調整する、まとめる"
+    }
+  ],
+  "additionalCandidates": [
+    {
+      "model": "gemma-4-26b-a4b-it",
+      "status": 200,
+      "firstMs": 7071,
+      "totalMs": 7179,
+      "text": "交渉する、通り抜ける",
+      "finish": "STOP",
+      "thoughtTokens": 296
+    },
+    {
+      "model": "gemini-3.6-flash",
+      "status": 200,
+      "firstMs": 1668,
+      "totalMs": 1802,
+      "text": "交渉する、折り合いをつける",
+      "finish": "STOP",
+      "thoughtTokens": 0
+    },
+    {
+      "model": "gemma-4-31b-it",
+      "error": "TimeoutError"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "error": "TimeoutError",
+      "timeoutMs": 30000,
+      "samples": 1
+    }
+  ],
+  "gemmaBudgetZero": [
+    {
+      "model": "gemma-4-26b-a4b-it",
+      "status": 400,
+      "error": "Thinking budget is not supported for this model."
+    }
+  ],
+  "notes": [
+    "Production model and environment variables were not changed.",
+    "First comparison uses actual production meaning prompts, 2 rounds per successful model.",
+    "Additional candidates use a shorter inlined instruction, so times are not strict pairwise comparisons.",
+    "Free-tier availability was checked against Google pricing; actual account access may differ.",
+    "No Groq key is configured, so Groq latency and Japanese quality have not been measured."
+  ]
+}
