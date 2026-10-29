@@ -1,0 +1,33 @@
+{
+  "recordedAt": "2026-10-29T08:57:27.157Z",
+  "model": "gemini-3.5-flash-lite",
+  "mode": "production",
+  "metric": "request start to first non-whitespace model text (not rendered paint)",
+  "targetMs": 200,
+  "samplesRequested": 2,
+  "samplesCompleted": 2,
+  "minMs": 1541,
+  "medianMs": 2095.0,
+  "maxMs": 2649,
+  "targetMetInAllSamples": false,
+  "rows": [
+    {
+      "term": "authorize",
+      "complete": true,
+      "chars": 11,
+      "firstTextMs": 2649,
+      "headersMs": 2647,
+      "totalMs": 2741,
+      "region": "kix1::hnd1::lwc45-1793264242839-f8bdfd5036f0"
+    },
+    {
+      "term": "coordinate",
+      "complete": true,
+      "chars": 14,
+      "firstTextMs": 1541,
+      "headersMs": 1532,
+      "totalMs": 1637,
+      "region": "kix1::hnd1::lwc45-1793264245522-61b5ae08ff10"
+    }
+  ]
+}

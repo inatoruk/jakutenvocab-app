@@ -1,0 +1,291 @@
+{
+  "date": "2026-10-29",
+  "model": "gemini-3.5-flash-lite",
+  "targetMs": 200,
+  "targetAchieved": false,
+  "notes": [
+    "Fixed one-token prompts diagnose a lower bound; they do not satisfy vocabulary generation.",
+    "These are small sequential samples, not controlled latency guarantees.",
+    "No model or production transport changed."
+  ],
+  "http2": [
+    {
+      "transport": "http2",
+      "status": 200,
+      "responseMs": 2812,
+      "firstDataMs": 2812,
+      "firstMs": 2812,
+      "totalMs": 2975,
+      "chars": 15,
+      "connectedMs": 51
+    },
+    {
+      "transport": "sdk-fetch",
+      "firstMs": 2695,
+      "totalMs": 2744,
+      "chars": 9
+    },
+    {
+      "transport": "sdk-fetch",
+      "firstMs": 868,
+      "totalMs": 919,
+      "chars": 9
+    },
+    {
+      "transport": "http2",
+      "status": 200,
+      "responseMs": 684,
+      "firstDataMs": 684,
+      "firstMs": 684,
+      "totalMs": 750,
+      "chars": 9,
+      "connectedMs": 51
+    },
+    {
+      "transport": "http2",
+      "status": 200,
+      "responseMs": 2695,
+      "firstDataMs": 2695,
+      "firstMs": 2695,
+      "totalMs": 2749,
+      "chars": 13,
+      "connectedMs": 51
+    },
+    {
+      "transport": "sdk-fetch",
+      "firstMs": 983,
+      "totalMs": 1033,
+      "chars": 7
+    },
+    {
+      "transport": "sdk-fetch",
+      "firstMs": 770,
+      "totalMs": 909,
+      "chars": 15
+    },
+    {
+      "transport": "http2",
+      "status": 200,
+      "responseMs": 1723,
+      "firstDataMs": 1723,
+      "firstMs": 1723,
+      "totalMs": 1886,
+      "chars": 9,
+      "connectedMs": 51
+    }
+  ],
+  "interactions": [
+    {
+      "mode": "interactions",
+      "status": 200,
+      "headersMs": 791,
+      "firstEventMs": 791,
+      "firstMs": 792,
+      "totalMs": 843,
+      "chars": 9,
+      "complete": true,
+      "eventTypes": [
+        "interaction.created",
+        "interaction.status_update",
+        "step.start",
+        "step.delta",
+        "step.stop",
+        "interaction.completed"
+      ],
+      "usage": {
+        "total_tokens": 27,
+        "total_input_tokens": 22,
+        "input_tokens_by_modality": [
+          {
+            "modality": "text",
+            "tokens": 22
+          }
+        ],
+        "total_cached_tokens": 0,
+        "total_output_tokens": 5,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 0,
+        "initial_input_tokens": 21
+      }
+    },
+    {
+      "mode": "generate",
+      "status": 200,
+      "headersMs": 513,
+      "firstEventMs": 513,
+      "firstMs": 513,
+      "totalMs": 567,
+      "chars": 9,
+      "complete": true,
+      "eventTypes": [
+        "generate-content"
+      ],
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 5,
+        "totalTokenCount": 26,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      }
+    },
+    {
+      "mode": "generate",
+      "status": 200,
+      "headersMs": 1324,
+      "firstEventMs": 1324,
+      "firstMs": 1324,
+      "totalMs": 1378,
+      "chars": 10,
+      "complete": true,
+      "eventTypes": [
+        "generate-content"
+      ],
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      }
+    },
+    {
+      "mode": "interactions",
+      "status": 200,
+      "headersMs": 618,
+      "firstEventMs": 618,
+      "firstMs": 619,
+      "totalMs": 677,
+      "chars": 10,
+      "complete": true,
+      "eventTypes": [
+        "interaction.created",
+        "interaction.status_update",
+        "step.start",
+        "step.delta",
+        "step.stop",
+        "interaction.completed"
+      ],
+      "usage": {
+        "total_tokens": 29,
+        "total_input_tokens": 22,
+        "input_tokens_by_modality": [
+          {
+            "modality": "text",
+            "tokens": 22
+          }
+        ],
+        "total_cached_tokens": 0,
+        "total_output_tokens": 7,
+        "total_tool_use_tokens": 0,
+        "total_thought_tokens": 0,
+        "initial_input_tokens": 21
+      }
+    }
+  ],
+  "floor": [
+    {
+      "label": "fixed-one-token",
+      "status": 200,
+      "firstMs": 842,
+      "totalMs": 899,
+      "chars": 3,
+      "thoughts": 0,
+      "promptTokens": 4,
+      "finish": "STOP"
+    },
+    {
+      "label": "english-meaning",
+      "status": 200,
+      "firstMs": 628,
+      "totalMs": 749,
+      "chars": 4,
+      "thoughts": 0,
+      "promptTokens": 14,
+      "finish": "STOP"
+    },
+    {
+      "label": "fixed-one-token",
+      "status": 200,
+      "firstMs": 635,
+      "totalMs": 688,
+      "chars": 2,
+      "thoughts": 0,
+      "promptTokens": 4,
+      "finish": "STOP"
+    },
+    {
+      "label": "japanese-meaning",
+      "status": 200,
+      "firstMs": 1008,
+      "totalMs": 1070,
+      "chars": 8,
+      "thoughts": 0,
+      "promptTokens": 9,
+      "finish": "STOP"
+    },
+    {
+      "label": "fixed-one-token",
+      "status": 200,
+      "firstMs": 1637,
+      "totalMs": 1691,
+      "chars": 2,
+      "thoughts": 0,
+      "promptTokens": 4,
+      "finish": "STOP"
+    },
+    {
+      "label": "english-meaning",
+      "status": 200,
+      "firstMs": 814,
+      "totalMs": 924,
+      "chars": 4,
+      "thoughts": 0,
+      "promptTokens": 14,
+      "finish": "STOP"
+    }
+  ],
+  "grpc": [
+    {
+      "transport": "grpc",
+      "status": 200,
+      "grpcStatus": "0",
+      "firstMs": 610,
+      "totalMs": 708,
+      "chars": 4,
+      "finish": 1
+    },
+    {
+      "transport": "rest",
+      "status": 200,
+      "firstMs": 707,
+      "totalMs": 807,
+      "chars": 4
+    },
+    {
+      "transport": "rest",
+      "status": 200,
+      "firstMs": 704,
+      "totalMs": 811,
+      "chars": 3
+    },
+    {
+      "transport": "grpc",
+      "status": 200,
+      "grpcStatus": "0",
+      "firstMs": 604,
+      "totalMs": 659,
+      "chars": 3,
+      "finish": 1
+    }
+  ]
+}
